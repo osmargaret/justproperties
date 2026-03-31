@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service - JustProperties | User Agreement</title>
+  <meta name="description" content="Read the Terms of Service for JustProperties. Understand the rules and guidelines for using our property marketplace platform in Nigeria." />
+  <meta name="keywords" content="JustProperties terms of service, user agreement Nigeria, real estate terms, property marketplace rules" />
+  <link rel="canonical" href="https://justproperties.com/terms-of-service" />
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #ffffff;
+      color: #111827;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* Navigation */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      background-color: #ffffff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .navbar.scrolled .nav-link,
+    .navbar.scrolled .nav-brand h1 {
+      color: #111827;
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-brand img {
+      height: 48px;
+      width: auto;
+    }
+
+    .nav-brand h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #10b981;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      background-color: #10b981;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #059669;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+      padding: 8rem 1rem 4rem;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 800px;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      opacity: 0.95;
+      line-height: 1.8;
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 1rem;
+    }
+
+    .terms-section {
+      margin-bottom: 3rem;
+    }
+
+    .terms-section h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #10b981;
+    }
+
+    .terms-section h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #374151;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .terms-section p {
+      color: #4b5563;
+      margin-bottom: 1rem;
+      line-height: 1.8;
+    }
+
+    .terms-section ul {
+      color: #4b5563;
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    .terms-section ul li {
+      margin-bottom: 0.5rem;
+      line-height: 1.7;
+    }
+
+    .last-updated {
+      background-color: #f3f4f6;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .last-updated strong {
+      color: #111827;
+    }
+
+    .highlight-box {
+      background-color: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 1rem 1.5rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 1.5rem 0;
+    }
+
+    .highlight-box p {
+      color: #92400e;
+      margin-bottom: 0;
+    }
+
+    .important-notice {
+      background-color: #fee2e2;
+      border-left: 4px solid #ef4444;
+      padding: 1rem 1.5rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 1.5rem 0;
+    }
+
+    .important-notice p {
+      color: #991b1b;
+      margin-bottom: 0;
+    }
+
+    /* Footer */
+    .footer {
+      background: linear-gradient(to bottom, #064e3b, #065f46);
+      color: white;
+      padding: 4rem 1rem 2rem;
+      margin-top: 4rem;
+    }
+
+    .footer-container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand img {
+      height: 40px;
+      width: auto;
+    }
+
+    .footer-brand span {
+      font-size: 1.25rem;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .footer-description {
+      color: #a7f3d0;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      background-color: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+
+    .footer-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6ee7b7;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-links a {
+      color: #a7f3d0;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-contact {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #a7f3d0;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-contact i {
+      font-size: 1rem;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-bottom p {
+      color: #a7f3d0;
+      font-size: 0.875rem;
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-bottom-links a {
+      color: #a7f3d0;
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer-bottom-links a:hover {
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .terms-section h2 {
+        font-size: 1.5rem;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a class="nav-brand" href="index.html">
+        <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="JustProperties Logo" />
+        <h1>JustProperties</h1>
+      </a>
+      <div class="nav-links">
+        <a href="landedproperty.html" class="nav-link">Landed Properties</a>
+        <a href="uncompleted_property.html" class="nav-link">Uncompleted</a>
+        <a href="completedproperty.html" class="nav-link">Completed</a>
+        <a href="rent_lease.html" class="nav-link">Rent/Lease</a>
+        <a href="short_let.html" class="nav-link">Short-Let</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+      </div>
+      <div class="nav-actions">
+        <a href="list_property.html" class="btn-primary">
+          <i class="ri-add-circle-line"></i>
+          List Property
+        </a>
+        <a href="signin.html" class="btn-secondary">
+          <i class="ri-user-line"></i>
+          Sign In
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Terms of Service</h1>
+      <p>Please read these terms carefully before using JustProperties. By accessing our platform, you agree to be bound by these terms.</p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="last-updated">
+      <strong>Last Updated:</strong> January 1, 2025
+    </div>
+
+    <section class="terms-section">
+      <h2>1. Acceptance of Terms</h2>
+      <p>Welcome to JustProperties ("we," "our," or "us"). These Terms of Service ("Terms") govern your access to and use of our website, mobile applications, and services (collectively, the "Services").</p>
+      <p>By accessing or using our Services, you agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, you may not access or use our Services.</p>
+      <div class="important-notice">
+        <p><strong>Important:</strong> These Terms constitute a legally binding agreement between you and JustProperties. Please read them carefully.</p>
+      </div>
+    </section>
+
+    <section class="terms-section">
+      <h2>2. Description of Services</h2>
+      <p>JustProperties is an online marketplace that connects property owners with potential buyers and renters in Nigeria. Our Services include:</p>
+      <ul>
+        <li>Property listing platform for owners to advertise their properties</li>
+        <li>Property search and browsing for buyers and renters</li>
+        <li>Direct communication tools between property owners and seekers</li>
+        <li>Property listing management tools</li>
+        <li>Customer support services</li>
+      </ul>
+      <p>We act solely as a platform provider and are not a party to any transaction between property owners and seekers. We do not own, sell, rent, or manage any properties listed on our platform.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>3. User Accounts</h2>
+      
+      <h3>3.1 Account Registration</h3>
+      <p>To access certain features of our Services, you may need to create an account. When registering, you agree to:</p>
+      <ul>
+        <li>Provide accurate, current, and complete information</li>
+        <li>Maintain and update your information as needed</li>
+        <li>Keep your account credentials secure</li>
+        <li>Accept responsibility for all activities under your account</li>
+        <li>Notify us immediately of any unauthorized use of your account</li>
+      </ul>
+      
+      <h3>3.2 Account Eligibility</h3>
+      <p>You must be at least 18 years old to create an account and use our Services. By creating an account, you represent and warrant that you meet this age requirement.</p>
+      
+      <h3>3.3 Account Termination</h3>
+      <p>We reserve the right to suspend or terminate your account at our discretion, including for violations of these Terms, fraudulent activity, or any other reason we deem necessary.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>4. Property Listings</h2>
+      
+      <h3>4.1 Listing Requirements</h3>
+      <p>When listing a property on JustProperties, you agree to:</p>
+      <ul>
+        <li>Provide accurate and truthful information about the property</li>
+        <li>Upload genuine photographs of the property</li>
+        <li>Disclose all relevant property details, including any defects or issues</li>
+        <li>Set fair and reasonable prices</li>
+        <li>Respond promptly to inquiries from potential buyers or renters</li>
+        <li>Maintain the listing's accuracy and update it as needed</li>
+      </ul>
+      
+      <h3>4.2 Prohibited Listings</h3>
+      <p>You may not list properties that:</p>
+      <ul>
+        <li>You do not own or have authority to sell/rent</li>
+        <li>Are fraudulent, misleading, or deceptive</li>
+        <li>Violate any laws or regulations</li>
+        <li>Infringe on third-party rights</li>
+        <li>Are already sold or rented</li>
+        <li>Contain inappropriate or offensive content</li>
+      </ul>
+      
+      <h3>4.3 Listing Fees</h3>
+      <p>Property owners are required to pay a one-time listing fee of ₦5,000 for each property listing. This fee is non-refundable once the listing is approved and published. We reserve the right to modify our fee structure at any time.</p>
+      
+      <h3>4.4 Listing Approval</h3>
+      <p>All listings are subject to review and approval by our team. We reserve the right to reject or remove any listing that violates these Terms or our policies.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>5. User Conduct</h2>
+      <p>When using our Services, you agree not to:</p>
+      <ul>
+        <li>Use the Services for any illegal or unauthorized purpose</li>
+        <li>Violate any applicable laws or regulations</li>
+        <li>Infringe on the rights of others</li>
+        <li>Post false, misleading, or deceptive content</li>
+        <li>Harass, abuse, or harm other users</li>
+        <li>Attempt to gain unauthorized access to our systems</li>
+        <li>Interfere with the proper functioning of the Services</li>
+        <li>Use automated tools to scrape or collect data from our platform</li>
+        <li>Impersonate any person or entity</li>
+        <li>Engage in any form of fraud or scam</li>
+      </ul>
+    </section>
+
+    <section class="terms-section">
+      <h2>6. Payments and Fees</h2>
+      
+      <h3>6.1 Payment Processing</h3>
+      <p>All payments are processed securely through Paystack, a third-party payment processor. By making a payment, you agree to Paystack's terms and conditions.</p>
+      
+      <h3>6.2 Listing Fees</h3>
+      <p>The listing fee of ₦5,000 is due at the time of listing submission. Your listing will not be published until payment is received and confirmed.</p>
+      
+      <h3>6.3 No Commission</h3>
+      <p>JustProperties does not charge any commission on property sales or rentals. The listing fee is the only charge you will incur for using our platform.</p>
+      
+      <h3>6.4 Refunds</h3>
+      <p>Listing fees are non-refundable once a listing is approved and published. If your listing is rejected, you may be eligible for a refund at our discretion.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>7. Intellectual Property</h2>
+      <p>The JustProperties name, logo, and all related content, features, and functionality are owned by JustProperties and are protected by copyright, trademark, and other intellectual property laws.</p>
+      <p>You may not use our intellectual property without our prior written consent. Any unauthorized use may result in legal action.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>8. Disclaimers and Limitation of Liability</h2>
+      
+      <h3>8.1 Service Disclaimer</h3>
+      <p>Our Services are provided "as is" and "as available" without any warranties of any kind, either express or implied. We do not guarantee that:</p>
+      <ul>
+        <li>The Services will be uninterrupted or error-free</li>
+        <li>The information on our platform is accurate or complete</li>
+        <li>Properties listed on our platform meet your requirements</li>
+        <li>Transactions between users will be successful</li>
+      </ul>
+      
+      <h3>8.2 Property Disclaimer</h3>
+      <p>We are not responsible for the accuracy of property listings or the condition of properties. We do not verify property ownership, legal status, or physical condition. Buyers and renters are responsible for conducting their own due diligence.</p>
+      
+      <h3>8.3 Limitation of Liability</h3>
+      <div class="highlight-box">
+        <p><strong>To the maximum extent permitted by law, JustProperties shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or business opportunities.</strong></p>
+      </div>
+    </section>
+
+    <section class="terms-section">
+      <h2>9. Indemnification</h2>
+      <p>You agree to indemnify, defend, and hold harmless JustProperties and its officers, directors, employees, agents, and affiliates from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from:</p>
+      <ul>
+        <li>Your use of the Services</li>
+        <li>Your violation of these Terms</li>
+        <li>Your violation of any third-party rights</li>
+        <li>Your property listings or transactions</li>
+        <li>Any disputes between you and other users</li>
+      </ul>
+    </section>
+
+    <section class="terms-section">
+      <h2>10. Dispute Resolution</h2>
+      
+      <h3>10.1 User Disputes</h3>
+      <p>We are not responsible for resolving disputes between property owners and seekers. However, we may, at our discretion, provide assistance in mediating disputes.</p>
+      
+      <h3>10.2 Governing Law</h3>
+      <p>These Terms shall be governed by and construed in accordance with the laws of the Federal Republic of Nigeria.</p>
+      
+      <h3>10.3 Jurisdiction</h3>
+      <p>Any disputes arising from these Terms or your use of our Services shall be subject to the exclusive jurisdiction of the courts of Lagos State, Nigeria.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>11. Changes to Terms</h2>
+      <p>We reserve the right to modify these Terms at any time. We will notify you of any changes by posting the new Terms on this page and updating the "Last Updated" date.</p>
+      <p>Your continued use of our Services after any changes constitutes your acceptance of the new Terms. If you do not agree to the modified Terms, you must stop using our Services.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>12. Severability</h2>
+      <p>If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary so that these Terms shall otherwise remain in full force and effect.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>13. Entire Agreement</h2>
+      <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and JustProperties regarding your use of our Services and supersede all prior agreements and understandings.</p>
+    </section>
+
+    <section class="terms-section">
+      <h2>14. Contact Us</h2>
+      <p>If you have any questions about these Terms of Service, please contact us:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:louis670421@gmail.com">louis670421@gmail.com</a></li>
+        <li><strong>Phone:</strong> <a href="tel:+2348067042140">08067042140</a></li>
+        <li><strong>Address:</strong> 94 Off Alashe Junction, Opposite Police Barracks, Igbogbo Road, Ikorodu, Lagos, Nigeria</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="JustProperties" />
+            <span>JustProperties</span>
+          </div>
+          <p class="footer-description">Nigeria's premier direct property marketplace connecting verified owners with serious buyers and renters.</p>
+          <div class="social-links">
+            <a href="https://instagram.com" target="_blank" rel="nofollow noopener noreferrer" class="social-link">
+              <i class="ri-instagram-line"></i>
+            </a>
+            <a href="https://facebook.com" target="_blank" rel="nofollow noopener noreferrer" class="social-link">
+              <i class="ri-facebook-fill"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="nofollow noopener noreferrer" class="social-link">
+              <i class="ri-twitter-x-line"></i>
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="nofollow noopener noreferrer" class="social-link">
+              <i class="ri-linkedin-fill"></i>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h3 class="footer-title">Explore</h3>
+          <ul class="footer-links">
+            <li><a href="browse_all.html">Browse Properties</a></li>
+            <li><a href="list_property.html">List Property</a></li>
+            <li><a href="plan.html">Pricing</a></li>
+            <li><a href="blog.html">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="footer-title">Property Types</h3>
+          <ul class="footer-links">
+            <li><a href="landedproperty.html">Landed Properties</a></li>
+            <li><a href="completedproperty.html">Completed</a></li>
+            <li><a href="uncompleted_property.html">Uncompleted</a></li>
+            <li><a href="rent_lease.html">Rent/Lease</a></li>
+            <li><a href="short_let.html">Short-Let</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="footer-title">Contact Us</h3>
+          <div class="footer-contact">
+            <i class="ri-phone-line"></i>
+            <span>08067042140</span>
+          </div>
+          <div class="footer-contact">
+            <i class="ri-mail-line"></i>
+            <span>louis670421@gmail.com</span>
+          </div>
+          <div class="footer-contact">
+            <i class="ri-whatsapp-line"></i>
+            <span>WhatsApp Support</span>
+          </div>
+          <div class="footer-contact">
+            <i class="ri-map-pin-line"></i>
+            <span>94 Off Alashe Junction, Igbogbo Road, Ikorodu</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 JustProperties. All rights reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="privacy-policy.html">Privacy Policy</a>
+          <a href="terms-of-service.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>
