@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landed Properties for Sale in Ikorodu, Lagos | JustProperties</title>
+  <meta name="description" content="Browse landed properties including duplexes, bungalows, and mansions for sale directly from verified owners in Ikorodu, Lagos, Nigeria." />
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../../../public/frontend/css/custom.css" />
+</head>
+<body class="font-sans antialiased">
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        <a class="flex items-center space-x-2" href="index.html">
+          <img alt="JustProperties Logo" class="h-9 sm:h-12 w-auto" src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" />
+          <h1 class="text-lg sm:text-2xl font-bold font-serif text-white">JustProperties</h1>
+        </a>
+        <div class="hidden lg:flex items-center space-x-8">
+          <a href="landedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-emerald-300">Landed Properties</a>
+          <a href="uncompleted_property.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Uncompleted</a>
+          <a href="completedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Completed</a>
+          <a href="rent_lease.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Rent/Lease</a>
+          <a href="short_let.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Short-Let</a>
+          <a href="blog.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Blog</a>
+        </div>
+        <div class="hidden lg:flex items-center space-x-4">
+          <a href="list_property.html" class="flex items-center gap-2 text-white px-5 py-2.5 rounded-lg font-medium transition whitespace-nowrap bg-emerald-600">
+            <i class="ri-add-circle-line text-lg"></i>List Property
+          </a>
+          <a href="signin.html" class="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap text-white hover:bg-white/10">
+            <i class="ri-user-line text-xl"></i><span class="text-sm">Sign In</span>
+          </a>
+        </div>
+        <div class="flex items-center space-x-3 lg:hidden">
+          <button class="p-2 rounded-lg cursor-pointer text-white"><i class="ri-menu-line text-2xl"></i></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="relative min-h-[40vh] flex items-center justify-center bg-gradient-to-br from-emerald-900 to-emerald-600 pt-20">
+    <div class="max-w-3xl mx-auto px-4 text-center py-16">
+      <h1 class="font-bold font-serif text-white mb-4 text-4xl leading-tight">Landed Properties</h1>
+      <p class="text-emerald-200 text-xl">Find your dream landed property from verified owners</p>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="bg-stone-50 border-b border-gray-200 sticky top-16 sm:top-20 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex flex-wrap gap-3 items-center">
+        <div class="flex-1 min-w-[180px]">
+          <select class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 cursor-pointer outline-none focus:border-emerald-500 text-sm">
+            <option>Location</option>
+            <option>Ikorodu</option>
+            <option>Lekki</option>
+            <option>Ajah</option>
+          </select>
+        </div>
+        <div class="flex-1 min-w-[180px]">
+          <select class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 cursor-pointer outline-none focus:border-emerald-500 text-sm">
+            <option>Property Type</option>
+            <option>Duplex</option>
+            <option>Bungalow</option>
+            <option>Mansion</option>
+          </select>
+        </div>
+        <div class="flex-1 min-w-[180px]">
+          <select class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 cursor-pointer outline-none focus:border-emerald-500 text-sm">
+            <option>Price Range</option>
+            <option>₦0 - ₦20M</option>
+            <option>₦20M - ₦50M</option>
+            <option>₦50M - ₦100M</option>
+            <option>₦100M+</option>
+          </select>
+        </div>
+        <div class="flex-1 min-w-[180px]">
+          <select class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 cursor-pointer outline-none focus:border-emerald-500 text-sm">
+            <option>Bedrooms</option>
+            <option>2 Beds</option>
+            <option>3 Beds</option>
+            <option>4 Beds</option>
+            <option>5+ Beds</option>
+          </select>
+        </div>
+        <button class="px-6 py-2.5 text-white font-medium rounded-lg transition hover:-translate-y-1 whitespace-nowrap bg-emerald-600 text-sm">
+          <i class="ri-search-line mr-2"></i>Search
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Properties Grid -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <p class="text-gray-500 text-base">Showing <span class="font-semibold text-gray-900">18</span> landed properties</p>
+      <select class="border-none bg-transparent text-gray-700 font-medium outline-none text-sm">
+        <option>Newest First</option>
+        <option>Price: Low to High</option>
+        <option>Price: High to Low</option>
+      </select>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Property 1 -->
+      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 border border-gray-100">
+        <div class="relative h-56 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Property" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">For Sale</span>
+          <button class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow"><i class="ri-heart-line text-gray-400"></i></button>
+        </div>
+        <div class="p-5">
+          <h3 class="font-bold text-gray-900 mb-2 text-lg">Luxury 5-Bedroom Duplex</h3>
+          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Ikorodu, Lagos</div>
+          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
+            <span><i class="ri-bed-line"></i> 5 Beds</span>
+            <span><i class="ri-briefcase-line"></i> 5 Baths</span>
+            <span><i class="ri-ruler-line"></i> 450sqft</span>
+          </div>
+          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+            <span class="font-bold text-emerald-600 text-xl">₦65,000,000</span>
+            <a href="#" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property 2 -->
+      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 border border-gray-100">
+        <div class="relative h-56 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Property" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">For Sale</span>
+        </div>
+        <div class="p-5">
+          <h3 class="font-bold text-gray-900 mb-2 text-lg">4-Bedroom Bungalow</h3>
+          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Gbaga, Ikorodu</div>
+          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
+            <span><i class="ri-bed-line"></i> 4 Beds</span>
+            <span><i class="ri-briefcase-line"></i> 3 Baths</span>
+            <span><i class="ri-ruler-line"></i> 300sqft</span>
+          </div>
+          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+            <span class="font-bold text-emerald-600 text-xl">₦35,000,000</span>
+            <a href="#" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property 3 -->
+      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 border border-gray-100">
+        <div class="relative h-56 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Property" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">For Sale</span>
+        </div>
+        <div class="p-5">
+          <h3 class="font-bold text-gray-900 mb-2 text-lg">6-Bedroom Mansion</h3>
+          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Agric, Ikorodu</div>
+          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
+            <span><i class="ri-bed-line"></i> 6 Beds</span>
+            <span><i class="ri-briefcase-line"></i> 7 Baths</span>
+            <span><i class="ri-ruler-line"></i> 700sqft</span>
+          </div>
+          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+            <span class="font-bold text-emerald-600 text-xl">₦120,000,000</span>
+            <a href="#" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center items-center gap-2 mt-12">
+      <button class="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg text-gray-400"><i class="ri-arrow-left-s-line"></i></button>
+      <button class="w-10 h-10 flex items-center justify-center rounded-lg text-white bg-emerald-600">1</button>
+      <button class="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50">2</button>
+      <button class="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500"><i class="ri-arrow-right-s-line"></i></button>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-white mt-12 bg-gradient-to-b from-emerald-900 to-emerald-800">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="JustProperties" class="h-10 w-auto" />
+            <span class="text-xl font-bold font-serif">JustProperties</span>
+          </div>
+          <p class="text-emerald-200 text-sm">Nigeria's premier direct property marketplace.</p>
+        </div>
+        <div><h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">Explore</h3><nav class="flex flex-col gap-3 text-sm text-emerald-200"><a href="#">Browse</a><a href="#">List Property</a></nav></div>
+        <div><h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">Types</h3><nav class="flex flex-col gap-3 text-sm text-emerald-200"><a href="#">Landed</a><a href="#">Completed</a></nav></div>
+        <div><h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">Contact</h3><p class="text-emerald-200 text-sm">08067042140</p></div>
+      </div>
+      <div class="border-t border-emerald-700/50 mt-8 pt-8 text-center">
+        <p class="text-emerald-200 text-sm">© 2026 JustProperties. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

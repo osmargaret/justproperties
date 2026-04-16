@@ -1,0 +1,166 @@
+listing{
+    category: {
+        Landed Properties:{
+            types: [
+                
+            ],
+            area: {
+                unit: {
+                    sqm: "sqm",
+                    sqft: "sqft",
+                    acres: "acres",
+                    hectares: "hectares"
+                },
+                value: "10"
+            }
+        },
+        Uncompleted: {
+            types: [
+                    Foundation Level,
+                    Walls Level,
+                    Roofing Level,
+                    Finishing Stage,
+                    Semi-Detached,
+                    Terrace,
+                    Bungalow
+                ],
+            
+        },
+        Completed: {
+            types: [
+                Detached Duplex,
+                Semi-Detached,
+                Terrace,
+                Bungalow,
+                Semi-Detached,
+                Terrace,
+                Bungalow,
+                Mansion
+            ],
+            bedrooms: {
+                
+            },
+            features: {
+                swimming pool,
+                gym,
+                parking_space,
+                furnished
+                24/7 security
+            }
+        },
+        Rent/Lease: {
+            types: [
+                
+            ]
+        },
+        Short-Let: {
+            types: [
+                
+            ]
+        }
+    },
+    bedrooms: {
+        
+    },
+    features: {
+
+    },
+    price-ranges:{
+
+    },
+    location{
+
+    },
+    images: [],
+    description:"",
+    contacts{
+
+    },
+    views:
+
+    
+}
+plans{
+    name, seats, duration,
+}
+promotions{
+    name, 
+    type: [
+        views, 
+        contact, 
+        blog posts (generation), 
+        social media posts (generation & publish), 
+        email marketing ,
+        sms marketing,
+        whatsapp marketing,  
+        events,
+        inquiries,
+        newsletters,
+        appointments,
+        featured listings   
+    ]   
+}
+subscription{
+    plan_id,
+    user_id,
+    start_at,
+    end_at,
+    renew_at,
+    status,
+    created_at,
+    updated_at
+}
+subscription_listings{
+    listing_id,
+    subscription_id,
+    status,
+    created_at,
+    updated_at
+}
+
+payments{
+
+}
+
+user{
+    
+}
+
+interests{
+    user_id,
+    listing_id,
+    interest_type: [inspection, inquiry, save],
+    created_at,
+    updated_at
+}
+saved{
+    user_id,
+    listing_id,
+    created_at,
+    updated_at
+}
+
+events 
+
+Logo | Browse | Blog | 
+
+Dashboard
+My Listings 
+Subscriptions:
+Promotions 
+Inquiries
+Appointments
+Saved Listings
+Settings
+Payment History
+Profile Edit
+
+
+Dashboard - {
+    recently viewed properties
+    recently viewed articles
+} 
+
+Saved Properties
+Saved Post
+Appointments

@@ -1,11 +1,38 @@
 <?php
 
+use App\Livewire\Auth\Login;
+use App\Livewire\Auth\Register;
+use App\Livewire\Blog\Article;
+use App\Livewire\Blog\BlogRoll;
+use App\Livewire\Guest\About;
+use App\Livewire\Guest\Contact;
+use App\Livewire\Guest\PrivacyPolicy;
+use App\Livewire\Guest\TermsOfService;
+use App\Livewire\Welcome;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', Welcome::class)->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+Route::middleware('guest')->group(function () {
+    Route::get('login', Login::class)->name('login');
+    Route::get('register', Register::class)->name('register');
+});
+
+/*Guest Routes*/
+Route::get('about',About::class)->name('about');
+Route::get('contact',Contact::class)->name('contact');
+Route::get('privacy-policy',PrivacyPolicy::class)->name('privacy-policy');
+Route::get('terms-of-service',TermsOfService::class)->name('terms-of-service');
+
+/*Blog Routes*/
+Route::get('blog',BlogRoll::class)->name('blog');
+Route::get('blog/post',Article::class)->name('article');
+
+
+Route::middleware(['web'])->group(function () {
+    Route::view('dashboard', 'dashboard.dashboard')->name('dashboard');
+    Route::view('profile', 'dashboard.profile')->name('profile');
+    Route::view('plan', 'dashboard.plan')->name('plan');
 });
 
 require __DIR__.'/settings.php';
