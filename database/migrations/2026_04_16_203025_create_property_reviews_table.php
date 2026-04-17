@@ -17,10 +17,14 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('property_id')->references('id')->on('properties');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->integer('rating');
+            $table->unsignedTinyInteger('rating'); // expected range 1-5
             $table->text('comment');
             $table->softDeletes();
             $table->timestamps();
+            $table->unique(['property_id', 'user_id']);
+            $table->index('property_id');
+            $table->index('user_id');
+            $table->index('rating');
         });
     }
 

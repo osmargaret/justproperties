@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('property_id')->constrained('properties');
             $table->foreignId('subscription_id')->constrained('subscriptions');
             $table->timestamps();
+            $table->unique(['property_id', 'subscription_id']);
         });
     }
 

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('category_id')->constrained('categories');
-            $table->unsignedBigInteger('post_id')->nullable();
-            $table->unsignedBigInteger('property_id')->nullable();
+            $table->foreignId('post_id')->nullable()->constrained('posts');
+            $table->foreignId('property_id')->nullable()->constrained('properties');
             $table->boolean('get_new_posts')->default(false);
             $table->boolean('get_comments')->default(false);
             $table->softDeletes();

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('category_id')->constrained('categories');
-            $table->unsignedBigInteger('property_id')->nullable();
+            $table->foreignId('property_id')->nullable()->constrained('properties');
             $table->string('title');
             $table->string('slug')->nullable();
             $table->text('excerpt')->nullable();

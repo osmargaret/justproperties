@@ -18,12 +18,11 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained('categories');
             $table->string('type');
             $table->text('location')->nullable();
-            $table->unsignedBigInteger('country_id')->nullable();
-            $table->unsignedBigInteger('state_id')->nullable();
-            $table->unsignedBigInteger('city_id')->nullable();
+            $table->foreignId('country_id')->nullable()->constrained('countries');
+            $table->foreignId('state_id')->nullable()->constrained('states');
+            $table->foreignId('city_id')->nullable()->constrained('cities');
             $table->string('town')->nullable();
             $table->string('address')->nullable();
-            $table->integer('price')->nullable();
             $table->decimal('inspection_fee', 10, 2)->default(0);
             $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
