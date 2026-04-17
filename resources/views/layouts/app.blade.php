@@ -30,9 +30,35 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600;700;800&amp;display=swap"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css" />
-
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+        theme: {
+            extend: {
+            fontFamily: {
+                serif: ['Playfair Display', 'serif'],
+                sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+                brand: {
+                50: '#ecfdf5',
+                100: '#d1fae5',
+                200: '#a7f3d0',
+                300: '#6ee7b7',
+                400: '#34d399',
+                500: '#10b981',
+                600: '#059669',
+                700: '#047857',
+                800: '#065f46',
+                900: '#064e3b',
+                }
+            }
+            }
+        }
+        }
+    </script>
     <link rel="stylesheet" href="{{ asset('frontend/css/style.css') }}" />
-    {{-- <link rel="stylesheet" href="{{ asset('frontend/css/custom.css') }}" /> --}}
+    
     
     @stack('styles')
     
@@ -41,77 +67,44 @@
 <body style="overflow: unset">
     <div class="min-h-screen bg-white">
         <nav id="navbar" class="navbar fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16 sm:h-20">
-                    <a class="flex items-center space-x-2 sm:space-x-3"
-                        href="/preview/1df53093-36b1-49fa-a5ef-02aaf0f68cc3/6522076" data-discover="true">
-                        <img alt="JustProperties Logo" class="h-9 sm:h-12 w-auto"
-                            src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" />
-
-                        <h1 class="text-lg sm:text-2xl font-bold font-serif text-white nav-brand">
-                            JustProperties
-                        </h1>
-                    </a>
-                    <div class="hidden lg:flex items-center space-x-8">
-                        <a href="landedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300 nav-link">Landed Properties </a>
-                        <a href="uncompleted_property.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300 nav-link">Uncompleted</a>
-                        <a href="completedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300 nav-link">Completed</a>
-                        <a href="rent_lease.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300 nav-link">Rent/Lease</a>
-                        <a href="short_let.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300 nav-link">Short-Let</a>
-                        <a href="blog.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300 nav-link">Blog</a>
-                    </div>
-                    <div class="hidden lg:flex items-center space-x-4">
-                        <button class="hidden md:flex items-center gap-2 bg-eme rald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium transition whitespace-nowrap btn-primary">
-                            <i class="ri-add-circle-line text-lg"></i>List Property
-                        </button>
-                        <a class="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap text-white hover:bg-white/10 nav-icons" href="signin.html" data-discover="true"><i
-                            class="ri-user-line text-xl w-5 h-5 flex items-center justify-center"></i><span
-                            class="text-sm">Sign In</span></a>
-                    </div>
-                    <div class="flex items-center space-x-3 lg:hidden">
-                        <button
-                            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition text-gray-700 btn-primary">
-                            <i class="ri-add-circle-line text-xl"></i><span class="font-medium">List
-                                Property</span></button><button class="p-2 rounded-lg cursor-pointer text-white">
-                            <i class="ri-menu-line text-2xl"></i>
-                        </button>
-                    </div>
+            <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <a class="flex items-center space-x-2 sm:space-x-3" href="index.html">
+                <img alt="JustProperties Logo" class="h-9 sm:h-12 w-auto" src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" />
+                <h1 class="text-lg sm:text-2xl font-bold font-serif text-white">JustProperties</h1>
+                </a>
+                <div class="hidden lg:flex items-center space-x-8">
+                <a href="landedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Landed Properties</a>
+                <a href="uncompleted_property.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Uncompleted</a>
+                <a href="completedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Completed</a>
+                <a href="rent_lease.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Rent/Lease</a>
+                <a href="short_let.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Short-Let</a>
+                <a href="blog.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Blog</a>
+                </div>
+                <div class="hidden lg:flex items-center space-x-4">
+                <a href="list_property.html" class="flex items-center gap-2 text-white px-5 py-2.5 rounded-lg font-medium transition whitespace-nowrap bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-700 hover:via-emerald-600 hover:to-emerald-500 shadow-md hover:shadow-lg">
+                    <i class="ri-add-circle-line text-lg"></i>List Property
+                </a>
+                <a href="signin.html" class="text-base flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap text-white hover:bg-white/10">
+                    <i class="ri-user-line text-xl w-5 h-5 flex items-center justify-center"></i>
+                    <span class="text-sm">Sign In</span>
+                </a>
+                </div>
+                <div class="flex items-center space-x-3 lg:hidden">
+                <a href="list_property.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition text-gray-700">
+                    <i class="ri-add-circle-line text-xl"></i>
+                    <span class="font-medium">List Property</span>
+                </a>
+                <button class="p-2 rounded-lg cursor-pointer text-white">
+                    <i class="ri-menu-line text-2xl"></i>
+                </button>
                 </div>
             </div>
-            <div class="lg:hidden transition-all duration-300 overflow-hidden max-h-0 opacity-0">
-                <div class="bg-white border-t border-gray-200 shadow-xl">
-                    <div class="px-4 py-5 space-y-1">
-                        <a href="landedproperty.html"
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"><i
-                                class="ri-landscape-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Landed
-                                Properties</span></a><a href="uncompleted_property.html"
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"><i
-                                class="ri-building-2-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Uncompleted</span></a><a
-                            href="completedproperty.html"
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"><i
-                                class="ri-home-4-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Completed</span></a><a
-                            href="rent_lease.html"
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"><i
-                                class="ri-key-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Rent/Lease</span></a><a
-                            href="short_let.html"
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"><i
-                                class="ri-hotel-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Short-Let</span></a><a
-                            href="blog.html"
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"><i
-                                class="ri-article-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Blog</span></a><a
-                            href="#contact"
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"><i
-                                class="ri-customer-service-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Contact</span></a><a
-                            class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors cursor-pointer"
-                            href="signin.html" data-discover="true"><i
-                                class="ri-user-line text-lg w-5 h-5 flex items-center justify-center"></i><span>Sign
-                                In / Sign Up</span></a>
-                    </div>
-                </div>
             </div>
         </nav>
 
         {{ $slot }}
+
         <footer class="bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900 text-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
                 <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">

@@ -301,6 +301,32 @@
       font-size: 0.75rem;
     }
 
+    .sidebar-section-label {
+      padding: 0.75rem 1.5rem 0.25rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+
+    a.menu-item {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .sidebar-logout-form {
+      margin: 0;
+    }
+
+    .menu-item--logout {
+      width: 100%;
+      border: none;
+      background: none;
+      font: inherit;
+      text-align: left;
+    }
+
     /* Main Content Area */
     .profile-content {
       background: white;
@@ -865,7 +891,7 @@
     <!-- Profile Grid -->
     <div class="profile-grid">
       <!-- Sidebar Menu -->
-      @include('dashboard.sidebar')
+      @include('dashboard.sidebar', ['embeddedInProfile' => true])
 
       <!-- Main Content Area - Personal Information Tab (Default) -->
       <div class="profile-content" id="personal-tab">
@@ -1470,7 +1496,7 @@
     let isEditing = false;
 
     // Tab switching
-    function switchTab(tabName) {
+    function switchTab(tabName, el) {
       // Hide all tabs
       const tabs = ['personal', 'subscription', 'listings', 'documents', 'notifications', 'security', 'favorites'];
       tabs.forEach(tab => {
@@ -1482,12 +1508,12 @@
       const selectedTab = document.getElementById(`${tabName}-tab`);
       if (selectedTab) selectedTab.style.display = 'block';
 
-      // Update active menu item
-      const menuItems = document.querySelectorAll('.menu-item');
+      // Update active menu item (profile tab rows only)
+      const menuItems = document.querySelectorAll('.menu-item[data-profile-tab]');
       menuItems.forEach(item => item.classList.remove('active'));
-      
-      // Find and activate clicked menu item
-      event.currentTarget.classList.add('active');
+      if (el) {
+        el.classList.add('active');
+      }
     }
 
     // Toggle edit mode
@@ -1603,10 +1629,10 @@
 
     // Initialize - ensure personal tab is active
     document.addEventListener('DOMContentLoaded', () => {
-      // Set first menu item as active
-      const firstMenuItem = document.querySelector('.menu-item');
-      if (firstMenuItem) {
-        firstMenuItem.classList.add('active');
+      const defaultTab = document.querySelector('.menu-item[data-profile-tab="personal"]');
+      if (defaultTab) {
+        document.querySelectorAll('.menu-item[data-profile-tab]').forEach(item => item.classList.remove('active'));
+        defaultTab.classList.add('active');
       }
     });
   </script>

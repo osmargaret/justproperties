@@ -18,21 +18,22 @@ Route::middleware('guest')->group(function () {
     Route::get('register', Register::class)->name('register');
 });
 
-/*Guest Routes*/
-Route::get('about',About::class)->name('about');
-Route::get('contact',Contact::class)->name('contact');
-Route::get('privacy-policy',PrivacyPolicy::class)->name('privacy-policy');
-Route::get('terms-of-service',TermsOfService::class)->name('terms-of-service');
+/* Guest Routes */
+Route::get('about', About::class)->name('about');
+Route::get('contact', Contact::class)->name('contact');
+Route::get('privacy-policy', PrivacyPolicy::class)->name('privacy-policy');
+Route::get('terms-of-service', TermsOfService::class)->name('terms-of-service');
 
-/*Blog Routes*/
-Route::get('blog',BlogRoll::class)->name('blog');
-Route::get('blog/post',Article::class)->name('article');
-
+/* Blog Routes */
+Route::get('blog', BlogRoll::class)->name('blog');
+Route::get('blog/post', Article::class)->name('article');
 
 Route::middleware(['web'])->group(function () {
-    Route::view('dashboard', 'dashboard.dashboard')->name('dashboard');
-    Route::view('profile', 'dashboard.profile')->name('profile');
-    Route::view('plan', 'dashboard.plan')->name('plan');
+    Route::view('dashboard', 'livewire.dashboard.landing')->name('dashboard');
+    Route::view('profile', 'livewire.dashboard.profile')->name('profile');
+    Route::view('plan', 'livewire.plan')->name('plan');
+    Route::view('list-property', 'livewire.dashboard.list_property')->name('list-property');
+    Route::view('transactions', 'livewire.dashboard.transaction')->name('transactions');
 });
 
 require __DIR__.'/settings.php';

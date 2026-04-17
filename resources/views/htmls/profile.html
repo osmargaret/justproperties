@@ -225,6 +225,26 @@
       font-size: 0.75rem;
     }
 
+    .sidebar-section-label {
+      padding: 0.75rem 1.5rem 0.25rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+
+    a.menu-item {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 1rem 0;
+    }
+
     /* Main Content Area */
     .profile-content {
       background: white;
@@ -789,57 +809,62 @@
       <!-- Sidebar Menu -->
       <aside class="profile-sidebar">
         <div class="sidebar-menu">
+          <div class="sidebar-section-label">Selling</div>
           <a href="dashboard.html" class="menu-item">
             <i class="ri-dashboard-line"></i>
             <span>Dashboard</span>
           </a>
           <a href="list_property.html" class="menu-item">
             <i class="ri-add-circle-line"></i>
-            <span>Add Listing</span>
+            <span>Add listing</span>
           </a>
+          <div class="menu-item" data-profile-tab="listings" onclick="switchTab('listings', this)">
+            <i class="ri-home-4-line"></i>
+            <span>My listings</span>
+            <span class="badge">3</span>
+          </div>
           <a href="transaction.html" class="menu-item">
             <i class="ri-money-dollar-circle-line"></i>
             <span>Transactions</span>
           </a>
           <a href="plan.html" class="menu-item">
             <i class="ri-vip-diamond-line"></i>
-            <span>Subscription Plan</span>
+            <span>Subscription plan</span>
           </a>
-          <div class="menu-divider"></div>
-          <div class="menu-item active" onclick="switchTab('personal')">
+
+          <div class="sidebar-section-label">Buying</div>
+          <div class="menu-item" data-profile-tab="favorites" onclick="switchTab('favorites', this)">
+            <i class="ri-heart-line"></i>
+            <span>Saved properties</span>
+            <span class="badge">12</span>
+          </div>
+
+          <div class="sidebar-section-label">Account</div>
+          <div class="menu-item active" data-profile-tab="personal" onclick="switchTab('personal', this)">
             <i class="ri-user-line"></i>
-            <span>Personal Information</span>
+            <span>Personal information</span>
           </div>
-          <div class="menu-item" onclick="switchTab('subscription')">
+          <div class="menu-item" data-profile-tab="subscription" onclick="switchTab('subscription', this)">
             <i class="ri-crown-line"></i>
-            <span>Subscription & Billing</span>
+            <span>Subscription &amp; billing</span>
           </div>
-          <div class="menu-item" onclick="switchTab('listings')">
-            <i class="ri-home-4-line"></i>
-            <span>My Listings</span>
-            <span class="badge">3</span>
-          </div>
-          <div class="menu-item" onclick="switchTab('documents')">
+          <div class="menu-item" data-profile-tab="documents" onclick="switchTab('documents', this)">
             <i class="ri-file-copy-line"></i>
             <span>Documents</span>
           </div>
-          <div class="menu-item" onclick="switchTab('notifications')">
+          <div class="menu-item" data-profile-tab="notifications" onclick="switchTab('notifications', this)">
             <i class="ri-notification-line"></i>
             <span>Notifications</span>
           </div>
-          <div class="menu-item" onclick="switchTab('security')">
+          <div class="menu-item" data-profile-tab="security" onclick="switchTab('security', this)">
             <i class="ri-lock-line"></i>
             <span>Security</span>
           </div>
-          <div class="menu-item" onclick="switchTab('favorites')">
-            <i class="ri-heart-line"></i>
-            <span>Saved Properties</span>
-            <span class="badge">12</span>
-          </div>
+
           <div class="menu-divider"></div>
           <a href="signin.html" class="menu-item">
             <i class="ri-logout-box-r-line"></i>
-            <span>Sign Out</span>
+            <span>Sign out</span>
           </a>
         </div>
       </aside>
@@ -1447,7 +1472,7 @@
     let isEditing = false;
 
     // Tab switching
-    function switchTab(tabName) {
+    function switchTab(tabName, el) {
       // Hide all tabs
       const tabs = ['personal', 'subscription', 'listings', 'documents', 'notifications', 'security', 'favorites'];
       tabs.forEach(tab => {
@@ -1459,12 +1484,12 @@
       const selectedTab = document.getElementById(`${tabName}-tab`);
       if (selectedTab) selectedTab.style.display = 'block';
 
-      // Update active menu item
-      const menuItems = document.querySelectorAll('.menu-item');
-      menuItems.forEach(item => item.classList.remove('active'));
-      
-      // Find and activate clicked menu item
-      event.currentTarget.classList.add('active');
+      // Active state: profile tab rows only (not sidebar links like Dashboard)
+      const tabRows = document.querySelectorAll('.menu-item[data-profile-tab]');
+      tabRows.forEach(item => item.classList.remove('active'));
+      if (el) {
+        el.classList.add('active');
+      }
     }
 
     // Toggle edit mode
@@ -1578,12 +1603,12 @@
       });
     }
 
-    // Initialize - ensure personal tab is active
+    // Initialize - ensure personal tab is active (not the first sidebar link)
     document.addEventListener('DOMContentLoaded', () => {
-      // Set first menu item as active
-      const firstMenuItem = document.querySelector('.menu-item');
-      if (firstMenuItem) {
-        firstMenuItem.classList.add('active');
+      const defaultTab = document.querySelector('.menu-item[data-profile-tab="personal"]');
+      if (defaultTab) {
+        document.querySelectorAll('.menu-item[data-profile-tab]').forEach(item => item.classList.remove('active'));
+        defaultTab.classList.add('active');
       }
     });
   </script>

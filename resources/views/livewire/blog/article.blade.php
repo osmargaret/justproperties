@@ -311,6 +311,3 @@
     </div>
   </main>
 </div>
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('frontend/css/custom.css') }}" />
-@endpush

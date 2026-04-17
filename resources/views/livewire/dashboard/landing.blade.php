@@ -746,6 +746,32 @@
             margin: 1rem 0;
         }
 
+        .sidebar-section-label {
+            padding: 0.75rem 1.5rem 0.25rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+
+        a.menu-item {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .sidebar-logout-form {
+            margin: 0;
+        }
+
+        .menu-item--logout {
+            width: 100%;
+            border: none;
+            background: none;
+            font: inherit;
+            text-align: left;
+        }
+
         .main-content {
             max-width: 1280px;
             margin: 90px auto 2rem;
@@ -836,7 +862,7 @@
 
         <div class="profile-grid">
             <!-- Sidebar Menu -->
-            @include('dashboard.sidebar')
+            @include('dashboard.sidebar', ['embeddedInProfile' => false])
 
             <div class="dashboard-main">
                 <!-- KPI Cards -->
