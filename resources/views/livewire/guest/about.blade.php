@@ -155,7 +155,7 @@
           <i class="ri-search-line text-lg"></i>
           Browse Properties
         </a>
-        <a href="list_property.html" class="inline-flex items-center gap-2 bg-transparent border-2 px-6 py-3 rounded-lg font-semibold transition-all hover:-translate-y-1 border-emerald-600 text-emerald-600 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 hover:shadow-lg">
+        <a href="{{ route('list-property') }}" class="inline-flex items-center gap-2 bg-transparent border-2 px-6 py-3 rounded-lg font-semibold transition-all hover:-translate-y-1 border-emerald-600 text-emerald-600 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 hover:shadow-lg">
           <i class="ri-add-circle-line text-lg"></i>
           List Your Property
         </a>

@@ -40,6 +40,11 @@ class Country extends Model
         return $this->hasMany(Property::class);
     }
 
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
     public function currencies(): BelongsToMany
     {
         return $this->belongsToMany(Currency::class, 'country_currencies')

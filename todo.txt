@@ -1,9 +1,5 @@
 
-promotions{
-    name, 
-    
-    ]   
-}
+
 subscription{
     plan_id,
     user_id,

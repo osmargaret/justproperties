@@ -1,5 +1,4 @@
 <div class="auth-card">
-    <!-- Left Panel - Branding -->
     <div class="brand-panel">
         <div class="brand-content">
             <div class="logo">
@@ -34,170 +33,185 @@
         </div>
     </div>
 
-    <!-- Right Panel - Sign Up Form -->
     <div class="form-panel">
         <div class="form-header">
             <h2>Create Account</h2>
-            <p>Already have an account? <a href="#" onclick="alert('Redirect to login (Demo)')">Sign in</a></p>
+            <p>Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
         </div>
 
-        <!-- Alert Message (hidden by default) -->
-        <div id="alertMessage" style="display: none;"></div>
-
-        <!-- Social Signup -->
         <div class="social-signup">
-            <button class="social-btn google" onclick="socialSignup('google')">
+            <button type="button" class="social-btn google" wire:click="socialSignup('google')">
                 <i class="ri-google-fill"></i>
                 Google
             </button>
-            <button class="social-btn facebook" onclick="socialSignup('facebook')">
+            <button type="button" class="social-btn facebook" wire:click="socialSignup('facebook')">
                 <i class="ri-facebook-fill"></i>
                 Facebook
             </button>
-            <button class="social-btn apple" onclick="socialSignup('apple')">
+            <button type="button" class="social-btn apple" wire:click="socialSignup('apple')">
                 <i class="ri-apple-fill"></i>
                 Apple
             </button>
         </div>
 
-        <!-- Divider -->
         <div class="divider">
             <span>OR</span>
         </div>
 
-        <!-- Sign Up Form -->
-        <form id="signupForm" onsubmit="handleSubmit(event)">
-            <!-- Name Fields -->
+        @if (session('status'))
+            <div class="alert success">
+                <i class="ri-information-line"></i>
+                <span>{{ session('status') }}</span>
+            </div>
+        @endif
+
+        <form wire:submit="register">
+            <div class="account-type">
+                <span class="type-label">I am registering as</span>
+                <div class="type-options">
+                    <label class="type-option {{ $account_type === 'buyer' ? 'selected' : '' }}">
+                        <input type="radio" wire:model.live="account_type" value="buyer" name="account_type">
+                        <span>Buyer</span>
+                    </label>
+                    <label class="type-option {{ $account_type === 'seller' ? 'selected' : '' }}">
+                        <input type="radio" wire:model.live="account_type" value="seller" name="account_type">
+                        <span>Seller</span>
+                    </label>
+                    <label class="type-option {{ $account_type === 'agent' ? 'selected' : '' }}">
+                        <input type="radio" wire:model.live="account_type" value="agent" name="account_type">
+                        <span>Agent</span>
+                    </label>
+                </div>
+                @error('account_type')
+                    <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                @enderror
+            </div>
+
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">
-                        <i class="ri-user-line"></i>
-                        First Name
-                    </label>
+                    <label class="form-label" for="first_name"><i class="ri-user-line"></i> First name</label>
                     <div class="input-group">
                         <i class="ri-user-line input-icon"></i>
-                        <input type="text" class="form-input" id="firstName" placeholder="John" required>
+                        <input id="first_name" type="text" class="form-input" wire:model="first_name" placeholder="John"
+                            autocomplete="given-name" required>
                     </div>
+                    @error('first_name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
-
                 <div class="form-group">
-                    <label class="form-label">
-                        <i class="ri-user-line"></i>
-                        Last Name
-                    </label>
+                    <label class="form-label" for="last_name"><i class="ri-user-line"></i> Last name</label>
                     <div class="input-group">
                         <i class="ri-user-line input-icon"></i>
-                        <input type="text" class="form-input" id="lastName" placeholder="Doe" required>
+                        <input id="last_name" type="text" class="form-input" wire:model="last_name" placeholder="Doe"
+                            autocomplete="family-name" required>
                     </div>
+                    @error('last_name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
-            <!-- Email -->
             <div class="form-group">
-                <label class="form-label">
-                    <i class="ri-mail-line"></i>
-                    Email Address
-                </label>
+                <label class="form-label" for="email"><i class="ri-mail-line"></i> Email address</label>
                 <div class="input-group">
                     <i class="ri-mail-line input-icon"></i>
-                    <input type="email" class="form-input" id="email" placeholder="john.doe@example.com" required>
+                    <input id="email" type="email" class="form-input" wire:model="email" placeholder="john.doe@example.com"
+                        autocomplete="email" required>
                 </div>
+                @error('email')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <!-- Phone -->
             <div class="form-group">
-                <label class="form-label">
-                    <i class="ri-phone-line"></i>
-                    Phone Number
-                </label>
+                <label class="form-label" for="phone"><i class="ri-phone-line"></i> Phone number</label>
                 <div class="input-group">
                     <i class="ri-phone-line input-icon"></i>
-                    <input type="tel" class="form-input" id="phone" placeholder="0801 234 5678" required>
+                    <input id="phone" type="tel" class="form-input" wire:model="phone" placeholder="0801 234 5678"
+                        autocomplete="tel" required>
                 </div>
+                @error('phone')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <!-- Location -->
             <div class="form-group">
-                <label class="form-label">
-                    <i class="ri-map-pin-line"></i>
-                    Location
-                </label>
+                <label class="form-label" for="country_id"><i class="ri-map-pin-line"></i> Country</label>
                 <div class="input-group">
                     <i class="ri-map-pin-line input-icon"></i>
-                    <select class="form-input" id="location" required style="appearance: none;">
-                        <option value="">Select your location</option>
-                        <option value="lagos">Lagos</option>
-                        <option value="abuja">Abuja</option>
-                        <option value="rivers">Rivers</option>
-                        <option value="oyo">Oyo</option>
-                        <option value="kano">Kano</option>
-                        <option value="other">Other</option>
+                    <select id="country_id" class="form-input form-select" wire:model="country_id" required
+                        style="appearance: none; padding-right: 2.5rem;">
+                        <option value="">Select your country</option>
+                        @foreach ($countries as $country)
+                            <option value="{{ $country->id }}">{{ $country->flag }} {{ $country->name }}</option>
+                        @endforeach
                     </select>
                 </div>
+                @error('country_id')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <!-- Password -->
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="ri-lock-line"></i>
-                    Password
-                </label>
+            <div class="form-group" x-data="{ show: false }">
+                <label class="form-label" for="password"><i class="ri-lock-line"></i> Password</label>
                 <div class="input-group">
                     <i class="ri-lock-line input-icon"></i>
-                    <input type="password" class="form-input" id="password" placeholder="Create a password"
-                        required onkeyup="checkPasswordStrength()">
+                    <input id="password" class="form-input" wire:model="password" placeholder="Create a password" required
+                        autocomplete="new-password" x-bind:type="show ? 'text' : 'password'">
+                    <button type="button" class="password-toggle" @click.prevent="show = !show" aria-label="Toggle password">
+                        <i class="ri-eye-line" x-show="!show"></i>
+                        <i class="ri-eye-off-line" x-show="show" x-cloak></i>
+                    </button>
                 </div>
-                <div class="password-strength" id="passwordStrength">
-                    <div class="strength-bar">
-                        <div class="strength-segment"></div>
-                        <div class="strength-segment"></div>
-                        <div class="strength-segment"></div>
-                        <div class="strength-segment"></div>
-                    </div>
-                    <span class="strength-text">Enter a password</span>
-                </div>
+                @error('password')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <!-- Confirm Password -->
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="ri-lock-line"></i>
-                    Confirm Password
-                </label>
+            <div class="form-group" x-data="{ show2: false }">
+                <label class="form-label" for="password_confirmation"><i class="ri-lock-line"></i> Confirm password</label>
                 <div class="input-group">
                     <i class="ri-lock-line input-icon"></i>
-                    <input type="password" class="form-input" id="confirmPassword" placeholder="Re-enter password"
-                        required>
+                    <input id="password_confirmation" class="form-input" wire:model="password_confirmation"
+                        placeholder="Re-enter password" required autocomplete="new-password"
+                        x-bind:type="show2 ? 'text' : 'password'">
+                    <button type="button" class="password-toggle" @click.prevent="show2 = !show2" aria-label="Toggle password">
+                        <i class="ri-eye-line" x-show="!show2"></i>
+                        <i class="ri-eye-off-line" x-show="show2" x-cloak></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- Terms and Conditions -->
             <div class="terms">
-                <input type="checkbox" id="terms" checked>
+                <input type="checkbox" wire:model.boolean="terms" id="terms">
                 <label for="terms">
-                    I agree to the <a href="#" onclick="alert('Terms of Service (Demo)')">Terms of Service</a>
+                    I agree to the <a href="{{ route('terms-of-service') }}" target="_blank" rel="noopener">Terms of Service</a>
                     and
-                    <a href="#" onclick="alert('Privacy Policy (Demo)')">Privacy Policy</a>
+                    <a href="{{ route('privacy-policy') }}" target="_blank" rel="noopener">Privacy Policy</a>
                 </label>
             </div>
+            @error('terms')
+                <p class="text-sm text-red-600 mb-2">{{ $message }}</p>
+            @enderror
 
-            <!-- Submit Button -->
-            <button type="submit" class="submit-btn" id="submitBtn">
-                <i class="ri-user-add-line"></i>
-                Create Account
+            <button type="submit" class="submit-btn" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="register">
+                    <i class="ri-user-add-line"></i>
+                    Create Account
+                </span>
+                <span wire:loading wire:target="register">Creating account…</span>
             </button>
         </form>
 
-        <!-- Login Link -->
         <div class="login-link">
-            <p>Already have an account? <a href="signin.html">Sign in</a></p>
+            <p>Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
         </div>
     </div>
 </div>
 
 @push('styles')
     <style>
-        /* Additional styles specific to signup */
         .social-signup {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -214,7 +228,6 @@
             border-radius: 0.75rem;
             background: white;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-size: 0.95rem;
             font-weight: 500;
         }
@@ -222,7 +235,6 @@
         .social-btn:hover {
             border-color: #059669;
             background: #f0fdf4;
-            transform: translateY(-2px);
         }
 
         .social-btn i {
@@ -242,7 +254,6 @@
             color: #000000;
         }
 
-        /* Divider */
         .divider {
             display: flex;
             align-items: center;
@@ -263,7 +274,6 @@
             font-size: 0.875rem;
         }
 
-        /* Account Type Selection */
         .account-type {
             margin-bottom: 1.5rem;
         }
@@ -278,23 +288,18 @@
 
         .type-options {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
         }
 
         .type-option {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 1rem;
+            padding: 0.75rem;
             border: 2px solid #e5e7eb;
             border-radius: 0.75rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .type-option:hover {
-            border-color: #059669;
         }
 
         .type-option.selected {
@@ -302,19 +307,16 @@
             background: #f0fdf4;
         }
 
-        .type-option input[type="radio"] {
-            width: 1rem;
-            height: 1rem;
+        .type-option input {
             accent-color: #059669;
         }
 
-        .type-option label {
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
 
-        /* Form Group */
         .form-group {
             margin-bottom: 1.25rem;
         }
@@ -342,7 +344,7 @@
             position: absolute;
             left: 1rem;
             color: #9ca3af;
-            transition: color 0.3s ease;
+            z-index: 1;
         }
 
         .form-input {
@@ -351,17 +353,12 @@
             border: 2px solid #e5e7eb;
             border-radius: 0.75rem;
             font-size: 0.95rem;
-            transition: all 0.3s ease;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #059669;
             box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
-        }
-
-        .form-input:focus+.input-icon {
-            color: #059669;
         }
 
         .password-toggle {
@@ -372,45 +369,25 @@
             color: #9ca3af;
             cursor: pointer;
             font-size: 1.25rem;
-            transition: color 0.3s ease;
         }
 
-        .password-toggle:hover {
-            color: #059669;
-        }
-
-        /* Terms and Conditions */
         .terms {
             display: flex;
             align-items: flex-start;
             gap: 0.75rem;
-            margin: 1.5rem 0;
-        }
-
-        .terms input[type="checkbox"] {
-            width: 1rem;
-            height: 1rem;
-            margin-top: 0.2rem;
-            accent-color: #059669;
+            margin: 1rem 0;
         }
 
         .terms label {
             font-size: 0.875rem;
             color: #4b5563;
-            line-height: 1.5;
         }
 
         .terms a {
             color: #059669;
-            text-decoration: none;
             font-weight: 500;
         }
 
-        .terms a:hover {
-            text-decoration: underline;
-        }
-
-        /* Submit Button */
         .submit-btn {
             width: 100%;
             padding: 1rem;
@@ -421,35 +398,21 @@
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .submit-btn:hover {
-            background: #047857;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .submit-btn i {
-            font-size: 1.125rem;
+            margin-bottom: 1rem;
         }
 
         .submit-btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
-            transform: none;
         }
 
-        /* Login Link */
         .login-link {
             text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
+            padding-top: 1rem;
             border-top: 1px solid #e5e7eb;
         }
 
@@ -460,53 +423,25 @@
 
         .login-link a {
             color: #059669;
-            text-decoration: none;
             font-weight: 600;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        /* Alert Messages */
-        .alert {
-            padding: 1rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.875rem;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-10px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .alert.error {
-            background: #fee2e2;
-            color: #b91c1c;
         }
 
         .alert.success {
             background: #dcfce7;
-            color: #059669;
+            color: #047857;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
         }
 
-        .alert i {
-            font-size: 1.125rem;
+        [x-cloak] {
+            display: none !important;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .social-signup {
                 grid-template-columns: 1fr;
@@ -521,26 +456,4 @@
             }
         }
     </style>
-@endpush
-
-@push('scripts')
-    <script>
-        // Password visibility toggle
-        document.addEventListener('livewire:loaded', () => {
-            @this.on('togglePassword', () => {
-                const input = document.querySelector('input[type="password"], input[type="text"]');
-                const icon = document.getElementById('toggleIcon');
-
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('ri-eye-line');
-                    icon.classList.add('ri-eye-off-line');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('ri-eye-off-line');
-                    icon.classList.add('ri-eye-line');
-                }
-            });
-        });
-    </script>
 @endpush

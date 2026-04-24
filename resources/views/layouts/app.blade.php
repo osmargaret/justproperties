@@ -65,153 +65,215 @@
 </head>
 
 <body style="overflow: unset">
+
     <div class="min-h-screen bg-white">
         <nav id="navbar" class="navbar fixed top-0 left-0 right-0 z-50 transition-all duration-300">
             <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between h-16 sm:h-20">
-                <a class="flex items-center space-x-2 sm:space-x-3" href="index.html">
-                <img alt="JustProperties Logo" class="h-9 sm:h-12 w-auto" src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" />
-                <h1 class="text-lg sm:text-2xl font-bold font-serif text-white">JustProperties</h1>
+                <a class="nav-brand flex items-center space-x-2" href="{{ route('welcome') }}">
+                    <img alt="JustProperties Logo" class="h-9 sm:h-12 w-auto" src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" />
+                    <h1 class="text-lg sm:text-2xl font-bold font-serif text-white">JustProperties</h1>
                 </a>
-                <div class="hidden lg:flex items-center space-x-8">
-                <a href="landedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Landed Properties</a>
-                <a href="uncompleted_property.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Uncompleted</a>
-                <a href="completedproperty.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Completed</a>
-                <a href="rent_lease.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Rent/Lease</a>
-                <a href="short_let.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Short-Let</a>
-                <a href="blog.html" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Blog</a>
+                <div class="hidden lg:flex items-center space-x-5">
+                    <a href="{{ route('landed-properties') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Landed Properties</a>
+                    <a href="{{ route('uncompleted-properties') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Uncompleted</a>
+                    <a href="{{ route('completed-properties') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Completed</a>
+                    <a href="{{ route('rent-lease') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Rent/Lease</a>
+                    <a href="{{ route('short-lets') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Short-Let</a>
+                    <!-- <a href="{{ route('blog') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Blog</a> -->
                 </div>
-                <div class="hidden lg:flex items-center space-x-4">
-                <a href="list_property.html" class="flex items-center gap-2 text-white px-5 py-2.5 rounded-lg font-medium transition whitespace-nowrap bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-700 hover:via-emerald-600 hover:to-emerald-500 shadow-md hover:shadow-lg">
+                <div class="hidden lg:flex items-center space-x-3">
+                <a href="{{ route('list-property') }}" class="flex items-center gap-2 text-white px-5 py-2.5 rounded-lg font-medium transition whitespace-nowrap bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-700 hover:via-emerald-600 hover:to-emerald-500 shadow-md hover:shadow-lg">
                     <i class="ri-add-circle-line text-lg"></i>List Property
                 </a>
-                <a href="signin.html" class="text-base flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap text-white hover:bg-white/10">
+                @guest
+                <a href="{{ route('login') }}" class="text-base flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap text-white hover:bg-white/10">
                     <i class="ri-user-line text-xl w-5 h-5 flex items-center justify-center"></i>
                     <span class="text-sm">Sign In</span>
                 </a>
+                @else
+                <a href="{{ auth()->user()->dashboard_url }}" class="nav-auth-pill flex items-center gap-3 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full cursor-pointer transition-colors">
+                    <span class="w-8 h-8 shrink-0 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-semibold">{{ strtoupper(auth()->user()->initials()) }}</span>
+                    <span class="hidden sm:block text-left">
+                        <span class="nav-auth-name block text-sm font-semibold text-white">{{ auth()->user()->name }}</span>
+                        <span class="nav-auth-sub block text-xs text-emerald-300">{{ auth()->user()->position }}</span>
+                    </span>
+                    <i class="nav-auth-chevron ri-arrow-down-s-line text-white/70"></i>
+                </a>
+                @endguest
                 </div>
                 <div class="flex items-center space-x-3 lg:hidden">
                 <a href="list_property.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition text-gray-700">
                     <i class="ri-add-circle-line text-xl"></i>
                     <span class="font-medium">List Property</span>
                 </a>
-                <button class="p-2 rounded-lg cursor-pointer text-white">
+                <button id="mobileMenuToggle" class="p-2 rounded-lg cursor-pointer text-white" aria-label="Toggle mobile menu" aria-expanded="false">
                     <i class="ri-menu-line text-2xl"></i>
                 </button>
                 </div>
             </div>
             </div>
+            <div id="mobileMenu" class="mobile-menu lg:hidden">
+                <div class="px-4 py-5 flex flex-col gap-1">
+                    <a href="landedproperty.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                        <i class="ri-landscape-line text-lg"></i>
+                        <span class="font-medium">Landed Properties</span>
+                    </a>
+                    <a href="uncompleted_property.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                        <i class="ri-building-2-line text-lg"></i>
+                        <span class="font-medium">Uncompleted</span>
+                    </a>
+                    <a href="completedproperty.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                        <i class="ri-home-4-line text-lg"></i>
+                        <span class="font-medium">Completed</span>
+                    </a>
+                    <a href="rent_lease.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                        <i class="ri-key-line text-lg"></i>
+                        <span class="font-medium">Rent/Lease</span>
+                    </a>
+                    <a href="short_let.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                        <i class="ri-hotel-line text-lg"></i>
+                        <span class="font-medium">Short-Let</span>
+                    </a>
+                    <a href="blog.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                        <i class="ri-article-line text-lg"></i>
+                        <span class="font-medium">Blog</span>
+                    </a>
+                    @guest
+                    <a href="{{ route('login') }}" class="mt-2 flex items-center gap-3 px-4 py-3 rounded-lg transition bg-emerald-600 text-white hover:bg-emerald-700">
+                        <i class="ri-user-line text-lg"></i>
+                        <span class="font-medium">Sign In / Sign Up</span>
+                    </a>
+                    @else
+                    <a href="{{ auth()->user()->dashboard_url }}" class="mt-2 flex items-center gap-3 px-4 py-3 rounded-lg transition bg-gray-100 text-gray-900 hover:bg-gray-200">
+                        <span class="w-10 h-10 shrink-0 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-semibold">{{ strtoupper(auth()->user()->initials()) }}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="font-medium truncate">{{ auth()->user()->name }}</div>
+                            <div class="text-xs text-emerald-600">{{ auth()->user()->position }}</div>
+                        </div>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="mt-1 px-1">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 text-left font-medium">
+                            <i class="ri-logout-box-r-line text-lg"></i>
+                            <span>Log out</span>
+                        </button>
+                    </form>
+                    @endguest
+                </div>
+            </div>
         </nav>
 
         {{ $slot }}
 
-        <footer class="bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900 text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
-                    <div class="col-span-2 sm:col-span-2 lg:col-span-1 space-y-4 sm:space-y-6">
-                        <a class="flex items-center space-x-2 sm:space-x-3"
-                            href="/preview/1df53093-36b1-49fa-a5ef-02aaf0f68cc3/6522076" data-discover="true"><img
-                                alt="JustProperties" class="h-8 sm:h-10 w-auto"
-                                src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" /><span
-                                class="text-lg sm:text-xl font-bold font-serif">JustProperties</span></a>
-                        <p class="text-emerald-100 text-xs sm:text-sm leading-relaxed">
-                            Nigeria's premier direct property marketplace connecting
-                            verified owners with serious buyers and renters.
-                        </p>
-                        <div class="flex space-x-3 sm:space-x-4">
-                            <a href="https://instagram.com" target="_blank" rel="nofollow noopener noreferrer"
-                                class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer"><i
-                                    class="ri-instagram-line text-base sm:text-lg"></i></a><a
-                                href="https://facebook.com" target="_blank" rel="nofollow noopener noreferrer"
-                                class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer"><i
-                                    class="ri-facebook-fill text-base sm:text-lg"></i></a><a
-                                href="https://twitter.com" target="_blank" rel="nofollow noopener noreferrer"
-                                class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer"><i
-                                    class="ri-twitter-x-line text-base sm:text-lg"></i></a><a
-                                href="https://linkedin.com" target="_blank" rel="nofollow noopener noreferrer"
-                                class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer"><i
-                                    class="ri-linkedin-fill text-base sm:text-lg"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-span-2 sm:col-span-1 space-y-4 sm:space-y-6">
-                        <h3 class="text-xs font-bold tracking-wider uppercase text-emerald-200">
+    
+        <footer class="text-white mt-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900">
+            <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+                <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="JustProperties" class="h-10 w-auto" />
+                    <span class="text-xl font-bold font-serif">JustProperties</span>
+                </div>
+                <p class="text-emerald-200 text-sm mb-6 leading-normal">Nigeria's premier direct property marketplace connecting verified owners with serious buyers and renters.</p>
+                <div class="flex gap-3">
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                    <i class="ri-instagram-line"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                    <i class="ri-facebook-fill"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                    <i class="ri-twitter-x-line"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                    <i class="ri-linkedin-fill"></i>
+                    </a>
+                </div>
+                </div>
+                <div>
+                <div class="">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">
                             Stay Updated
                         </h3>
                         <form id="newsletter-form" data-readdy-form="true" class="space-y-3 sm:space-y-4">
-                            <div class="relative">
+                            <div class="">
                                 <input placeholder="Enter your email" required=""
                                     class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border-b-2 border-white/30 focus:border-white text-white placeholder-emerald-200 outline-none transition-colors text-xs sm:text-sm"
-                                    type="email" value="" name="email" /><button type="submit"
-                                    class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-700 rounded-full transition-colors cursor-pointer whitespace-nowrap">
-                                    <i class="ri-arrow-right-line text-sm sm:text-base"></i>
-                                </button>
+                                    type="email" value="" name="email" />
+                                
                             </div>
-                            <p class="text-[10px] sm:text-xs text-emerald-200">
-                                Get property alerts and market insights.
-                            </p>
+                            <div class="">
+                                <select class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-emerald-800 hover:bg-emerald-700 disabled:bg-emerald-700 rounded-lg transition-colors cursor-pointer whitespace-nowrap text-white placeholder-emerald-200 outline-none transition-colors text-xs sm:text-sm" name="" id="">
+                                    <option value="">Select Property Type</option>
+                                    <option value="1">Landed Property</option>
+                                    <option value="2">Uncompleted Property</option>
+                                    <option value="3">Completed Property</option>
+                                    <option value="4">Rent/Lease Property</option>
+                                    <option value="5">Short-Let Property</option>
+                                </select>
+                                
+                            </div>
+
+                            <button type="submit"
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-700 rounded-lg transition-colors cursor-pointer whitespace-nowrap text-white">
+                                Get property alerts.
+                                <i class="ri-arrow-right-line text-sm sm:text-base"></i>
+                            </button>
                         </form>
                     </div>
-                    <div class="space-y-4 sm:space-y-6">
-                        <h3 class="text-xs font-bold tracking-wider uppercase text-emerald-200">
-                            Explore
-                        </h3>
-                        <nav class="space-y-3 sm:space-y-4">
-                            <a href="rent_lease.html"
-                                class="block text-emerald-50 hover:text-white text-sm sm:text-base transition-colors cursor-pointer hover:underline">Browse
-                                Properties</a><a href="list_property.html"
-                                class="text-gray-400 hover:text-emerald-500 transition text-left">
-                                List Property</a><a href="plan.html"
-                                class="block text-emerald-50 hover:text-white text-sm sm:text-base transition-colors cursor-pointer hover:underline">Pricing</a><a
-                                href="rent_lease.html"
-                                class="block text-emerald-50 hover:text-white text-sm sm:text-base transition-colors cursor-pointer hover:underline">How
-                                It Works</a>
-                        </nav>
-                    </div>
-                    <div class="space-y-4 sm:space-y-6">
-                        <h3 class="text-xs font-bold tracking-wider uppercase text-emerald-200">
-                            Contact Us
-                        </h3>
-                        <div class="space-y-3 sm:space-y-4">
-                            <a href="tel:+2348067042140"
-                                class="flex items-center space-x-2 sm:space-x-3 text-emerald-50 hover:text-white transition-colors cursor-pointer"><i
-                                    class="ri-phone-line text-base sm:text-lg"></i><span
-                                    class="text-sm sm:text-base">08067042140</span></a><a
-                                href="mailto:louis670421@gmail.com"
-                                class="flex items-center space-x-2 sm:space-x-3 text-emerald-50 hover:text-white transition-colors cursor-pointer"><i
-                                    class="ri-mail-line text-base sm:text-lg"></i><span
-                                    class="text-xs sm:text-base break-all">louis670421@gmail.com</span></a><a
-                                href="https://wa.me/2348067042140" target="_blank" rel="noopener noreferrer"
-                                class="flex items-center space-x-2 sm:space-x-3 text-emerald-50 hover:text-white transition-colors cursor-pointer"><i
-                                    class="ri-whatsapp-line text-base sm:text-lg"></i><span
-                                    class="text-sm sm:text-base">WhatsApp Support</span></a>
-                            <p class="text-xs sm:text-sm text-emerald-100 leading-relaxed">
-                                94 Off Alashe Junction, Opposite Police Barracks, Igbogbo
-                                Road, Ikorodu
-                            </p>
-                        </div>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">Quick Links</h3>
+                    <nav class="flex flex-col gap-3">
+                        <a href="{{ route('about') }}" class="text-emerald-200 hover:text-white text-sm transition">About Us</a>
+                        <a href="{{ route('pricing') }}" class="text-emerald-200 hover:text-white text-sm transition">Pricing</a>
+                        <a href="{{ route('blog') }}" class="text-emerald-200 hover:text-white text-sm transition">Blog</a>
+                        <a href="{{ route('contact') }}" class="text-emerald-200 hover:text-white text-sm transition">Contact</a>
+                    </nav>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">Resources</h3>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Buying Guide</a>
+                        <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Legal Tips</a>
+                        <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Investment Guide</a>
+                        <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Market Report</a>
+                        <a href="index.html" class="text-emerald-200 hover:text-white text-sm transition">FAQ</a>
+                    </nav>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">Contact Us</h3>
+                    <div class="flex flex-col gap-3">
+                        <a href="tel:+2348067042140" class="flex items-center gap-2 text-emerald-200 hover:text-white text-sm transition">
+                        <i class="ri-phone-line"></i>
+                        08067042140
+                        </a>
+                        <a href="mailto:louis670421@gmail.com" class="flex items-center gap-2 text-emerald-200 hover:text-white text-sm transition">
+                        <i class="ri-mail-line"></i>
+                        louis670421@gmail.com
+                        </a>
+                        <a href="#" class="flex items-center gap-2 text-emerald-200 hover:text-white text-sm transition">
+                        <i class="ri-whatsapp-line"></i>
+                        WhatsApp Support
+                        </a>
+                        <p class="text-emerald-200 text-xs sm:text-sm leading-relaxed">
+                            94 Off Alashe Junction, Opposite Police Barracks, Igbogbo
+                            Road, Ikorodu
+                        </p>
                     </div>
                 </div>
+            </div>
             </div>
             <div class="border-t border-emerald-700/50">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-                    <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
-                        <p class="text-xs sm:text-sm text-emerald-200">
-                            © 2026 JustProperties. All rights reserved.
-                        </p>
-                        <div class="flex items-center space-x-4 sm:space-x-6">
-                            <a href="#contact"
-                                class="text-xs sm:text-sm text-emerald-200 hover:text-white transition-colors cursor-pointer">Terms
-                                of Service</a><a href="#contact"
-                                class="text-xs sm:text-sm text-emerald-200 hover:text-white transition-colors cursor-pointer">Privacy
-                                Policy</a><a href="https://readdy.ai/?ref=logo" target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-xs sm:text-sm text-emerald-200 hover:text-white transition-colors cursor-pointer">Website
-                                Builder</a>
-                        </div>
-                    </div>
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p class="text-emerald-200 text-sm">© 2026 JustProperties. All rights reserved.</p>
+                <div class="flex gap-6">
+                <a href="{{ route('terms-of-service') }}" class="text-emerald-200 hover:text-white text-sm transition">Terms of Service</a>
+                <a href="{{ route('privacy-policy') }}" class="text-emerald-200 hover:text-white text-sm transition">Privacy Policy</a>
                 </div>
             </div>
-
+            </div>
         </footer>
         <button
             class="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 flex items-center justify-center group cursor-pointer"
@@ -227,20 +289,36 @@
         </button>
     </div>
 
-
-
-
-
     <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                const isOpen = mobileMenu.classList.toggle('open');
+                mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+        }
+
         // Navbar scroll effect
         const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
+        const forceSolidNavbar = Boolean(
+            document.querySelector('.white-header, .force-solid-navbar, [data-navbar="solid"]')
+        );
+
+        const updateNavbarState = () => {
+            if (!navbar) return;
+
+            if (forceSolidNavbar || window.scrollY > 50) {
                 navbar.classList.add('scrolled');
             } else {
                 navbar.classList.remove('scrolled');
             }
-        });
+        };
+
+        updateNavbarState();
+        window.addEventListener('scroll', updateNavbarState);
     </script>
     @stack('scripts')
     <script>

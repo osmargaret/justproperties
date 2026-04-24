@@ -27,8 +27,8 @@ return new class extends Migration
             $table->string('youtube')->nullable();
             $table->string('website')->nullable();
             $table->boolean('is_admin')->default(false);
-            $table->boolean('can_sell')->default(false);
-            $table->boolean('can_buy')->default(false);
+            $table->string('active_role')->default('buyer'); // buyer, seller
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Auth;
 
+use App\Models\Country;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -12,36 +13,75 @@ use Livewire\Component;
 #[Layout('layouts.auth')]
 class Register extends Component
 {
-    public $name = '';
-    public $email = '';
-    public $password = '';
-    public $password_confirmation = '';
-    public $account_type = 'buyer';
+    public string $first_name = '';
 
-    protected function rules()
+    public string $last_name = '';
+
+    public string $email = '';
+
+    public string $phone = '';
+
+    public ?int $country_id = null;
+
+    public string $password = '';
+
+    public string $password_confirmation = '';
+
+    public string $account_type = 'buyer';
+
+    public bool $terms = false;
+
+    protected function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'account_type' => 'required|in:buyer,seller,agent',
+            'first_name' => ['required', 'string', 'max:120'],
+            'last_name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['required', 'string', 'max:40'],
+            'country_id' => ['required', 'integer', 'exists:countries,id'],
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            'account_type' => ['required', 'in:buyer,seller,agent'],
+            'terms' => ['accepted'],
         ];
     }
 
-    public function togglePassword()
+    public function register(): mixed
     {
-        // This will be handled by JavaScript
+        $this->validate();
+
+        $name = trim($this->first_name.' '.$this->last_name);
+        $activeRole = $this->account_type === 'seller' ? 'seller' : 'buyer';
+
+        $user = User::create([
+            'name' => $name,
+            'email' => $this->email,
+            'password' => $this->password,
+            'phone' => $this->phone,
+            'country_id' => $this->country_id,
+            'active_role' => $activeRole,
+            'is_admin' => false,
+            'two_factor_enable' => false,
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect()->route('verification.notice');
     }
 
-    public function socialSignup($provider)
+    public function socialSignup(string $provider): void
     {
-        // Implement social signup logic here
-        // For now, just redirect or show message
         session()->flash('status', "Social signup with {$provider} is not implemented yet.");
     }
 
     public function render()
     {
-        return view('livewire.auth.register');
+        return view('livewire.auth.register', [
+            'countries' => Country::query()
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'flag']),
+        ]);
     }
 }
