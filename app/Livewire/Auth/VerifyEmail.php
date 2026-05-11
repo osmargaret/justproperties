@@ -12,14 +12,14 @@ class VerifyEmail extends Component
     public function mount(): void
     {
         if (Auth::user()?->hasVerifiedEmail()) {
-            $this->redirect(route('buyer-dashboard'), navigate: true);
+            $this->redirect(Auth::user()->dashboard_url, navigate: true);
         }
     }
 
     public function sendVerification(): void
     {
         if (Auth::user()->hasVerifiedEmail()) {
-            $this->redirect(route('buyer-dashboard'), navigate: true);
+            $this->redirect(Auth::user()->dashboard_url, navigate: true);
 
             return;
         }

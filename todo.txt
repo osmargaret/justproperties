@@ -1,66 +1,138 @@
+ADMIN[
+    Users => [
+        [Table columns should be: 
+            Details (Avatar,Name,Email,Phone), 
+            Country,
+            Properties (count),
+            Active Subscriptions (e.g 2 Subscriptions | 20 Seats),
+            Actions (View )
+        ],
+        [Add Search, Sort (by Name, Properties, Seats) ],
+        [
+            User details page should show details of user, 
+            Buttons: Suspend, Delete, View Properties, View Subscriptions
+        ]
+    ],
+    Subscriptions => [
+        This should show a table with columns => [
+            Date Purchased, Subscription_ID, Plan, User , Seats (2 of 5), Status, Expiry Date, View Invoice
+        ],
+        [View Invoice button should open modal: Show payment information]
 
+        [Add Search by user, Filter by Date Range, Filter by Status, Sort (by Purchase Date,Expiry Date) ],
+    ]
+    Promotions => [
+        This should show a table with columns => [
+            Date Purchased, 
+            User,
+            Type => [Blog Post, Featured (views & clicks) , Newsletters], 
+            Property (hyperlink to property view), 
+            Status, 
+            View Analytics
+        ],
+        [View Analytics button should open modal: Show post views, property views/clicks, emails sent, emails opened, audience type]
+        [Add Search by user, Filter by Date Range, Filter by Type, Filter by Status, Sort (by Date, ) ],
+    ],
+    Properties => [
+        This should show a table with columns => [
+            Date Listed, 
+            User,
+            Category & Type, 
+            Property (hyperlink to property details), 
+            Status, 
+            Approve | Disapprove | Delete
+        ],
+        [Add Search by user & property tile, Filter by Category, Filter by Status, Sort (by Date, ) ],
+        [
+            Property Details page should contain => [
+                Property details as entered by seller,
+                Section to view subscription plan
+                Section to view promotions & analytics
+                Buttons to approve/disapprove/delete 
+                Section to view moderation History
+            ]
+        ]
+    ]
+    Inspections => [
+        remove everything about inspections from the system. => [
+             remove it from properties migrations and model
+             list-property livewire component and page, 
+             admin pages and sidebar 
+             routes
+        ]
+       
+    ],
+    Blog => [
+        This should show a table with columns => [
+            Date Created, 
+            Owner,
+            Title,
+            Category & Tag
+            Related Property, 
+            Status
+            View
+        ],
+        [Add Search by owner & tile, Filter by Category, Filter by Status, Sort (by Date, ) ],
+        [
+            Blog Post view page should contain => [
+                Title, Content, Featured Image, Tag
+                Section to view Promotion record (if exist)
+                Section to view analytics,
+                Hyperlink to Related Property ,
+                Section to view Author,
+                Button to edit|delete|regenerate (if AI-content)|
+            ],
+            Add Blog Create & Edit Pages
+        ]
+    ],
+    Payments => [
+        This should show a table with columns => [
+            Date, Reference, Details, User , Amount, Status, View More
+        ],
+        [View more button should open modal: Show payment information]
 
-subscription{
-    plan_id,
-    user_id,
-    start_at,
-    end_at,
-    renew_at,
-    status,
-    created_at,
-    updated_at
-}
-subscription_listings{
-    listing_id,
-    subscription_id,
-    status,
-    created_at,
-    updated_at
-}
+        [Add Search by user / reference, Filter by Date Range, Filter by Status, Sort (by Date) ],
+    ],
+    Coupons => [
+        This should show a table with columns => [
+            Code, Details, Total Count, Qty Used, Status, Edit/Delete
+        ],
+        [Add Search by code, Filter by Status, Sort (by Qty Remaining, by Qty Used) ],
+        Add Create & Edit Pages
+    ],
+    Settings => [
+        [Settings->Content Settings : [
+                Content Generation: Manual / AI ,
+                Manual Timeframe hours,
+                Content min & max word count, 
+            ]
+        ]
+        [Settings->Subscription Plans page should be CRUD],
+        [Settings->Promotion Plans page should be CRUD: Blog Post|Featured (views & clicks)|Newsletters],
+        [Settings->Staff page should be CRUD],
+        [
+            Settings->Roles and Permissions menu should be listed before Staff on the sidebar.
+            Roles should be page should be CRUD, 
+            Permissions will be things like:[
+                view-users, delete-users, moderate-user,
+                view-properties, delete-property, moderate-property, view-inspections
+                view-post, create-post, update-post, delete-post, moderate-post,
+                view-subscriptions, view-promotions,
+                view-payments, view-coupons, manage-coupons,
+                manage-settings, 
 
-payments{
+            ]
+            
+        ],
+        [Add Currencies Page to perform CRUD on Currencies. We can set a currency as default],
+        [
+            Settings->Countries page should be CRUD,
+            [
+                Each country should have config button which will open Country Config page which
+                will consist of 'subscription plan prices','promotion plan prices','payment gateways',
+                verification requirements, 
+            ]
+        ],
+    ],
 
-}
-
-user{
-    
-}
-
-interests{
-    user_id,
-    listing_id,
-    interest_type: [inspection, inquiry, save],
-    created_at,
-    updated_at
-}
-saved{
-    user_id,
-    listing_id,
-    created_at,
-    updated_at
-}
-
-events 
-
-Logo |      Browse | Finance | Blog  |      
-
-Dashboard{
-
-}
-My Listings 
-Subscriptions:
-Promotions 
-Appointments
-Saved Listings
-Settings
-Payment History
-Profile Edit
-
-
-Dashboard - {
-    recently viewed properties
-    recently viewed articles
-} 
-Saved Properties
-Saved Post
-Appointments
+]

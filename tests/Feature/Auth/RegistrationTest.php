@@ -47,7 +47,6 @@ class RegistrationTest extends TestCase
             ->set('country_id', $country->id)
             ->set('password', 'Password1!')
             ->set('password_confirmation', 'Password1!')
-            ->set('account_type', 'buyer')
             ->set('terms', true)
             ->call('register')
             ->assertHasNoErrors()
@@ -58,6 +57,7 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'new-user@example.com',
             'country_id' => $country->id,
+            'active_role' => null,
         ]);
 
         $this->assertInstanceOf(User::class, User::query()->where('email', 'new-user@example.com')->first());

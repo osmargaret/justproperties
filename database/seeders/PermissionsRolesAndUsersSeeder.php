@@ -5,25 +5,37 @@ namespace Database\Seeders;
 use App\Models\Country;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\RoleUser;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class PermissionsRolesAndUsersSeeder extends Seeder
 {
-    /**
-     * permissions → roles → users → role_users (matches migration FK order after users exist).
-     */
     public function run(): void
     {
         $permissionSlugs = [
+            ['name' => 'View users', 'slug' => 'view-users'],
+            ['name' => 'Delete users', 'slug' => 'delete-users'],
+            ['name' => 'Moderate user', 'slug' => 'moderate-user'],
+            ['name' => 'View properties', 'slug' => 'view-properties'],
+            ['name' => 'Delete property', 'slug' => 'delete-property'],
+            ['name' => 'Moderate property', 'slug' => 'moderate-property'],
+            ['name' => 'View post', 'slug' => 'view-post'],
+            ['name' => 'Create post', 'slug' => 'create-post'],
+            ['name' => 'Update post', 'slug' => 'update-post'],
+            ['name' => 'Delete post', 'slug' => 'delete-post'],
+            ['name' => 'Moderate post', 'slug' => 'moderate-post'],
+            ['name' => 'View subscriptions', 'slug' => 'view-subscriptions'],
+            ['name' => 'View promotions', 'slug' => 'view-promotions'],
+            ['name' => 'View payments', 'slug' => 'view-payments'],
+            ['name' => 'View coupons', 'slug' => 'view-coupons'],
+            ['name' => 'Manage coupons', 'slug' => 'manage-coupons'],
+            ['name' => 'Manage settings', 'slug' => 'manage-settings'],
             ['name' => 'Manage users', 'slug' => 'manage-users'],
             ['name' => 'Manage properties', 'slug' => 'manage-properties'],
             ['name' => 'Manage subscriptions', 'slug' => 'manage-subscriptions'],
             ['name' => 'Manage payments', 'slug' => 'manage-payments'],
             ['name' => 'Manage blog', 'slug' => 'manage-blog'],
-            ['name' => 'Manage settings', 'slug' => 'manage-settings'],
         ];
 
         $permissions = [];
@@ -64,8 +76,8 @@ class PermissionsRolesAndUsersSeeder extends Seeder
                     'password' => $password,
                     'email_verified_at' => $now,
                     'two_factor_enable' => false,
-                    'is_admin' => true,
-                    'active_role' => 'buyer',
+                    'role_id' => $adminRole->id,
+                    'active_role' => 'admin',
                     'phone' => '+2348000000001',
                     'country_id' => $nigeriaId,
                 ]
@@ -78,7 +90,7 @@ class PermissionsRolesAndUsersSeeder extends Seeder
                     'password' => $password,
                     'email_verified_at' => $now,
                     'two_factor_enable' => false,
-                    'is_admin' => false,
+                    'role_id' => $sellerRole->id,
                     'active_role' => 'seller',
                     'phone' => '+2348000000002',
                     'country_id' => $nigeriaId,
@@ -92,24 +104,12 @@ class PermissionsRolesAndUsersSeeder extends Seeder
                     'password' => $password,
                     'email_verified_at' => $now,
                     'two_factor_enable' => false,
-                    'is_admin' => false,
+                    'role_id' => null,
                     'active_role' => 'buyer',
                     'phone' => '+2348000000003',
                     'country_id' => $nigeriaId,
                 ]
             );
         });
-
-        $adminUser = User::query()->where('email', 'admin@example.com')->firstOrFail();
-
-        RoleUser::query()->firstOrCreate(
-            ['role_id' => $adminRole->id, 'user_id' => $adminUser->id],
-            []
-        );
-
-        RoleUser::query()->firstOrCreate(
-            ['role_id' => $sellerRole->id, 'user_id' => User::query()->where('email', 'seller@example.com')->firstOrFail()->id],
-            []
-        );
     }
 }

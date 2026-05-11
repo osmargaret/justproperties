@@ -24,16 +24,13 @@
         <a href="{{ route('admin.properties') }}" class="{{ request()->routeIs('admin.properties') || request()->routeIs('admin.properties.show') ? $navActive : $navIdle }}">
             <i class="ri-building-line text-xl"></i><span class="font-medium">Properties</span>
         </a>
-        <a href="{{ route('admin.inspections') }}" class="{{ request()->routeIs('admin.inspections') ? $navActive : $navIdle }}">
-            <i class="ri-calendar-check-line text-xl"></i><span class="font-medium">Inspections</span>
-        </a>
-        <a href="{{ route('admin.blog') }}" class="{{ request()->routeIs('admin.blog') ? $navActive : $navIdle }}">
+        <a href="{{ route('admin.blog') }}" class="{{ request()->routeIs('admin.blog*') ? $navActive : $navIdle }}">
             <i class="ri-article-line text-xl"></i><span class="font-medium">Blog</span>
         </a>
         <a href="{{ route('admin.payments') }}" class="{{ request()->routeIs('admin.payments') ? $navActive : $navIdle }}">
             <i class="ri-bank-card-line text-xl"></i><span class="font-medium">Payments</span>
         </a>
-        <a href="{{ route('admin.coupons') }}" class="{{ request()->routeIs('admin.coupons') ? $navActive : $navIdle }}">
+        <a href="{{ route('admin.coupons') }}" class="{{ request()->routeIs('admin.coupons*') ? $navActive : $navIdle }}">
             <i class="ri-coupon-3-line text-xl"></i><span class="font-medium">Coupons</span>
         </a>
 
@@ -48,9 +45,10 @@
                 <a href="{{ route('admin.settings.categories') }}" class="{{ request()->routeIs('admin.settings.categories') ? $subNavActive : $subNav }}">Categories</a>
                 <a href="{{ route('admin.settings.subscription-plans') }}" class="{{ request()->routeIs('admin.settings.subscription-plans') ? $subNavActive : $subNav }}">Subscription Plans</a>
                 <a href="{{ route('admin.settings.promotion-plans') }}" class="{{ request()->routeIs('admin.settings.promotion-plans') ? $subNavActive : $subNav }}">Promotion Plans</a>
-                <a href="{{ route('admin.settings.staff') }}" class="{{ request()->routeIs('admin.settings.staff') ? $subNavActive : $subNav }}">Staff</a>
                 <a href="{{ route('admin.settings.roles') }}" class="{{ request()->routeIs('admin.settings.roles') ? $subNavActive : $subNav }}">Roles &amp; Permissions</a>
-                <a href="{{ route('admin.settings.countries') }}" class="{{ request()->routeIs('admin.settings.countries') ? $subNavActive : $subNav }}">Countries</a>
+                <a href="{{ route('admin.settings.staff') }}" class="{{ request()->routeIs('admin.settings.staff') ? $subNavActive : $subNav }}">Staff</a>
+                <a href="{{ route('admin.settings.currencies') }}" class="{{ request()->routeIs('admin.settings.currencies') ? $subNavActive : $subNav }}">Currencies</a>
+                <a href="{{ route('admin.settings.countries') }}" class="{{ request()->routeIs('admin.settings.countries*') ? $subNavActive : $subNav }}">Countries</a>
             </div>
         </details>
 

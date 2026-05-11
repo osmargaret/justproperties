@@ -4,18 +4,17 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'email', 'password', 'phone', 'is_admin', 'active_role', 'country_id'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'active_role', 'country_id', 'role_id', 'suspended_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmailContract
 {
@@ -32,7 +31,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
+            'suspended_at' => 'datetime',
         ];
     }
 
@@ -61,11 +60,6 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(Payment::class);
     }
 
-    public function inspections(): HasMany
-    {
-        return $this->hasMany(Inspection::class);
-    }
-
     public function propertyReviews(): HasMany
     {
         return $this->hasMany(PropertyReview::class);
@@ -91,10 +85,9 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(Media::class);
     }
 
-    public function roles(): BelongsToMany
+    public function role(): BelongsTo
     {
-        return $this->belongsToMany(Role::class, 'role_users')
-            ->withTimestamps();
+        return $this->belongsTo(Role::class);
     }
 
     public function blogSubscriptions(): HasMany
@@ -105,14 +98,23 @@ class User extends Authenticatable implements MustVerifyEmailContract
     protected function permissions(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->roles
-                ->pluck('permissions')
-                ->flatten(1)
-                ->filter()
-                ->unique()
-                ->values()
-                ->all()
+            get: function () {
+                $permissions = $this->role?->permissions ?? [];
+
+                return collect(is_array($permissions) ? $permissions : [])
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->all();
+            }
         );
+    }
+
+    protected function isAdmin(): Attribute
+    {
+        return Attribute::make(get: function (): bool {
+            return $this->role?->type === 'admin';
+        });
     }
 
     /**
@@ -130,14 +132,43 @@ class User extends Authenticatable implements MustVerifyEmailContract
     protected function position(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->is_admin ? 'Admin' : ($this->active_role === 'seller' ? 'Seller' : 'Buyer')
+            get: function () {
+                if ($this->is_admin) {
+                    $role = $this->active_role;
+                    if ($role === null || $role === '' || $role === 'admin') {
+                        return 'Admin';
+                    }
+
+                    return $role === 'seller' ? 'Seller' : 'Buyer';
+                }
+                if ($this->active_role === null || $this->active_role === '') {
+                    return 'Member';
+                }
+
+                return $this->active_role === 'seller' ? 'Seller' : 'Buyer';
+            }
         );
     }
 
     protected function dashboardUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->is_admin ? route('admin.dashboard', absolute: false) : ($this->active_role === 'seller' ? route('seller-dashboard', absolute: false) : route('buyer-dashboard', absolute: false))
+            get: function () {
+                if ($this->active_role === 'admin') {
+                    return route('admin.dashboard', absolute: false);
+                }
+                if ($this->active_role === 'buyer') {
+                    return route('buyer.dashboard', absolute: false);
+                }
+                if ($this->active_role === 'seller') {
+                    return route('seller.dashboard', absolute: false);
+                }
+                if ($this->is_admin) {
+                    return route('admin.dashboard', absolute: false);
+                }
+
+                return route('home', absolute: false);
+            }
         );
     }
 }

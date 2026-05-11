@@ -23,7 +23,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'vat_value',
     'total',
     'method',
+    'gateway',
+    'details',
+    'gateway_payload',
     'status',
+    'paid_at',
 ])]
 class Payment extends Model
 {
@@ -37,6 +41,8 @@ class Payment extends Model
             'vat_rate' => 'decimal:2',
             'vat_value' => 'decimal:2',
             'total' => 'decimal:2',
+            'gateway_payload' => 'array',
+            'paid_at' => 'datetime',
         ];
     }
 

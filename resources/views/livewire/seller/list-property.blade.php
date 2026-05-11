@@ -1,345 +1,343 @@
 <div>
-  
-  <!-- Main Content -->
-  <main class="white-header max-w-7xl mx-auto px-4 mt-[90px] mb-8">
+    <main class="white-header max-w-7xl mx-auto px-4 mt-[90px] mb-8">
+        @include('layouts.profile-header')
 
-  
-    <!-- Welcome Banner -->
-    <div class="bg-gradient-to-r from-emerald-900 to-emerald-600 rounded-xl p-8 mb-8 text-white flex items-center justify-between flex-wrap gap-4">
-      <div>
-        <h2 class="text-2xl font-bold mb-2">Welcome back, John! 👋</h2>
-        <p class="text-emerald-100">List your property and reach thousands of potential buyers instantly</p>
-      </div>
-      <div class="bg-white/20 px-6 py-2 rounded-full font-semibold border border-white/30">
-        <i class="ri-crown-line mr-2"></i> Basic Plan - 1 listing left this month
+        @if (session('status'))
+            <div class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {{ session('status') }}
+            </div>
+        @endif
 
-      </div>
-    </div>
+        <form wire:submit="submitListing" class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+            <div class="bg-white rounded-xl p-8 shadow-md">
+                <div class="border-b border-gray-200 pb-8 mb-8">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                        <i class="ri-home-4-line text-emerald-600"></i> Property Details
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="sm:col-span-2">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Property Title *</label>
+                            <input type="text" wire:model.blur="title" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g., Luxury 5 Bedroom Duplex with BQ" />
+                            @error('title') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Property Description *</label>
+                            <textarea wire:model.blur="description" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" rows="4"></textarea>
+                            @error('description') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Listing category *</label>
+                            <select wire:model.live="listing_category_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="">Select category</option>
+                                @foreach ($categories as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('listing_category_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Cost ({{ $activeCurrency?->symbol ?? '₦' }}) *</label>
+                            <input type="number" wire:model.blur="cost" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g., 85000000" />
+                            @error('cost') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                        
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        @php
+                            $activeCategory = $listing_category_id ? $categories->firstWhere('id', (int) $listing_category_id) : null;
+                        @endphp
+                        @include('livewire.seller.partials.category-settings-fields', ['settings' => $activeCategory?->settings ?? collect()])
+                    </div>
+                </div>
 
-    <!-- Dashboard Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
-      <!-- Left Column - Listing Form -->
-      <div class="bg-white rounded-xl p-8 shadow-md">
-        <!-- Subscription Status -->
-        <div class="bg-emerald-50 border border-emerald-600 rounded-lg p-6 mb-8 flex items-center gap-4">
-          <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center text-white text-2xl">
-            <i class="ri-verified-badge-fill"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold">You have an active subscription!</h3>
-            <p class="text-gray-500 text-sm">Basic Plan - Valid until Dec 31, 2026</p>
-            <span class="inline-block bg-emerald-600 text-white text-xs px-3 py-1 rounded-full mt-1">1 listing remaining this month</span>
-          </div>
-        </div>
+                <div class="border-b border-gray-200 pb-8 mb-8">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                        <i class="ri-map-pin-line text-emerald-600"></i> Location
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">State *</label>
+                            <select wire:model.live="state_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="">Select state</option>
+                                @foreach ($states as $state)
+                                    <option value="{{ $state->id }}">{{ $state->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('state_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">City/LGA *</label>
+                            <select wire:model.live="city_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="">Select city/LGA</option>
+                                @foreach ($cities as $city)
+                                    <option value="{{ $city->id }}">{{ $city->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('city_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Street Address *</label>
+                            <input type="text" wire:model.blur="address" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                            @error('address') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Neighborhood/Landmark</label>
+                            <input type="text" wire:model.blur="neighborhood" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                            @error('neighborhood') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="sm:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" wire:model.live="show_address" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                                Show full address on listing
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Property Details Section -->
-        <div class="border-b border-gray-200 pb-8 mb-8">
-          <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <i class="ri-home-4-line text-emerald-600"></i> Property Details
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div class="sm:col-span-2">
-              <label class="block font-medium text-sm text-gray-700 mb-2">
-                <i class="ri-pencil-line text-emerald-600 mr-1"></i> Property Title *
-              </label>
-              <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="e.g., Luxury 5 Bedroom Duplex with BQ" />
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">
-                <i class="ri-price-tag-3-line text-emerald-600 mr-1"></i> Listing category *
-              </label>
-              <select
-                wire:model.live="listing_category_id"
-                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white"
-              >
-                <option value="">Select category</option>
-                @foreach($categories as $cat)
-                  <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">
-                <i class="ri-money-naira-circle-line text-emerald-600 mr-1"></i> Price (₦) *
-              </label>
-              <input type="number" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="e.g., 85000000" />
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">
-                <i class="ri-hotel-bed-line text-emerald-600 mr-1"></i> Bedrooms *
-              </label>
-              <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white">
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6+</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">
-                <i class="ri-drop-line text-emerald-600 mr-1"></i> Bathrooms *
-              </label>
-              <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white">
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6+</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">
-                <i class="ri-ruler-line text-emerald-600 mr-1"></i> Land Size (sqm)
-              </label>
-              <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="e.g., 450" />
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">
-                <i class="ri-building-line text-emerald-600 mr-1"></i> Building Size (sqm)
-              </label>
-              <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="e.g., 350" />
+                <div class="border-b border-gray-200 pb-8 mb-8">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                        <i class="ri-image-line text-emerald-600"></i> Property Images *
+                    </h3>
+                    <label class="block border-2 border-dashed border-gray-200 rounded-lg p-8 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all">
+                        <input type="file" wire:model="uploadedImages" multiple accept="image/*" class="hidden">
+                        <i class="ri-upload-cloud-line text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-500">Click to upload images</p>
+                        <p class="text-gray-400 text-sm mt-2">Maximum 10 images, JPEG/PNG/WebP up to 5MB each</p>
+                    </label>
+                    @error('uploadedImages') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                    @error('uploadedImages.*') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                    @if ($uploadedImages)
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            @foreach ($uploadedImages as $index => $image)
+                                <div class="aspect-square rounded-lg overflow-hidden relative border border-gray-200">
+                                    <img src="{{ $image->temporaryUrl() }}" class="w-full h-full object-cover" alt="Preview {{ $index + 1 }}">
+                                    <button type="button" wire:click="removeImage({{ $index }})" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center">
+                                        <i class="ri-close-line"></i>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                        <i class="ri-contacts-line text-emerald-600"></i> Contact Information
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Contact Name *</label>
+                            <input type="text" wire:model.blur="contact_name" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                            @error('contact_name') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Phone Number *</label>
+                            <input type="tel" wire:model.blur="contact_phone" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                            @error('contact_phone') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Email *</label>
+                            <input type="email" wire:model.blur="contact_email" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                            @error('contact_email') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">WhatsApp</label>
+                            <input type="tel" wire:model.blur="contact_whatsapp" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                            @error('contact_whatsapp') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            @php
-              $activeCategory = $listing_category_id
-                  ? $categories->firstWhere('id', (int) $listing_category_id)
-                  : null;
-            @endphp
-            @include('livewire.seller.partials.category-settings-fields', [
-                'settings' => $activeCategory?->settings ?? collect(),
-            ])
-          </div>
-        </div>
+            <div class="space-y-8">
 
-        <!-- Location Section -->
-        <div class="border-b border-gray-200 pb-8 mb-8">
-          <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <i class="ri-map-pin-line text-emerald-600"></i> Location
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">State *</label>
-              <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white">
-                <option value="lagos">Lagos</option>
-                <option value="abuja">Abuja</option>
-                <option value="rivers">Rivers</option>
-                <option value="oyo">Oyo</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">City/LGA *</label>
-              <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white">
-                <option value="">Select</option>
-                <option value="ikorodu">Ikorodu</option>
-                <option value="lekki">Lekki</option>
-                <option value="ajah">Ajah</option>
-                <option value="ikeja">Ikeja</option>
-                <option value="vi">Victoria Island</option>
-              </select>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block font-medium text-sm text-gray-700 mb-2">Street Address *</label>
-              <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="e.g., 123 Property Road, Off Main Street" />
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block font-medium text-sm text-gray-700 mb-2">Neighborhood/Landmark</label>
-              <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="e.g., Opposite Police Barracks, Near Shoprite" />
-            </div>
-          </div>
-        </div>
+                <div class="bg-gradient-to-r from-emerald-900 to-emerald-600 rounded-xl p-8 mb-8 text-white flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold mb-2">Upload Multiple Properties</h2>
+                        <p class="text-emerald-100 text-sm">Use excel or csv file to upload your properties</p>
+                    </div>
+                    <a href="{{ route('seller.bulk-template.download') }}" class="text-emerald-100 text-sm hover:underline">Download sample file</a>
+                    <button type="button" wire:click="openBulkUploadModal" class="bg-white/20 px-6 py-2 rounded-full font-semibold border border-white/30">
+                        <i class="ri-file-upload-line mr-2"></i>
+                        Upload properties file
+                    </button>
 
-        <!-- Description & Features -->
-        <div class="border-b border-gray-200 pb-8 mb-8">
-          <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <i class="ri-file-text-line text-emerald-600"></i> Description & Features
-          </h3>
-          <div class="space-y-6">
-            <div class="sm:col-span-2">
-              <label class="block font-medium text-sm text-gray-700 mb-2">Property Description *</label>
-              <textarea class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" rows="4" placeholder="Describe your property in detail..."></textarea>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block font-medium text-sm text-gray-700 mb-2">Key Features (comma separated)</label>
-              <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="e.g., Swimming Pool, 24/7 Security, BQ, Parking" />
-            </div>
-          </div>
-        </div>
+                </div>
 
-        <!-- Images Section -->
-        <div class="border-b border-gray-200 pb-8 mb-8">
-          <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <i class="ri-image-line text-emerald-600"></i> Property Images *
-          </h3>
-          <div class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all">
-            <i class="ri-upload-cloud-line text-4xl text-gray-400 mb-2"></i>
-            <p class="text-gray-500">Click or drag images to upload</p>
-            <p class="text-gray-400 text-sm mt-2">Maximum 10 images, JPEG/PNG up to 5MB each</p>
-          </div>
-          <div class="grid grid-cols-4 gap-4 mt-4">
-            <div class="aspect-square rounded-lg overflow-hidden relative">
-              <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&h=200&fit=crop" alt="Preview" class="w-full h-full object-cover" />
-              <button class="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full text-white flex items-center justify-center"><i class="ri-close-line text-xs"></i></button>
-            </div>
-            <div class="aspect-square rounded-lg overflow-hidden relative">
-              <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=200&h=200&fit=crop" alt="Preview" class="w-full h-full object-cover" />
-              <button class="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full text-white flex items-center justify-center"><i class="ri-close-line text-xs"></i></button>
-            </div>
-            <div class="aspect-square rounded-lg overflow-hidden relative">
-              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=200&h=200&fit=crop" alt="Preview" class="w-full h-full object-cover" />
-              <button class="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full text-white flex items-center justify-center"><i class="ri-close-line text-xs"></i></button>
-            </div>
-            <div class="aspect-square rounded-lg bg-gray-100 flex items-center justify-center cursor-pointer">
-              <i class="ri-add-line text-3xl text-gray-400"></i>
-            </div>
-          </div>
-        </div>
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <i class="ri-crown-line text-emerald-600"></i> Subscription
+                    </h3>
+                    @if ($this->hasUnusedSubscriptions)
+                        <fieldset class="space-y-3 mb-4">
+                            <legend class="text-xs font-medium text-gray-600 mb-1">Apply this listing using</legend>
+                            <label @class([
+                                'flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition-colors',
+                                'border-emerald-500 bg-emerald-50/70' => $subscription_source === 'existing',
+                                'border-gray-200' => $subscription_source !== 'existing',
+                            ])>
+                                <input type="radio" wire:model.live="subscription_source" value="existing" class="mt-0.5 border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                                <span>
+                                    <span class="block text-sm font-medium text-gray-900">Use an existing subscription</span>
+                                    <span class="block text-xs text-gray-500 mt-0.5">Uses one free slot. No plan charge for this listing.</span>
+                                </span>
+                            </label>
+                            <label @class([
+                                'flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition-colors',
+                                'border-emerald-500 bg-emerald-50/70' => $subscription_source === 'purchase',
+                                'border-gray-200' => $subscription_source !== 'purchase',
+                            ])>
+                                <input type="radio" wire:model.live="subscription_source" value="purchase" class="mt-0.5 border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                                <span>
+                                    <span class="block text-sm font-medium text-gray-900">Buy a new subscription</span>
+                                    <span class="block text-xs text-gray-500 mt-0.5">Purchase a plan for this listing even if you still have slots elsewhere.</span>
+                                </span>
+                            </label>
+                        </fieldset>
+                        @if ($subscription_source === 'existing')
+                            <p class="text-xs text-gray-500 mb-2">Select which subscription should cover this listing.</p>
+                            <select wire:model.live="selected_subscription_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
+                                <option value="">Choose subscription</option>
+                                @foreach ($availableSubscriptions as $subscription)
+                                    <option value="{{ $subscription->id }}">
+                                        {{ $subscription->plan?->name ?? 'Subscription' }} — {{ $subscription->remaining_slots }} slot(s) left
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('selected_subscription_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        @else
+                            <p class="text-xs text-gray-500 mb-2">Choose a plan to purchase for this listing.</p>
+                            <select wire:model.live="selected_subscription_plan_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
+                                <option value="">Choose subscription plan</option>
+                                @foreach ($subscriptionPlans as $plan)
+                                    <option value="{{ $plan->id }}">{{ $plan->name }} ({{ $plan->seats }} listings / {{ $plan->days }} days)</option>
+                                @endforeach
+                            </select>
+                            @error('selected_subscription_plan_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        @endif
+                        @error('subscription_source') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                    @else
+                        <p class="text-xs text-gray-500 mb-3">No unused subscription found. Choose a plan to purchase.</p>
+                        <select wire:model.live="selected_subscription_plan_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
+                            <option value="">Choose subscription plan</option>
+                            @foreach ($subscriptionPlans as $plan)
+                                <option value="{{ $plan->id }}">{{ $plan->name }} ({{ $plan->seats }} listings / {{ $plan->days }} days)</option>
+                            @endforeach
+                        </select>
+                        @error('selected_subscription_plan_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                    @endif
+                </div>
 
-        <!-- Contact Information -->
-        <div>
-          <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <i class="ri-contacts-line text-emerald-600"></i> Contact Information
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">Contact Name *</label>
-              <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" value="John Doe" />
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">Phone Number *</label>
-              <input type="tel" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" value="08067042140" />
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">Email *</label>
-              <input type="email" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" value="john.doe@example.com" />
-            </div>
-            <div>
-              <label class="block font-medium text-sm text-gray-700 mb-2">WhatsApp</label>
-              <input type="tel" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" value="08067042140" />
-            </div>
-          </div>
-        </div>
-      </div>
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
+                        <i class="ri-rocket-line text-emerald-600"></i> Boost Your Listing
+                    </h3>
+                    <p class="text-gray-500 text-xs mb-4">Optional promotion</p>
+                    <select wire:model.live="selected_promotion_plan_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
+                        <option value="">No promotion</option>
+                        @foreach ($promotionPlans as $plan)
+                            <option value="{{ $plan->id }}">{{ $plan->name }} ({{ $plan->days }} days)</option>
+                        @endforeach
+                    </select>
+                    @error('selected_promotion_plan_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
 
-      <!-- Right Column -->
-      <div class="space-y-8">
-        <!-- Subscription Plans -->
-        <div class="bg-white rounded-xl p-6 shadow-md">
-          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-            <i class="ri-crown-line text-emerald-600"></i> Select Your Plan
-          </h3>
-          <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4 bg-white">
-            <option value="basic" selected>Basic - 1 listing per month</option>
-            <option value="professional">Professional - 5 listings per month</option>
-            <option value="business">Business - Unlimited listings</option>
-          </select>
-          <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4 bg-white">
-            <option value="1">1 Month - ₦5,000</option>
-            <option value="3">3 Months - ₦13,500 (Save 10%)</option>
-            <option value="6" selected>6 Months - ₦25,500 (Save 15%)</option>
-            <option value="12">12 Months - ₦42,000 (Save 30%)</option>
-          </select>
-          <p class="text-gray-500 text-xs mb-6">
-            <i class="ri-information-line mr-1"></i> Cancel anytime. <a href="#" class="text-emerald-600">View plan details</a>
-          </p>
-        </div>
+                <div class="bg-white rounded-xl p-6 shadow-md sticky top-24">
+                    <h3 class="text-xl font-semibold mb-6 pb-4 border-b border-gray-200">Payment Summary</h3>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Subscription</span>
+                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->subscriptionAmount(), 2) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Promotion</span>
+                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->promotionAmount(), 2) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Subtotal</span>
+                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->subtotalAmount(), 2) }}</span>
+                        </div>
+                        @if ($this->couponDiscountAmount() > 0)
+                            <div class="flex justify-between text-sm text-emerald-700">
+                                <span>Promo discount</span>
+                                <span>-{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->couponDiscountAmount(), 2) }}</span>
+                            </div>
+                        @endif
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">VAT ({{ number_format($this->vatRate(), 1) }}%)</span>
+                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->vatAmount(), 2) }}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between py-4 border-t-2 border-gray-200 mb-6">
+                        <span class="font-bold">Total</span>
+                        <span class="font-bold text-2xl text-emerald-600">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->totalAmount(), 2) }}</span>
+                    </div>
+                    @if ($this->subtotalAmount() > 0)
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" wire:model.defer="promo_code" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Enter promo code" />
+                            <button type="button" wire:click="applyPromoCode" class="px-4 py-2 bg-gray-100 rounded-lg font-medium hover:bg-gray-200">Apply</button>
+                        </div>
+                        @error('promo_code') <p class="text-sm text-red-600 mb-4">{{ $message }}</p> @enderror
+                    @endif
 
-        <!-- Promotion Section -->
-        <div class="bg-white rounded-xl p-6 shadow-md">
-          <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
-            <i class="ri-rocket-line text-emerald-600"></i> Boost Your Listing
-          </h3>
-          <p class="text-gray-500 text-xs mb-4">Select one promotion to increase visibility</p>
-          <div class="space-y-3">
-            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-500">
-              <input type="radio" name="promo" checked class="accent-emerald-600" />
-              <span class="text-sm">No promotion</span>
-            </label>
-            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-500">
-              <input type="radio" name="promo" class="accent-emerald-600" />
-              <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-emerald-600"><i class="ri-star-line"></i></div>
-              <div class="flex-1">
-                <div class="text-sm font-medium">Featured</div>
-                <div class="text-xs text-gray-500">Top results 30 days</div>
-              </div>
-              <div class="font-semibold text-emerald-600">+₦3k</div>
-            </label>
-            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-500">
-              <input type="radio" name="promo" class="accent-emerald-600" />
-              <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-emerald-600"><i class="ri-flashlight-line"></i></div>
-              <div class="flex-1">
-                <div class="text-sm font-medium">Urgent</div>
-                <div class="text-xs text-gray-500">Special badge</div>
-              </div>
-              <div class="font-semibold text-emerald-600">+₦2k</div>
-            </label>
-            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-500">
-              <input type="radio" name="promo" class="accent-emerald-600" />
-              <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-emerald-600"><i class="ri-whatsapp-line"></i></div>
-              <div class="flex-1">
-                <div class="text-sm font-medium">WhatsApp</div>
-                <div class="text-xs text-gray-500">1000+ buyers</div>
-              </div>
-              <div class="font-semibold text-emerald-600">+₦4k</div>
-            </label>
-          </div>
-        </div>
+                    <div class="rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-800 text-xs p-3 mb-4">
+                        Payment gateway is selected automatically based on your country settings.
+                    </div>
 
-        <!-- Payment Summary -->
-        <div class="bg-white rounded-xl p-6 shadow-md sticky top-24">
-          <h3 class="text-xl font-semibold mb-6 pb-4 border-b border-gray-200">Payment Summary</h3>
-          <div class="space-y-3 mb-6">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Basic Plan</span>
-              <span class="font-medium">₦5,000/month</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button type="button" wire:click="saveDraft" class="w-full py-4 border border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-semibold rounded-lg flex items-center justify-center gap-2 transition-all">
+                            <i class="ri-save-line"></i> Save as Draft
+                        </button>
+                        <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all">
+                        @if ($this->requiresPayment())
+                            <i class="ri-lock-line"></i> Pay {{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->totalAmount(), 2) }} & Submit Listing
+                        @else
+                            <i class="ri-check-line"></i> Submit Listing
+                        @endif
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Duration</span>
-              <span class="font-medium">6 Months</span>
+        </form>
+
+        @if ($showBulkUploadModal)
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" wire:keydown.escape="closeBulkUploadModal">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900">Bulk upload properties</h3>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Upload CSV/Excel using the sample template. Each row is saved as draft. Dynamic category fields use the same column names as in the template (for example <code>bedrooms</code>), not a prefix. See the Help and Field options sheets in the downloaded file.
+                            </p>
+                        </div>
+                        <button type="button" wire:click="closeBulkUploadModal" class="text-gray-500 hover:text-gray-800">
+                            <i class="ri-close-line text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="rounded-lg border border-gray-200 p-4 mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select file (.csv, .xlsx, .xls)</label>
+                        <input type="file" wire:model="bulk_upload_file" accept=".csv,.xlsx,.xls" class="block w-full text-sm text-gray-700">
+                        @error('bulk_upload_file') <p class="text-sm text-red-600 mt-2">{{ $message }}</p> @enderror
+                    </div>
+
+                    @if ($bulkUploadErrors)
+                        <div class="max-h-40 overflow-y-auto rounded-lg border border-amber-300 bg-amber-50 p-3 mb-4 text-sm text-amber-800">
+                            <p class="font-medium mb-2">Some rows failed:</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($bulkUploadErrors as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div class="flex justify-end gap-3">
+                        <button type="button" wire:click="closeBulkUploadModal" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                        <button type="button" wire:click="processBulkUpload" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">Upload and save drafts</button>
+                    </div>
+                </div>
             </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Subtotal (6 months)</span>
-              <span class="font-medium">₦25,500</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-500">VAT (7.5%)</span>
-              <span class="font-medium">₦1,913</span>
-            </div>
-          </div>
-          <div class="flex justify-between py-4 border-t-2 border-gray-200 mb-6">
-            <span class="font-bold">Total</span>
-            <span class="font-bold text-2xl text-emerald-600">₦27,413</span>
-          </div>
-          <div class="flex gap-2 mb-6">
-            <input type="text" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Enter promo code" />
-            <button class="px-4 py-2 bg-gray-100 rounded-lg font-medium hover:bg-gray-200">Apply</button>
-          </div>
-          <div class="space-y-2 mb-6">
-            <label class="flex items-center gap-3 p-3 border border-emerald-500 bg-emerald-50 rounded-lg cursor-pointer">
-              <input type="radio" name="payment" checked class="accent-emerald-600" />
-              <span class="font-medium">Card Payment</span>
-            </label>
-            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-500">
-              <input type="radio" name="payment" class="accent-emerald-600" />
-              <span class="font-medium">Paystack</span>
-            </label>
-            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-500">
-              <input type="radio" name="payment" class="accent-emerald-600" />
-              <span class="font-medium">Bank Transfer</span>
-            </label>
-          </div>
-          <button class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg">
-            <i class="ri-lock-line"></i> Pay ₦27,413 & Submit Listing
-          </button>
-          <div class="flex items-center justify-center gap-2 mt-4 text-gray-500 text-xs">
-            <i class="ri-shield-check-line text-emerald-600"></i> Secured by Paystack • 256-bit SSL Encrypted
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
+        @endif
+    </main>
 </div>

@@ -1,0 +1,54 @@
+Seller[
+    List-Property =>[
+        [remove promotion from this page. A payment cannot be related to both subscription and promotion at the same time],
+    ],
+    Listed Properties => [
+        Add property first image thumbnail to table,
+        Visibility of property depends on status and moderation relationship,
+        Add Edit-Property page,
+    ],
+    Listed-Property Details view => [
+        Show subscription used for property. Allow user to change subscription from subscriptions with available seats. 
+        Add button to promote property- onclick show modal with promotional plans, coupon field and button to pay
+        If promotion content exist, show promotion details and anaylytics.  => [
+            Blog Promotion => [
+                Show title of Post with href link,
+                Show views, Date created, published,
+            ],
+            Newsletter => [
+                Show email title and content,
+                Show number of recipient, emails sent, emails opened,
+            ],
+            Featured Listing => [
+                Show start date, target type, target count, 
+                Show target_achieved
+            ]
+
+        ],
+        if promotion exist but not content => [
+            Blog Promotion => [
+                if not available,show pending.. generating,
+                if available, show button to preview => [
+                    Show 3 posts and ask the user to pick 1. Each post shows title, content,
+                ]
+            ],
+            Newsletter => [
+                if not available,show pending.. generating,
+                if available, show button to preview => [
+                    Show 3 emails and ask the user to pick 1. Each email shows subject, content,
+                ]
+            ],
+            Featured Listing => [
+                if analysis does not exist, show generating
+                else, show targets and target achieved
+            ]
+
+        ]
+    ],
+    Subscriptions => [
+        List the subscriptions in table with filter on active. 
+        Allow users to change filter to inactive
+        For each subscription, show number of seats, plan, start date, expiry date, button to renew, invoice
+    ],
+    
+]

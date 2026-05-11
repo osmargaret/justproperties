@@ -1,29 +1,47 @@
-<x-admin.page title="Users" description="Browse and moderate registered buyer and seller accounts.">
-    <p class="text-gray-600 text-sm mb-6">Static preview data. Connect your database to list real users.</p>
-    <div class="overflow-x-auto border border-gray-200 rounded-lg">
-        <table class="min-w-full text-sm text-left">
-            <thead class="bg-gray-50 text-gray-600 font-medium border-b border-gray-200">
+<x-admin.page title="Users" description="User management with subscriptions, seats and property activity.">
+    <div class="mb-4 flex flex-wrap gap-3">
+        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search name, email, phone..." class="w-full max-w-sm rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        <button wire:click="sort('name')" type="button" class="rounded-lg border px-3 py-2 text-sm">Sort by Name</button>
+        <button wire:click="sort('properties_count')" type="button" class="rounded-lg border px-3 py-2 text-sm">Sort by Properties</button>
+        <button wire:click="sort('subscription_seats')" type="button" class="rounded-lg border px-3 py-2 text-sm">Sort by Seats</button>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table class="min-w-full text-left text-sm">
+            <thead class="border-b border-gray-200 bg-gray-50 text-gray-600">
                 <tr>
-                    <th class="px-4 py-3">Name</th>
-                    <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Role</th>
-                    <th class="px-4 py-3"></th>
+                    <th class="px-4 py-3">Details</th>
+                    <th class="px-4 py-3">Country</th>
+                    <th class="px-4 py-3">Properties</th>
+                    <th class="px-4 py-3">Active Subscriptions</th>
+                    <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium text-gray-900">Ada Okafor</td>
-                    <td class="px-4 py-3 text-gray-600">ada@example.com</td>
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs">Seller</span></td>
-                    <td class="px-4 py-3"><a href="{{ route('admin.users.show', ['user' => 1]) }}" class="text-emerald-600 font-medium hover:underline">View</a></td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium text-gray-900">Chidi Eze</td>
-                    <td class="px-4 py-3 text-gray-600">chidi@example.com</td>
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs">Buyer</span></td>
-                    <td class="px-4 py-3"><a href="{{ route('admin.users.show', ['user' => 2]) }}" class="text-emerald-600 font-medium hover:underline">View</a></td>
-                </tr>
+                @forelse ($users as $row)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900">{{ $row->name }}</div>
+                            <div class="text-xs text-gray-500">{{ $row->email }}</div>
+                            <div class="text-xs text-gray-500">{{ $row->phone ?: 'No phone' }}</div>
+                        </td>
+                        <td class="px-4 py-3 text-gray-700">{{ $row->country?->name ?? '—' }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $row->properties_count }}</td>
+                        <td class="px-4 py-3 text-gray-700">
+                            {{ $row->subscriptions->where('status', 'active')->count() }} subscriptions | {{ (int) ($row->subscription_seats ?? 0) }} seats
+                        </td>
+                        <td class="px-4 py-3">
+                            <a href="{{ route('admin.users.show', ['user' => $row->id]) }}" class="font-medium text-emerald-600 hover:underline">View</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">No users found.</td></tr>
+                @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="mt-4">
+        {{ $users->links() }}
     </div>
 </x-admin.page>

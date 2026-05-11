@@ -93,7 +93,7 @@
                             <li class="flex gap-4 items-start">
                                 <span class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><i class="ri-calendar-check-line text-lg"></i></span>
                                 <div class="min-w-0 flex-1">
-                                    <p class="font-medium text-gray-900">5 inspection disputes</p>
+                                    <p class="font-medium text-gray-900">5 moderation disputes</p>
                                     <p class="text-xs text-gray-500 mt-0.5">Buyer &amp; seller schedule conflicts · Inspections</p>
                                 </div>
                             </li>

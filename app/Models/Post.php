@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 #[Fillable([
     'user_id',
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'slug',
     'excerpt',
     'content',
+    'content_source',
+    'ai_generated_at',
     'status',
     'published_at',
     'tags',
@@ -26,6 +29,7 @@ class Post extends Model
         return [
             'tags' => 'array',
             'published_at' => 'datetime',
+            'ai_generated_at' => 'datetime',
         ];
     }
 
@@ -47,5 +51,15 @@ class Post extends Model
     public function blogSubscriptions(): HasMany
     {
         return $this->hasMany(NewsletterSubscription::class);
+    }
+
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
+    public function promotions(): MorphMany
+    {
+        return $this->morphMany(Promotion::class, 'promotable');
     }
 }

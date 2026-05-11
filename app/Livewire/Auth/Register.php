@@ -27,8 +27,6 @@ class Register extends Component
 
     public string $password_confirmation = '';
 
-    public string $account_type = 'buyer';
-
     public bool $terms = false;
 
     protected function rules(): array
@@ -40,7 +38,6 @@ class Register extends Component
             'phone' => ['required', 'string', 'max:40'],
             'country_id' => ['required', 'integer', 'exists:countries,id'],
             'password' => ['required', 'string', 'confirmed', Password::defaults()],
-            'account_type' => ['required', 'in:buyer,seller,agent'],
             'terms' => ['accepted'],
         ];
     }
@@ -50,7 +47,6 @@ class Register extends Component
         $this->validate();
 
         $name = trim($this->first_name.' '.$this->last_name);
-        $activeRole = $this->account_type === 'seller' ? 'seller' : 'buyer';
 
         $user = User::create([
             'name' => $name,
@@ -58,8 +54,7 @@ class Register extends Component
             'password' => $this->password,
             'phone' => $this->phone,
             'country_id' => $this->country_id,
-            'active_role' => $activeRole,
-            'is_admin' => false,
+            'active_role' => null,
             'two_factor_enable' => false,
         ]);
 

@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable(['property_id', 'promotion_plan_id', 'start_at', 'end_at', 'status'])]
+#[Fillable(['user_id', 'property_id', 'promotion_plan_id', 'promotable_id', 'promotable_type', 'start_at', 'end_at', 'status'])]
 class Promotion extends Model
 {
     protected function casts(): array
@@ -23,9 +24,19 @@ class Promotion extends Model
         return $this->belongsTo(Property::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function plan(): BelongsTo
     {
         return $this->belongsTo(PromotionPlan::class, 'promotion_plan_id');
+    }
+
+    public function promotable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     protected function isActive(): Attribute

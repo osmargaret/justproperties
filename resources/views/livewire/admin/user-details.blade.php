@@ -1,16 +1,30 @@
-<x-admin.page title="User details" description="Account overview and activity (placeholder).">
-    @if($user)
-        <p class="text-sm text-gray-500 mb-4">Viewing user ID: <span class="font-mono text-gray-800">{{ $user }}</span></p>
+<x-admin.page title="User details" description="Profile, account controls, and related resources.">
+    @if (session('status'))
+        <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700">{{ session('status') }}</div>
     @endif
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="border border-gray-200 rounded-lg p-4">
-            <h3 class="font-semibold text-gray-900 mb-2">Profile</h3>
-            <p class="text-sm text-gray-600">Name, email, phone, and verification status will appear here.</p>
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="rounded-lg border border-gray-200 p-4">
+            <h3 class="mb-2 font-semibold text-gray-900">Profile</h3>
+            <p class="text-sm text-gray-600"><span class="font-medium">Name:</span> {{ $user->name }}</p>
+            <p class="text-sm text-gray-600"><span class="font-medium">Email:</span> {{ $user->email }}</p>
+            <p class="text-sm text-gray-600"><span class="font-medium">Phone:</span> {{ $user->phone ?: '—' }}</p>
+            <p class="text-sm text-gray-600"><span class="font-medium">Country:</span> {{ $user->country?->name ?? '—' }}</p>
         </div>
-        <div class="border border-gray-200 rounded-lg p-4">
-            <h3 class="font-semibold text-gray-900 mb-2">Listings &amp; activity</h3>
-            <p class="text-sm text-gray-600">Recent listings, inspections, and payments (static placeholder).</p>
+        <div class="rounded-lg border border-gray-200 p-4">
+            <h3 class="mb-2 font-semibold text-gray-900">Activity summary</h3>
+            <p class="text-sm text-gray-600">Properties: {{ $user->properties_count }}</p>
+            <p class="text-sm text-gray-600">Subscriptions: {{ $user->subscriptions_count }}</p>
+            <p class="text-sm text-gray-600">Status: {{ $user->suspended_at ? 'Suspended' : 'Active' }}</p>
         </div>
     </div>
-    <a href="{{ route('admin.users') }}" class="inline-flex mt-6 text-sm font-medium text-emerald-600 hover:text-emerald-700">← Back to users</a>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+        <button wire:click="suspend" type="button" class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white">Suspend</button>
+        <button wire:click="delete" wire:confirm="Delete this user?" type="button" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white">Delete</button>
+        <a href="{{ route('admin.properties', ['q' => $user->name]) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">View Properties</a>
+        <a href="{{ route('admin.subscriptions', ['q' => $user->name]) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">View Subscriptions</a>
+    </div>
+
+    <a href="{{ route('admin.users') }}" class="mt-6 inline-flex text-sm font-medium text-emerald-600 hover:text-emerald-700">← Back to users</a>
 </x-admin.page>

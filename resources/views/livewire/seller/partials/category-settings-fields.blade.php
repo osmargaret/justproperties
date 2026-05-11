@@ -1,15 +1,22 @@
 @props(['settings'])
 
 @if($settings->isNotEmpty())
-    <div class="sm:col-span-2 space-y-6 border-t border-gray-200 pt-6 mt-2">
+    <div class="sm:col-span-2 lg:col-span-3 border-t border-gray-200 pt-6 mt-2">
         <h4 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <i class="ri-list-settings-line text-emerald-600"></i>
             Category-specific fields
         </h4>
-        <p class="text-sm text-gray-500">Driven by <code class="text-xs bg-gray-100 px-1 rounded">category_settings</code> for the selected listing category.</p>
+        <p class="text-sm text-gray-500">Driven by <code class="text-xs bg-gray-100 px-1 rounded">category settings</code> for the selected listing category.</p>
 
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         @foreach($settings as $field)
-            <div wire:key="category-setting-{{ $field->id }}">
+            @php
+                $isWideField = in_array($field->data_type, [
+                    \App\Models\CategorySetting::TYPE_TEXTAREA,
+                    \App\Models\CategorySetting::TYPE_MULTI_ENUM,
+                ], true);
+            @endphp
+            <div wire:key="category-setting-{{ $field->id }}" class="{{ $isWideField ? 'sm:col-span-2 lg:col-span-3' : '' }}">
                 <label class="block font-medium text-sm text-gray-700 mb-2">
                     {{ $field->label }}
                     @if($field->is_required)
@@ -31,7 +38,8 @@
                         @break
 
                     @case(\App\Models\CategorySetting::TYPE_MULTI_ENUM)
-                        <div class="flex flex-wrap gap-3 rounded-lg border border-gray-100 bg-gray-50 p-4">
+                        <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                             @foreach($field->options ?? [] as $opt)
                                 <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                                     <input
@@ -39,10 +47,12 @@
                                         value="{{ $opt }}"
                                         wire:model.live="dynamicAttributes.{{ $field->key }}"
                                         class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                        style="width: 1rem; height: 1rem; accent-color: #059669;"
                                     />
                                     <span>{{ $opt }}</span>
                                 </label>
                             @endforeach
+                            </div>
                         </div>
                         @break
 
@@ -88,7 +98,12 @@
                             @if($field->is_required) required @endif
                         />
                 @endswitch
+
+                @error('dynamicAttributes.'.$field->key)
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
         @endforeach
+        </div>
     </div>
 @endif

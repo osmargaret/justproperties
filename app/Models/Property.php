@@ -11,16 +11,22 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 #[Fillable([
     'name',
+    'slug',
     'description',
+    'cost',
     'category_id',
-    'type',
     'location',
     'country_id',
     'state_id',
     'city_id',
-    'town',
+    'neighborhood',
     'address',
-    'inspection_fee',
+    'show_address',
+    'status',
+    'contact_name',
+    'contact_phone',
+    'contact_email',
+    'contact_whatsapp',
     'user_id',
 ])]
 class Property extends Model
@@ -28,7 +34,8 @@ class Property extends Model
     protected function casts(): array
     {
         return [
-            'inspection_fee' => 'decimal:2',
+            'cost' => 'decimal:2',
+            'show_address' => 'boolean',
         ];
     }
 
@@ -72,11 +79,6 @@ class Property extends Model
         return $this->hasMany(PropertyAlert::class);
     }
 
-    public function inspections(): HasMany
-    {
-        return $this->hasMany(Inspection::class);
-    }
-
     public function savedByUsers(): HasMany
     {
         return $this->hasMany(SavedProperty::class);
@@ -90,6 +92,16 @@ class Property extends Model
     public function promotions(): HasMany
     {
         return $this->hasMany(Promotion::class);
+    }
+
+    public function featuredProperties(): HasMany
+    {
+        return $this->hasMany(FeaturedProperty::class);
+    }
+
+    public function moderations(): HasMany
+    {
+        return $this->hasMany(Moderation::class);
     }
 
     public function subscriptionLinks(): HasMany
@@ -117,7 +129,7 @@ class Property extends Model
         return Attribute::make(get: function (): string {
             return collect([
                 $this->address,
-                $this->town,
+                $this->neighborhood,
                 $this->city?->name,
                 $this->state?->name,
                 $this->country?->name,

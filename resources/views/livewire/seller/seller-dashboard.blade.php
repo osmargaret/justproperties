@@ -42,28 +42,28 @@
                         Quick actions
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <a href="{{ route('listed-properties') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('seller.listed-properties') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-home-4-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">My listings</div>
                                 <div class="text-xs text-gray-500">Edit or renew</div>
                             </div>
                         </a>
-                        <a href="{{ route('subscriptions') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('seller.subscriptions') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-crown-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Subscription</div>
                                 <div class="text-xs text-gray-500">Plan &amp; billing</div>
                             </div>
                         </a>
-                        <a href="{{ route('documents') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('seller.documents') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-file-shield-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Documents</div>
                                 <div class="text-xs text-gray-500">Verification</div>
                             </div>
                         </a>
-                        <a href="{{ route('transactions') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('seller.transactions') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-exchange-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Transactions</div>
@@ -79,7 +79,7 @@
                             <i class="ri-bar-chart-2-line text-emerald-600"></i>
                             Listing performance
                         </h3>
-                        <a href="{{ route('listed-properties') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">Manage all</a>
+                        <a href="{{ route('seller.listed-properties') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">Manage all</a>
                     </div>
                     <table class="w-full min-w-[520px]">
                         <thead>
@@ -125,7 +125,7 @@
                             </p>
                         </div>
                         <div class="flex flex-wrap gap-3 shrink-0">
-                            <a href="{{ route('documents') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-emerald-600 text-emerald-700 font-medium text-sm hover:bg-emerald-600 hover:text-white transition">
+                            <a href="{{ route('seller.documents') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-emerald-600 text-emerald-700 font-medium text-sm hover:bg-emerald-600 hover:text-white transition">
                                 <i class="ri-upload-cloud-line"></i>
                                 Upload documents
                             </a>

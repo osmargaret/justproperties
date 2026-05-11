@@ -103,7 +103,7 @@
                 @endguest
                 </div>
                 <div class="flex items-center space-x-3 lg:hidden">
-                <a href="list_property.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition text-gray-700">
+                <a href="{{ route('list-property') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition text-gray-700">
                     <i class="ri-add-circle-line text-xl"></i>
                     <span class="font-medium">List Property</span>
                 </a>
@@ -115,27 +115,27 @@
             </div>
             <div id="mobileMenu" class="mobile-menu lg:hidden">
                 <div class="px-4 py-5 flex flex-col gap-1">
-                    <a href="landedproperty.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                    <a href="{{ route('landed-properties') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
                         <i class="ri-landscape-line text-lg"></i>
                         <span class="font-medium">Landed Properties</span>
                     </a>
-                    <a href="uncompleted_property.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                    <a href="{{ route('uncompleted-properties') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
                         <i class="ri-building-2-line text-lg"></i>
                         <span class="font-medium">Uncompleted</span>
                     </a>
-                    <a href="completedproperty.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                    <a href="{{ route('completed-properties') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
                         <i class="ri-home-4-line text-lg"></i>
                         <span class="font-medium">Completed</span>
                     </a>
-                    <a href="rent_lease.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                    <a href="{{ route('rent-lease') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
                         <i class="ri-key-line text-lg"></i>
                         <span class="font-medium">Rent/Lease</span>
                     </a>
-                    <a href="short_let.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                    <a href="{{ route('short-lets') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
                         <i class="ri-hotel-line text-lg"></i>
                         <span class="font-medium">Short-Let</span>
                     </a>
-                    <a href="blog.html" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                    <a href="{{ route('blog') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
                         <i class="ri-article-line text-lg"></i>
                         <span class="font-medium">Blog</span>
                     </a>

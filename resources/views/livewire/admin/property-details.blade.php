@@ -1,13 +1,43 @@
-<x-admin.page title="Property details" description="Moderation tools and owner contact (placeholder).">
-    @if($property)
-        <p class="text-sm text-gray-500 mb-4">Property ID: <span class="font-mono text-gray-800">{{ $property }}</span></p>
+<x-admin.page title="Property details" description="Full listing details and moderation history.">
+    @if (session('status'))
+        <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700">{{ session('status') }}</div>
     @endif
-    <div class="space-y-4 text-sm text-gray-600">
-        <p>Gallery, description, pricing, and inspection history will render here from your database.</p>
-        <div class="flex flex-wrap gap-3">
-            <button type="button" class="px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium text-sm">Approve (demo)</button>
-            <button type="button" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium text-sm">Reject (demo)</button>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-200 p-4">
+            <h3 class="mb-2 font-semibold text-gray-900">{{ $property->name }}</h3>
+            <p class="text-sm text-gray-600">{{ $property->description }}</p>
+            <div class="mt-3 space-y-1 text-sm text-gray-600">
+                <p><span class="font-medium">Owner:</span> {{ $property->user?->name ?? '—' }}</p>
+                <p><span class="font-medium">Category:</span> {{ $property->category?->name ?? '—' }}</p>
+                <p><span class="font-medium">Status:</span> {{ $property->status }}</p>
+            </div>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-4">
+            <h3 class="mb-2 font-semibold text-gray-900">Subscription and promotions</h3>
+            <p class="text-sm text-gray-600">Subscriptions: {{ $property->subscriptionLinks->count() }}</p>
+            <p class="text-sm text-gray-600">Promotions: {{ $property->promotions->count() }}</p>
         </div>
     </div>
-    <a href="{{ route('admin.properties') }}" class="inline-flex mt-6 text-sm font-medium text-emerald-600 hover:text-emerald-700">← Back to properties</a>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+        <button wire:click="approve" type="button" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white">Approve</button>
+        <button wire:click="disapprove" type="button" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Disapprove</button>
+        <button wire:click="delete" wire:confirm="Delete this property?" type="button" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white">Delete</button>
+    </div>
+
+    <div class="mt-6 rounded-lg border border-gray-200">
+        <div class="border-b border-gray-200 px-4 py-3 font-medium text-gray-900">Moderation history</div>
+        <div class="divide-y divide-gray-100">
+            @forelse ($moderations as $moderation)
+                <div class="px-4 py-3 text-sm text-gray-700">
+                    <span class="font-medium">{{ $moderation->action }}</span> ({{ $moderation->status }}) · {{ $moderation->created_at->format('Y-m-d H:i') }}
+                </div>
+            @empty
+                <div class="px-4 py-3 text-sm text-gray-500">No moderation history yet.</div>
+            @endforelse
+        </div>
+    </div>
+
+    <a href="{{ route('admin.properties') }}" class="mt-6 inline-flex text-sm font-medium text-emerald-600 hover:text-emerald-700">← Back to properties</a>
 </x-admin.page>

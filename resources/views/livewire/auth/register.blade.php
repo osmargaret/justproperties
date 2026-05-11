@@ -66,27 +66,6 @@
         @endif
 
         <form wire:submit="register">
-            <div class="account-type">
-                <span class="type-label">I am registering as</span>
-                <div class="type-options">
-                    <label class="type-option {{ $account_type === 'buyer' ? 'selected' : '' }}">
-                        <input type="radio" wire:model.live="account_type" value="buyer" name="account_type">
-                        <span>Buyer</span>
-                    </label>
-                    <label class="type-option {{ $account_type === 'seller' ? 'selected' : '' }}">
-                        <input type="radio" wire:model.live="account_type" value="seller" name="account_type">
-                        <span>Seller</span>
-                    </label>
-                    <label class="type-option {{ $account_type === 'agent' ? 'selected' : '' }}">
-                        <input type="radio" wire:model.live="account_type" value="agent" name="account_type">
-                        <span>Agent</span>
-                    </label>
-                </div>
-                @error('account_type')
-                    <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
-                @enderror
-            </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label" for="first_name"><i class="ri-user-line"></i> First name</label>
@@ -274,43 +253,6 @@
             font-size: 0.875rem;
         }
 
-        .account-type {
-            margin-bottom: 1.5rem;
-        }
-
-        .type-label {
-            display: block;
-            font-weight: 500;
-            font-size: 0.875rem;
-            color: #374151;
-            margin-bottom: 0.75rem;
-        }
-
-        .type-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-        }
-
-        .type-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            cursor: pointer;
-        }
-
-        .type-option.selected {
-            border-color: #059669;
-            background: #f0fdf4;
-        }
-
-        .type-option input {
-            accent-color: #059669;
-        }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -444,10 +386,6 @@
 
         @media (max-width: 768px) {
             .social-signup {
-                grid-template-columns: 1fr;
-            }
-
-            .type-options {
                 grid-template-columns: 1fr;
             }
 

@@ -2,6 +2,7 @@
 
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\ResetPassword;
+use App\Livewire\Auth\RoleWelcome;
 use App\Livewire\Auth\TwoFactorChallenge;
 use App\Livewire\Auth\VerifyEmail;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -29,7 +30,7 @@ Route::middleware('auth')->group(function () {
 
 Route::post('email/verification-notification', function (Request $request) {
     if ($request->user()->hasVerifiedEmail()) {
-        return redirect()->intended(route('buyer-dashboard'));
+        return redirect()->intended($request->user()->dashboard_url);
     }
 
     $request->user()->sendEmailVerificationNotification();
@@ -40,5 +41,9 @@ Route::post('email/verification-notification', function (Request $request) {
 Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
 
-    return redirect()->route('buyer-dashboard')->with('verified', true);
+    return redirect()->intended($request->user()->dashboard_url)->with('verified', true);
 })->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('home', RoleWelcome::class)->name('home');
+});

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['name', 'slug', 'type', 'permissions'])]
 class Role extends Model
@@ -17,10 +17,9 @@ class Role extends Model
         ];
     }
 
-    public function users(): BelongsToMany
+    public function users(): HasMany
     {
-        return $this->belongsToMany(User::class, 'role_users')
-            ->withTimestamps();
+        return $this->hasMany(User::class);
     }
 
     protected function permissionCount(): Attribute

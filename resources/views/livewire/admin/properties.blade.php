@@ -1,29 +1,57 @@
-<x-admin.page title="Properties" description="Moderate and feature listings across the marketplace.">
-    <p class="text-gray-600 text-sm mb-6">Static sample rows. Wire this table to your Property model when ready.</p>
-    <div class="overflow-x-auto border border-gray-200 rounded-lg">
-        <table class="min-w-full text-sm text-left">
-            <thead class="bg-gray-50 text-gray-600 font-medium border-b border-gray-200">
+<x-admin.page title="Properties" description="Property moderation queue and actions.">
+    <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-4">
+        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search user or property..." class="rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        <select wire:model.live="category" class="rounded-lg border border-gray-200 px-3 py-2 text-sm">
+            <option value="">All categories</option>
+            @foreach ($categories as $categoryOption)
+                <option value="{{ $categoryOption->id }}">{{ $categoryOption->name }}</option>
+            @endforeach
+        </select>
+        <select wire:model.live="status" class="rounded-lg border border-gray-200 px-3 py-2 text-sm">
+            <option value="">All statuses</option>
+            @foreach ($statusOptions as $statusOption)
+                <option value="{{ $statusOption }}">{{ $statusOption }}</option>
+            @endforeach
+        </select>
+        <button wire:click="$set('sortDir', $sortDir === 'asc' ? 'desc' : 'asc')" class="rounded-lg border px-3 py-2 text-sm">Toggle Date Sort</button>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table class="min-w-full text-left text-sm">
+            <thead class="border-b border-gray-200 bg-gray-50 text-gray-600">
                 <tr>
-                    <th class="px-4 py-3">Title</th>
-                    <th class="px-4 py-3">Type</th>
+                    <th class="px-4 py-3">Date Listed</th>
+                    <th class="px-4 py-3">User</th>
+                    <th class="px-4 py-3">Category &amp; Type</th>
+                    <th class="px-4 py-3">Property</th>
                     <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3"></th>
+                    <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium text-gray-900">4-bed duplex · Gberigbe</td>
-                    <td class="px-4 py-3 text-gray-600">Completed</td>
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs">Pending</span></td>
-                    <td class="px-4 py-3"><a href="{{ route('admin.properties.show', ['property' => 101]) }}" class="text-emerald-600 font-medium hover:underline">Open</a></td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium text-gray-900">Half plot · Odogunyan</td>
-                    <td class="px-4 py-3 text-gray-600">Landed</td>
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs">Live</span></td>
-                    <td class="px-4 py-3"><a href="{{ route('admin.properties.show', ['property' => 102]) }}" class="text-emerald-600 font-medium hover:underline">Open</a></td>
-                </tr>
+                @forelse ($properties as $property)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">{{ $property->created_at->format('Y-m-d') }}</td>
+                        <td class="px-4 py-3">{{ $property->user?->name ?? '—' }}</td>
+                        <td class="px-4 py-3">{{ $property->category?->name ?? '—' }}</td>
+                        <td class="px-4 py-3">
+                            <a href="{{ route('admin.properties.show', ['property' => $property->id]) }}" class="text-emerald-600 hover:underline">{{ $property->name }}</a>
+                        </td>
+                        <td class="px-4 py-3">{{ $property->status }}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-wrap gap-2">
+                                <button wire:click="approve({{ $property->id }})" class="text-xs font-medium text-emerald-600 hover:underline">Approve</button>
+                                <button wire:click="disapprove({{ $property->id }})" class="text-xs font-medium text-amber-600 hover:underline">Disapprove</button>
+                                <button wire:click="delete({{ $property->id }})" wire:confirm="Delete property?" class="text-xs font-medium text-red-600 hover:underline">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="6" class="px-4 py-6 text-center text-sm text-gray-500">No properties found.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
+
+    <div class="mt-4">{{ $properties->links() }}</div>
 </x-admin.page>

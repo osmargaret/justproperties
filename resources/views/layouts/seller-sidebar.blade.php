@@ -5,20 +5,20 @@
 <aside class="bg-white rounded-xl shadow-md overflow-hidden h-fit lg:sticky lg:top-24">
     <div class="py-4">
         <div class="font-medium text-gray-500 text-sm mb-2">Selling</div>
-        <a href="{{ route('seller-dashboard') }}" class="{{ request()->routeIs('seller-dashboard') ? $navActive : $navIdle }}">
+        <a href="{{ route('seller.dashboard') }}" class="{{ request()->routeIs('seller.dashboard') ? $navActive : $navIdle }}">
             <i class="ri-dashboard-line text-xl"></i><span class="font-medium">Dashboard</span>
         </a>
         <a href="{{ route('list-property') }}" class="{{ request()->routeIs('list-property') ? $navActive : $navIdle }}">
             <i class="ri-add-circle-line text-xl"></i><span class="font-medium">List Property</span>
         </a>
-        <a href="{{ route('listed-properties') }}" class="{{ request()->routeIs('listed-properties') ? $navActive : $navIdle }}">
+        <a href="{{ route('seller.listed-properties') }}" class="{{ request()->routeIs('seller.listed-properties') ? $navActive : $navIdle }}">
             <i class="ri-home-4-line text-xl"></i><span class="font-medium">My Listings</span>
         </a>
-        <a href="{{ route('subscriptions') }}" class="{{ request()->routeIs('subscriptions') ? $navActive : $navIdle }}">
+        <a href="{{ route('seller.subscriptions') }}" class="{{ request()->routeIs('seller.subscriptions') ? $navActive : $navIdle }}">
             <i class="ri-vip-diamond-line text-xl"></i>
             <span class="font-medium">Subscriptions</span>
         </a>
-        <a href="{{ route('transactions') }}" class="{{ request()->routeIs('transactions') ? $navActive : $navIdle }}">
+        <a href="{{ route('seller.transactions') }}" class="{{ request()->routeIs('seller.transactions') ? $navActive : $navIdle }}">
             <i class="ri-money-dollar-circle-line text-xl"></i>
             <span class="font-medium">Transactions</span>
         </a>

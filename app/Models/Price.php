@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable(['amount', 'currency_id', 'priceable_id', 'priceable_type'])]
+#[Fillable(['amount', 'currency_id', 'country_id', 'priceable_id', 'priceable_type'])]
 class Price extends Model
 {
     protected function casts(): array
@@ -20,6 +20,11 @@ class Price extends Model
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class);
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function priceable(): MorphTo

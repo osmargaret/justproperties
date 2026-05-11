@@ -42,28 +42,28 @@
                         Quick actions
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <a href="{{ route('favourites') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('buyer.favourites') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-heart-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Saved</div>
                                 <div class="text-xs text-gray-500">View favourites</div>
                             </div>
                         </a>
-                        <a href="{{ route('notifications') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('buyer.notifications') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-notification-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Alerts</div>
                                 <div class="text-xs text-gray-500">Email &amp; WhatsApp</div>
                             </div>
                         </a>
-                        <a href="{{ route('security') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('buyer.security') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-shield-user-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Security</div>
                                 <div class="text-xs text-gray-500">Password &amp; 2FA</div>
                             </div>
                         </a>
-                        <a href="{{ route('profile') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('buyer.profile') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-user-settings-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Profile</div>
@@ -80,7 +80,7 @@
                                 <i class="ri-heart-line text-emerald-600"></i>
                                 Recently saved
                             </h3>
-                            <a href="{{ route('favourites') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">View all</a>
+                            <a href="{{ route('buyer.favourites') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">View all</a>
                         </div>
                         <ul class="space-y-4">
                             <li class="flex gap-4">
@@ -113,7 +113,7 @@
                             <li class="flex gap-2"><i class="ri-checkbox-circle-fill text-emerald-300 shrink-0 mt-0.5"></i> Message owners directly from the property page.</li>
                             <li class="flex gap-2"><i class="ri-checkbox-circle-fill text-emerald-300 shrink-0 mt-0.5"></i> Keep your profile verified to speed up enquiries.</li>
                         </ul>
-                        <a href="{{ route('notifications') }}" class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 border border-white/30 text-sm font-medium transition">
+                        <a href="{{ route('buyer.notifications') }}" class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 border border-white/30 text-sm font-medium transition">
                             <i class="ri-settings-3-line"></i>
                             Manage notifications
                         </a>
