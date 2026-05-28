@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-#[Fillable(['name', 'slug', 'type', 'features', 'days'])]
+#[Fillable(['name', 'slug', 'type', 'features'])]
 class PromotionPlan extends Model
 {
     protected function casts(): array

@@ -20,8 +20,16 @@
     </div>
 
     <div class="mt-6 flex flex-wrap gap-3">
-        <button wire:click="suspend" type="button" class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white">Suspend</button>
-        <button wire:click="delete" wire:confirm="Delete this user?" type="button" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white">Delete</button>
+        @if(auth()->id() !== $user->id)
+            @if (!$user->suspended_at)
+                <button wire:click="suspend" type="button" class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white">Suspend</button>
+            @else
+                <button wire:click="unsuspend" type="button" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white">Unsuspend {{ $user->suspended_at }}</button>
+            @endif
+            <button wire:click="delete" wire:confirm="Delete this user?" type="button" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white">Delete</button>
+
+        @endif
+        
         <a href="{{ route('admin.properties', ['q' => $user->name]) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">View Properties</a>
         <a href="{{ route('admin.subscriptions', ['q' => $user->name]) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">View Subscriptions</a>
     </div>

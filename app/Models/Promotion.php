@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable(['user_id', 'property_id', 'promotion_plan_id', 'promotable_id', 'promotable_type', 'start_at', 'end_at', 'status'])]
+#[Fillable(['user_id', 'property_id', 'promotion_plan_id', 'promotable_id', 'promotable_type', 'start_at', 'end_at', 'usage', 'status'])]
 class Promotion extends Model
 {
     protected function casts(): array
@@ -16,6 +16,7 @@ class Promotion extends Model
         return [
             'start_at' => 'datetime',
             'end_at' => 'datetime',
+            'usage' => 'array',
         ];
     }
 

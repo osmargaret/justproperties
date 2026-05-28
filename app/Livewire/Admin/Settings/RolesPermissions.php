@@ -2,10 +2,8 @@
 
 namespace App\Livewire\Admin\Settings;
 
-use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class RolesPermissions extends Component
@@ -18,22 +16,15 @@ class RolesPermissions extends Component
 
     public string $roleSlug = '';
 
-    public string $type = 'admin';
-
-    /** @var list<string> */
-    public array $selectedPermissions = [];
-
-    public string $newPermissionName = '';
-
-    public string $newPermissionSlug = '';
+    /** @var array<string, array<string>> */
+    public array $permissionGroups = [];
 
     public function openCreateRole(): void
     {
         $this->editingRoleId = null;
         $this->name = '';
         $this->roleSlug = '';
-        $this->type = 'admin';
-        $this->selectedPermissions = [];
+        $this->permissionGroups = array_fill_keys(array_keys(Role::PERMISSION_GROUPS), []);
         $this->resetErrorBag();
         $this->showRoleModal = true;
     }
@@ -44,9 +35,10 @@ class RolesPermissions extends Component
         $this->editingRoleId = $role->id;
         $this->name = $role->name;
         $this->roleSlug = (string) ($role->slug ?? '');
-        $this->type = $role->type;
-        $perms = $role->permissions ?? [];
-        $this->selectedPermissions = is_array($perms) ? array_values(array_filter($perms)) : [];
+        $this->permissionGroups = [];
+        foreach (array_keys(Role::PERMISSION_GROUPS) as $group) {
+            $this->permissionGroups[$group] = is_array($role->{$group}) ? $role->{$group} : [];
+        }
         $this->resetErrorBag();
         $this->showRoleModal = true;
     }
@@ -62,10 +54,19 @@ class RolesPermissions extends Component
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'roleSlug' => ['nullable', 'string', 'max:255'],
-            'type' => ['required', Rule::in(['admin', 'seller'])],
-            'selectedPermissions' => ['array'],
-            'selectedPermissions.*' => ['string', 'max:120'],
+            'permissionGroups' => ['array'],
         ]);
+
+        $known = [];
+        foreach (Role::PERMISSION_GROUPS as $group => $actions) {
+            $known[$group] = $actions;
+        }
+
+        $filtered = [];
+        foreach (array_keys(Role::PERMISSION_GROUPS) as $group) {
+            $capabilities = $this->permissionGroups[$group] ?? [];
+            $filtered[$group] = array_values(array_intersect($capabilities, $known[$group]));
+        }
 
         $slug = $this->roleSlug !== '' ? Str::slug($this->roleSlug) : Str::slug($this->name);
 
@@ -79,23 +80,18 @@ class RolesPermissions extends Component
             return;
         }
 
-        $known = Permission::query()->pluck('slug')->all();
-        $filtered = array_values(array_intersect($this->selectedPermissions, $known));
+        $data = [
+            'name' => $this->name,
+            'slug' => $slug,
+        ];
+        foreach ($filtered as $group => $capabilities) {
+            $data[$group] = $capabilities;
+        }
 
         if ($this->editingRoleId) {
-            Role::query()->whereKey($this->editingRoleId)->update([
-                'name' => $this->name,
-                'slug' => $slug,
-                'type' => $this->type,
-                'permissions' => $filtered,
-            ]);
+            Role::query()->whereKey($this->editingRoleId)->update($data);
         } else {
-            Role::query()->create([
-                'name' => $this->name,
-                'slug' => $slug,
-                'type' => $this->type,
-                'permissions' => $filtered,
-            ]);
+            Role::query()->create($data);
         }
 
         session()->flash('status', __('Role saved.'));
@@ -114,31 +110,12 @@ class RolesPermissions extends Component
         session()->flash('status', __('Role deleted.'));
     }
 
-    public function addPermission(): void
-    {
-        $this->validate([
-            'newPermissionName' => ['required', 'string', 'max:255'],
-            'newPermissionSlug' => ['required', 'string', 'max:120', 'regex:/^[a-z][a-z0-9_-]*$/', 'unique:permissions,slug'],
-        ]);
-
-        Permission::query()->create([
-            'name' => $this->newPermissionName,
-            'slug' => $this->newPermissionSlug,
-        ]);
-
-        $this->newPermissionName = '';
-        $this->newPermissionSlug = '';
-        session()->flash('status', __('Permission added.'));
-    }
-
     public function render()
     {
-        $roles = Role::query()->orderBy('type')->orderBy('name')->get();
-        $permissions = Permission::query()->orderBy('slug')->get();
+        $roles = Role::query()->orderBy('name','asc')->get();
 
         return view('livewire.admin.settings.roles-permissions', [
             'roles' => $roles,
-            'permissions' => $permissions,
         ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Settings;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\StaffInviteNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -28,14 +29,17 @@ class Staff extends Component
         $this->name = '';
         $this->email = '';
         $this->password = '';
-        $this->role_id = Role::query()->where('type', 'admin')->orderBy('name')->value('id');
+        $this->role_id = Role::orderBy('name', 'asc')->value('id');
         $this->resetErrorBag();
         $this->showModal = true;
     }
 
     public function openEdit(int $userId): void
     {
-        $user = User::query()->whereKey($userId)->whereHas('role', fn ($q) => $q->where('type', 'admin'))->firstOrFail();
+        if ($userId === auth()->id()) {
+            return;
+        }
+        $user = User::query()->whereKey($userId)->whereHas('role')->firstOrFail();
         $this->editingUserId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
@@ -69,7 +73,7 @@ class Staff extends Component
 
         $this->validate($rules);
 
-        $role = Role::query()->whereKey($this->role_id)->where('type', 'admin')->firstOrFail();
+        $role = Role::query()->whereKey($this->role_id)->firstOrFail();
 
         $payload = [
             'name' => $this->name,
@@ -95,7 +99,8 @@ class Staff extends Component
             $payload['password'] = Hash::make($this->password);
             $payload['email_verified_at'] = now();
             $payload['country_id'] = auth()->user()?->country_id;
-            User::query()->create($payload);
+            $user = User::query()->create($payload);
+            $user->notify(new StaffInviteNotification($user, $this->password));
         }
 
         session()->flash('status', __('Staff member saved.'));
@@ -104,25 +109,25 @@ class Staff extends Component
 
     public function deleteStaff(int $userId): void
     {
-        $user = User::query()->whereKey($userId)->whereHas('role', fn ($q) => $q->where('type', 'admin'))->firstOrFail();
+        $user = User::query()->whereKey($userId)->whereHas('role')->firstOrFail();
         if (auth()->id() === $user->id) {
-            session()->flash('error', __('You cannot delete your own account.'));
+            session()->flash('error', __('You cannot remove yourself from admin.'));
 
             return;
         }
-        $user->delete();
-        session()->flash('status', __('Staff member removed.'));
+        $user->update(['role_id' => null]);
+        session()->flash('status', __('Staff member removed from admin.'));
     }
 
     public function render()
     {
         $staff = User::query()
             ->with('role')
-            ->whereHas('role', fn ($q) => $q->where('type', 'admin'))
+            ->whereHas('role')
             ->orderBy('name')
             ->get();
 
-        $adminRoles = Role::query()->where('type', 'admin')->orderBy('name')->get();
+        $adminRoles = Role::orderBy('name', 'asc')->get();
 
         return view('livewire.admin.settings.staff', [
             'staff' => $staff,

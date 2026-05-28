@@ -6,13 +6,10 @@ use App\Exports\PropertyBulkTemplateExport;
 use App\Models\Category;
 use App\Models\CategorySetting;
 use App\Models\City;
-use App\Models\Coupon;
 use App\Models\Currency;
 use App\Models\Media;
 use App\Models\Payment;
 use App\Models\Price;
-use App\Models\Promotion;
-use App\Models\PromotionPlan;
 use App\Models\Property;
 use App\Models\PropertyFeature;
 use App\Models\State;
@@ -85,10 +82,6 @@ class ListProperty extends Component
     public const SUBSCRIPTION_SOURCE_EXISTING = 'existing';
 
     public const SUBSCRIPTION_SOURCE_PURCHASE = 'purchase';
-
-    public ?int $selected_promotion_plan_id = null;
-
-    public string $promo_code = '';
 
     /**
      * @var array<string, mixed>
@@ -169,23 +162,6 @@ class ListProperty extends Component
             unset($this->uploadedImages[$index]);
             $this->uploadedImages = array_values($this->uploadedImages);
         }
-    }
-
-    public function applyPromoCode(): void
-    {
-        if ($this->promo_code === '') {
-            session()->flash('status', 'Enter a promo code first.');
-
-            return;
-        }
-
-        if ($this->resolvedCoupon() === null) {
-            throw ValidationException::withMessages([
-                'promo_code' => __('This promo code is invalid or not eligible for this listing.'),
-            ]);
-        }
-
-        session()->flash('status', __('Promo code applied successfully.'));
     }
 
     public function openBulkUploadModal(): void
@@ -388,77 +364,9 @@ class ListProperty extends Component
         return $this->resolveAmountForPriceable(SubscriptionPlan::class, (int) $this->selected_subscription_plan_id);
     }
 
-    public function promotionAmount(): float
-    {
-        if (! $this->selected_promotion_plan_id) {
-            return 0.0;
-        }
-
-        return $this->resolveAmountForPriceable(PromotionPlan::class, (int) $this->selected_promotion_plan_id);
-    }
-
     public function subtotalAmount(): float
     {
-        return round($this->subscriptionAmount() + $this->promotionAmount(), 2);
-    }
-
-    public function resolvedCoupon(): ?Coupon
-    {
-        if (trim($this->promo_code) === '') {
-            return null;
-        }
-
-        $code = Str::upper(trim($this->promo_code));
-        /** @var Coupon|null $coupon */
-        $coupon = Coupon::query()
-            ->whereRaw('UPPER(code) = ?', [$code])
-            ->where('is_published', true)
-            ->where(function ($query) {
-                $query->whereNull('start_at')->orWhere('start_at', '<=', now());
-            })
-            ->where(function ($query) {
-                $query->whereNull('expires_at')->orWhere('expires_at', '>=', now());
-            })
-            ->first();
-
-        if (! $coupon) {
-            return null;
-        }
-
-        if ($coupon->minimum_spend !== null && $this->subtotalAmount() < (float) $coupon->minimum_spend) {
-            return null;
-        }
-
-        $eligibleItems = collect($coupon->eligible_items ?? []);
-        $needsSubscription = $this->subscriptionAmount() > 0;
-        $hasPromotion = (int) $this->selected_promotion_plan_id > 0;
-        $isEligible = (! $needsSubscription || $eligibleItems->contains('subscription'))
-            && (! $hasPromotion || $eligibleItems->contains('promotion'));
-
-        return $isEligible ? $coupon : null;
-    }
-
-    public function couponDiscountAmount(): float
-    {
-        $coupon = $this->resolvedCoupon();
-        if (! $coupon || $this->subtotalAmount() <= 0) {
-            return 0.0;
-        }
-
-        $discount = $coupon->is_percentage
-            ? ($this->subtotalAmount() * ((float) $coupon->discount / 100))
-            : (float) $coupon->discount;
-
-        if ($coupon->discount_cap !== null) {
-            $discount = min($discount, (float) $coupon->discount_cap);
-        }
-
-        return round(min($discount, $this->subtotalAmount()), 2);
-    }
-
-    public function discountedSubtotal(): float
-    {
-        return round(max(0, $this->subtotalAmount() - $this->couponDiscountAmount()), 2);
+        return round($this->subscriptionAmount(), 2);
     }
 
     public function vatRate(): float
@@ -468,12 +376,12 @@ class ListProperty extends Component
 
     public function vatAmount(): float
     {
-        return round(($this->discountedSubtotal() * $this->vatRate()) / 100, 2);
+        return round(($this->subtotalAmount() * $this->vatRate()) / 100, 2);
     }
 
     public function totalAmount(): float
     {
-        return round($this->discountedSubtotal() + $this->vatAmount(), 2);
+        return round($this->subtotalAmount() + $this->vatAmount(), 2);
     }
 
     public function requiresPayment(): bool
@@ -501,8 +409,6 @@ class ListProperty extends Component
             'uploadedImages.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'selected_subscription_id' => ['nullable', 'integer'],
             'selected_subscription_plan_id' => ['nullable', 'integer', 'exists:subscription_plans,id'],
-            'selected_promotion_plan_id' => ['nullable', 'integer', 'exists:promotion_plans,id'],
-            'promo_code' => ['nullable', 'string', 'max:80'],
             'subscription_source' => ['nullable', 'string', Rule::in([self::SUBSCRIPTION_SOURCE_EXISTING, self::SUBSCRIPTION_SOURCE_PURCHASE])],
         ];
     }
@@ -546,8 +452,6 @@ class ListProperty extends Component
             'uploadedImages' => 'property images',
             'selected_subscription_id' => 'existing subscription',
             'selected_subscription_plan_id' => 'subscription plan',
-            'selected_promotion_plan_id' => 'promotion plan',
-            'promo_code' => 'promo code',
             'subscription_source' => 'subscription option',
         ];
     }
@@ -760,22 +664,6 @@ class ListProperty extends Component
                     ]);
                 }
 
-                if ($this->selected_promotion_plan_id) {
-                    $promotionPlan = PromotionPlan::query()->find($this->selected_promotion_plan_id);
-                    if ($promotionPlan) {
-                        Promotion::query()->create([
-                            'user_id' => $user->id,
-                            'property_id' => $property->id,
-                            'promotion_plan_id' => $promotionPlan->id,
-                            'promotable_id' => $property->id,
-                            'promotable_type' => Property::class,
-                            'start_at' => now(),
-                            'end_at' => now()->addDays(max(1, (int) $promotionPlan->days)),
-                            'status' => $requiresPayment ? 'pending' : 'active',
-                        ]);
-                    }
-                }
-
                 if ($requiresPayment && $this->activeCurrency && $this->totalAmount() > 0) {
                     Payment::query()->create([
                         'user_id' => $user->id,
@@ -785,8 +673,6 @@ class ListProperty extends Component
                         'reference' => 'LIST-'.Str::upper(Str::random(12)),
                         'request_id' => null,
                         'amount' => $this->subtotalAmount(),
-                        'coupon_id' => $this->resolvedCoupon()?->id,
-                        'coupon_value' => (string) $this->couponDiscountAmount(),
                         'vat_rate' => $this->vatRate(),
                         'vat_value' => $this->vatAmount(),
                         'total' => $this->totalAmount(),
@@ -817,7 +703,6 @@ class ListProperty extends Component
             'states' => $states,
             'cities' => $cities,
             'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name')->get(),
-            'promotionPlans' => PromotionPlan::query()->orderBy('name')->get(),
             'availableSubscriptions' => $this->availableSubscriptions,
             'activeCurrency' => $this->activeCurrency,
         ]);

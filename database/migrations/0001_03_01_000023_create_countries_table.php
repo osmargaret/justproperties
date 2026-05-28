@@ -18,9 +18,11 @@ return new class extends Migration
             $table->string('code')->nullable();
             $table->string('flag')->nullable();
             $table->string('phone_code')->nullable();
+            $table->unsignedBigInteger('currency_id')->nullable();
             $table->string('language_code')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+           
         });
     }
 

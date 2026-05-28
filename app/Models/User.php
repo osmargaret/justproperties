@@ -95,25 +95,25 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(NewsletterSubscription::class);
     }
 
-    protected function permissions(): Attribute
+    public function hasPermission(string $permission, string $capability): bool
     {
-        return Attribute::make(
-            get: function () {
-                $permissions = $this->role?->permissions ?? [];
+        if (! $this->relationLoaded('role') && $this->role_id) {
+            $this->load('role');
+        }
+        $role = $this->role;
+        if (! $role) {
+            return false;
+        }
+        $field = $permission.'_permission';
+        $capabilities = $role->{$field} ?? [];
 
-                return collect(is_array($permissions) ? $permissions : [])
-                    ->filter()
-                    ->unique()
-                    ->values()
-                    ->all();
-            }
-        );
+        return in_array($capability, (array) $capabilities, true);
     }
 
     protected function isAdmin(): Attribute
     {
         return Attribute::make(get: function (): bool {
-            return $this->role?->type === 'admin';
+            return $this->role_id !== null;
         });
     }
 

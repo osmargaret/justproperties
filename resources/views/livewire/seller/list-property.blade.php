@@ -228,41 +228,13 @@
                     @endif
                 </div>
 
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
-                        <i class="ri-rocket-line text-emerald-600"></i> Boost Your Listing
-                    </h3>
-                    <p class="text-gray-500 text-xs mb-4">Optional promotion</p>
-                    <select wire:model.live="selected_promotion_plan_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
-                        <option value="">No promotion</option>
-                        @foreach ($promotionPlans as $plan)
-                            <option value="{{ $plan->id }}">{{ $plan->name }} ({{ $plan->days }} days)</option>
-                        @endforeach
-                    </select>
-                    @error('selected_promotion_plan_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                <div class="bg-white rounded-xl p-6 shadow-md sticky top-24">
+<div class="bg-white rounded-xl p-6 shadow-md sticky top-24">
                     <h3 class="text-xl font-semibold mb-6 pb-4 border-b border-gray-200">Payment Summary</h3>
                     <div class="space-y-3 mb-6">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">Subscription</span>
                             <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->subscriptionAmount(), 2) }}</span>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Promotion</span>
-                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->promotionAmount(), 2) }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Subtotal</span>
-                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->subtotalAmount(), 2) }}</span>
-                        </div>
-                        @if ($this->couponDiscountAmount() > 0)
-                            <div class="flex justify-between text-sm text-emerald-700">
-                                <span>Promo discount</span>
-                                <span>-{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->couponDiscountAmount(), 2) }}</span>
-                            </div>
-                        @endif
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">VAT ({{ number_format($this->vatRate(), 1) }}%)</span>
                             <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->vatAmount(), 2) }}</span>
@@ -272,13 +244,6 @@
                         <span class="font-bold">Total</span>
                         <span class="font-bold text-2xl text-emerald-600">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->totalAmount(), 2) }}</span>
                     </div>
-                    @if ($this->subtotalAmount() > 0)
-                        <div class="flex gap-2 mb-4">
-                            <input type="text" wire:model.defer="promo_code" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Enter promo code" />
-                            <button type="button" wire:click="applyPromoCode" class="px-4 py-2 bg-gray-100 rounded-lg font-medium hover:bg-gray-200">Apply</button>
-                        </div>
-                        @error('promo_code') <p class="text-sm text-red-600 mb-4">{{ $message }}</p> @enderror
-                    @endif
 
                     <div class="rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-800 text-xs p-3 mb-4">
                         Payment gateway is selected automatically based on your country settings.

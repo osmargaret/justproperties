@@ -21,6 +21,13 @@ class UserDetails extends Component
         session()->flash('status', __('User suspended.'));
     }
 
+    public function unsuspend(): void
+    {
+        $this->user->update(['suspended_at' => null]);
+        $this->user->refresh();
+        session()->flash('status', __('User unsuspended.'));
+    }
+
     public function delete(): mixed
     {
         $this->user->delete();

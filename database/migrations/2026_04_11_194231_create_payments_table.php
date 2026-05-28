@@ -32,6 +32,17 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('no action')->onDelete('cascade');
             $table->foreign('currency_id')->references('id')->on('currencies');
             $table->foreign('coupon_id')->references('id')->on('coupons');
+            
+
+            $table->timestamp('paid_at')->nullable()->after('status');
+            $table->string('gateway')->nullable()->after('method');
+            $table->text('details')->nullable()->after('gateway');
+            $table->json('gateway_payload')->nullable()->after('details');
+
+            $table->index('paid_at');
+            $table->index('status');
+            $table->index('reference');
+            
             $table->index('paymentable_id');
             $table->index('paymentable_type');
             $table->index('currency_id');

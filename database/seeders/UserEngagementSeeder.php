@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Models\Inspection;
 use App\Models\Property;
 use App\Models\PropertyAlert;
 use App\Models\PropertyReview;
@@ -59,23 +58,6 @@ class UserEngagementSeeder extends Seeder
             [
                 'rating' => 5,
                 'comment' => 'Excellent listing and transparent communication during the inspection process.',
-            ]
-        );
-
-        Inspection::query()->firstOrCreate(
-            [
-                'property_id' => $p1->id,
-                'user_id' => $buyer->id,
-                'booking_date' => now()->addDays(3)->toDateString(),
-            ],
-            [
-                'buyer_time' => '10:30:00',
-                'seller_date' => null,
-                'seller_time' => null,
-                'confirmed_date' => null,
-                'confirmed_time' => null,
-                'status' => 'pending',
-                'inspection_fee' => $p1->inspection_fee,
             ]
         );
     }

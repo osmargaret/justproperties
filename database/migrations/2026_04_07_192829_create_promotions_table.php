@@ -13,14 +13,21 @@ return new class extends Migration
     {
         Schema::create('promotions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->unsignedBigInteger('property_id');
             $table->unsignedBigInteger('promotion_plan_id');
+            $table->unsignedBigInteger('promotable_id')->nullable(); //featured listing id, blog post id, newsletter id, 
+            $table->string('promotable_type')->nullable(); //featured listing, blog post, newsletter, 
+            $table->dateTime('start_at');
+            $table->dateTime('end_at')->nullable(); // when promotion expires
+            $table->json('usage')->nullable(); // tracks usage of features (clicks, posts, emails, recipients)
+            $table->string('status')->default('pending'); // pending, active, inactive, expired, completed
+            $table->timestamps();
+            $table->index(['promotable_type', 'promotable_id']);
+            $table->index('status');
+            $table->index('start_at');
             $table->foreign('property_id')->references('id')->on('properties');
             $table->foreign('promotion_plan_id')->references('id')->on('promotion_plans');
-            $table->dateTime('start_at');
-            $table->dateTime('end_at');
-            $table->string('status')->default('pending'); // pending, active, inactive, expired
-            $table->timestamps();
         });
     }
 

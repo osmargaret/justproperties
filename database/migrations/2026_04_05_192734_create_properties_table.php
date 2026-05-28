@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('slug')->nullable();
             $table->text('description');
             $table->decimal('cost', 14, 2)->default(0)->after('description');
             $table->foreignId('category_id')->constrained('categories');
@@ -25,20 +26,17 @@ return new class extends Migration
             $table->string('neighborhood')->nullable();
             $table->string('address')->nullable();
             $table->boolean('show_address')->default(true);
-            $table->boolean('accepts_inspection_requests')->default(false);
-            $table->decimal('inspection_fee', 10, 2)->default(0);
+            
             $table->string('contact_name')->nullable();
             $table->string('contact_phone', 40)->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_whatsapp', 40)->nullable();
             $table->string('status')->default('draft');
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('moderated_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('moderation_status')->default('pending');
-            $table->text('moderation_reason')->nullable();
-            $table->dateTime('moderated_at')->nullable();
+            
             $table->timestamps();
 
+            
         });
     }
 

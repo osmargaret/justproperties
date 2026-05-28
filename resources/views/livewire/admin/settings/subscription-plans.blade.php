@@ -51,35 +51,53 @@
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" wire:click.self="closeModal">
             <div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl" @click.stop>
                 <h3 class="text-lg font-semibold text-gray-900">{{ $editingId ? __('Edit plan') : __('New plan') }}</h3>
-                <form wire:submit="savePlan" class="mt-4 space-y-3">
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" wire:model="name" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-                        @error('name') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">Slug (optional)</label>
-                        <input type="text" wire:model="slug" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-                        @error('slug') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
+                <form wire:submit="savePlan" class="mt-4 space-y-4">
+                    <!-- Plan Properties Section -->
+                    <div class="space-y-3 border-b border-gray-200 pb-4">
                         <div>
-                            <label class="text-sm font-medium text-gray-700">Seats</label>
-                            <input type="number" wire:model="seats" min="1" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-                            @error('seats') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                            <label class="text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" wire:model="name" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+                            @error('name') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="text-sm font-medium text-gray-700">Days</label>
-                            <input type="number" wire:model="days" min="1" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-                            @error('days') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                            <label class="text-sm font-medium text-gray-700">Slug (optional)</label>
+                            <input type="text" wire:model="slug" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+                            @error('slug') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Seats</label>
+                                <input type="number" wire:model="seats" min="1" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+                                @error('seats') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Days</label>
+                                <input type="number" wire:model="days" min="1" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+                                @error('days') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">Features (JSON)</label>
-                        <textarea wire:model="featuresJson" rows="4" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 font-mono text-xs"></textarea>
-                        @error('featuresJson') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+
+                    <!-- Features Section -->
+                    <div class="space-y-3 border-b border-gray-200 pb-4">
+                        <label class="text-sm font-medium text-gray-700">Features</label>
+                        @foreach ($featureRows as $i => $row)
+                            <div class="grid grid-cols-2 gap-3" wire:key="fr-{{ $i }}">
+                                <div>
+                                    <label class="text-xs font-medium text-gray-600">{{ ucwords(str_replace('_', ' ', $row['key'])) }}</label>
+                                    <div class="mt-1 text-xs text-gray-500">Key: {{ $row['key'] }}</div>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-medium text-gray-600">Value</label>
+                                    <input type="text" wire:model="featureRows.{{ $i }}.value" placeholder="Enter feature value" class="mt-1 w-full rounded-lg border border-gray-200 px-2 py-1 text-sm" />
+                                </div>
+                            </div>
+                        @endforeach
+                        @error('featureRows') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
-                    <div>
+
+                    <!-- Prices Section -->
+                    <div class="space-y-3 pb-4">
                         <div class="flex items-center justify-between">
                             <label class="text-sm font-medium text-gray-700">Default prices (global)</label>
                             <button type="button" wire:click="addPriceRow" class="text-xs text-emerald-600 hover:underline">Add row</button>
@@ -97,6 +115,7 @@
                         @endforeach
                         @error('priceRows') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
+
                     <div class="flex gap-2 pt-2">
                         <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white">Save</button>
                         <button type="button" wire:click="closeModal" class="rounded-lg border border-gray-200 px-4 py-2 text-sm">Cancel</button>

@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->nullable();
-            $table->string('type'); // views, contact, blog posts (generation), social media posts (generation & publish), email marketing, sms marketing, whatsapp marketing, events, inquiries, newsletters, appointments, featured listings
-            $table->json('features')->nullable();
-            $table->integer('days')->default(30);
+            $table->string('type'); // blog_post, featured, newsletter
+            $table->json('features')->nullable(); // clicks, posts, emails, recipients
             $table->timestamps();
         });
     }

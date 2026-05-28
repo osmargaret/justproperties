@@ -20,11 +20,14 @@ return new class extends Migration
             $table->string('slug')->nullable();
             $table->text('excerpt')->nullable();
             $table->longText('content');
+            $table->string('content_source')->default('manual');
+            $table->timestamp('ai_generated_at')->nullable();
             $table->string('status')->default('draft'); // draft, published, archived
             $table->timestamp('published_at')->nullable();
-            $table->timestamps();
             $table->softDeletes();
+            $table->timestamps();
             $table->index('user_id');
+            $table->index('content_source');
             $table->index('category_id');
             $table->index('property_id');
         });

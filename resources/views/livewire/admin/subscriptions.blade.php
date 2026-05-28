@@ -1,18 +1,38 @@
 <x-admin.page title="Subscriptions" description="Subscription records and invoice lookup.">
     <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-5">
-        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search user..." class="rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-        <input wire:model.live="dateFrom" type="date" class="rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-        <input wire:model.live="dateTo" type="date" class="rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-        <select wire:model.live="status" class="rounded-lg border border-gray-200 px-3 py-2 text-sm">
-            <option value="">All statuses</option>
-            @foreach ($statuses as $statusOption)
-                <option value="{{ $statusOption }}">{{ $statusOption }}</option>
-            @endforeach
-        </select>
-        <div class="flex gap-2">
-            <button wire:click="$set('sortBy','start_at')" class="rounded-lg border px-3 py-2 text-sm">Sort Purchase</button>
-            <button wire:click="$set('sortBy','end_at')" class="rounded-lg border px-3 py-2 text-sm">Sort Expiry</button>
-        </div>
+        <label class="block">
+            <span class="text-xs font-medium text-gray-500 mb-1 block">Search</span>
+            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search user..." class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        </label>
+
+        <label class="block">
+            <span class="text-xs font-medium text-gray-500 mb-1 block">Date from</span>
+            <input wire:model.live="dateFrom" type="date" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        </label>
+
+        <label class="block">
+            <span class="text-xs font-medium text-gray-500 mb-1 block">Date to</span>
+            <input wire:model.live="dateTo" type="date" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        </label>
+
+        <label class="block">
+            <span class="text-xs font-medium text-gray-500 mb-1 block">Status</span>
+            <select wire:model.live="status" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                <option value="">All statuses</option>
+                @foreach ($statuses as $statusOption)
+                    <option value="{{ $statusOption }}">{{ $statusOption }}</option>
+                @endforeach
+            </select>
+        </label>
+
+        <label class="block">
+            <span class="text-xs font-medium text-gray-500 mb-1 block">Sort</span>
+            <select wire:model.live="sortBy" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                <option value="end_at">Expiry date</option>
+                <option value="start_at">Purchase date</option>
+                
+            </select>
+        </label>
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-gray-200">

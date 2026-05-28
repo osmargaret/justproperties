@@ -26,9 +26,11 @@ return new class extends Migration
             $table->string('linkedin')->nullable();
             $table->string('youtube')->nullable();
             $table->string('website')->nullable();
-            $table->boolean('is_admin')->default(false);
+            
             $table->string('active_role')->nullable()->default(null); // buyer, seller — set when user opens a dashboard
             $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
+            $table->timestamp('suspended_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

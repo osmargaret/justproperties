@@ -15,8 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->nullable();
-            $table->string('type')->default('admin');
-            $table->json('permissions');
+            $table->json('users_permission')->nullable();
+            $table->json('subscriptions_permission')->nullable();
+            $table->json('promotions_permission')->nullable();
+            $table->json('properties_permission')->nullable();
+            $table->json('posts_permission')->nullable();
+            $table->json('payments_permission')->nullable();
+            $table->json('coupons_permission')->nullable();
+            $table->json('settings_permission')->nullable();
             $table->timestamps();
         });
     }

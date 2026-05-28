@@ -15,12 +15,15 @@ return new class extends Migration
             $table->id();
             $table->decimal('amount', 10, 2);
             $table->unsignedBigInteger('currency_id');
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
             $table->foreign('currency_id')->references('id')->on('currencies');
             $table->unsignedBigInteger('priceable_id')->nullable();
             $table->string('priceable_type')->nullable();
             $table->timestamps();
             $table->index('priceable_id');
             $table->index('priceable_type');
+            $table->index(['priceable_type', 'priceable_id', 'currency_id', 'country_id']);
+            
         });
     }
 

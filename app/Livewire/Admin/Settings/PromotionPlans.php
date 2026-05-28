@@ -17,6 +17,13 @@ class PromotionPlans extends Component
         'newsletter' => 'Newsletters',
     ];
 
+    public const FEATURE_KEYS = [
+        'clicks',
+        'posts',
+        'emails',
+        'recipients',
+    ];
+
     public bool $showModal = false;
 
     public ?int $editingId = null;
@@ -29,7 +36,8 @@ class PromotionPlans extends Component
 
     public int $days = 30;
 
-    public string $featuresJson = '{}';
+    /** @var list<array{key: string, value: string}> */
+    public array $featureRows = [];
 
     /** @var list<array{currency_id: int|null, amount: string}> */
     public array $priceRows = [];
@@ -41,7 +49,10 @@ class PromotionPlans extends Component
         $this->slug = '';
         $this->type = 'blog_post';
         $this->days = 30;
-        $this->featuresJson = '{}';
+        $this->featureRows = array_map(
+            fn ($key) => ['key' => $key, 'value' => ''],
+            self::FEATURE_KEYS
+        );
         $defaultCurrency = Currency::query()->where('is_active', true)->orderByDesc('is_default')->orderBy('code')->value('id');
         $this->priceRows = [['currency_id' => $defaultCurrency, 'amount' => '0']];
         $this->resetErrorBag();
@@ -55,8 +66,10 @@ class PromotionPlans extends Component
         $this->name = $plan->name;
         $this->slug = (string) ($plan->slug ?? '');
         $this->type = in_array($plan->type, array_keys(self::TYPES), true) ? $plan->type : 'blog_post';
-        $this->days = (int) $plan->days;
-        $this->featuresJson = json_encode($plan->features ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $this->featureRows = array_map(function ($key) use ($plan) {
+            $value = $plan->features[$key] ?? '';
+            return ['key' => $key, 'value' => (string) $value];
+        }, self::FEATURE_KEYS);
         $this->priceRows = [];
         foreach ($plan->prices as $p) {
             $this->priceRows[] = ['currency_id' => $p->currency_id, 'amount' => (string) $p->amount];
@@ -96,18 +109,19 @@ class PromotionPlans extends Component
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
             'type' => ['required', Rule::in(array_keys(self::TYPES))],
-            'days' => ['required', 'integer', 'min:1'],
-            'featuresJson' => ['nullable', 'string'],
+            'featureRows' => ['nullable', 'array'],
+            'featureRows.*.value' => ['nullable', 'string', 'max:1000'],
             'priceRows' => ['required', 'array', 'min:1'],
             'priceRows.*.currency_id' => ['required', 'integer', 'exists:currencies,id'],
             'priceRows.*.amount' => ['required', 'numeric', 'min:0'],
         ]);
 
-        $decoded = json_decode(trim($this->featuresJson) ?: '{}', true);
-        if (! is_array($decoded)) {
-            $this->addError('featuresJson', __('Must be valid JSON.'));
-
-            return;
+        // Convert feature rows to associative array
+        $features = [];
+        foreach ($this->featureRows as $row) {
+            if (isset($row['key'], $row['value'])) {
+                $features[$row['key']] = $row['value'];
+            }
         }
 
         $slug = $this->slug !== '' ? Str::slug($this->slug) : Str::slug($this->name);
@@ -118,16 +132,14 @@ class PromotionPlans extends Component
                 'name' => $this->name,
                 'slug' => $slug,
                 'type' => $this->type,
-                'days' => $this->days,
-                'features' => $decoded,
+                'features' => $features,
             ]);
         } else {
             $plan = PromotionPlan::query()->create([
                 'name' => $this->name,
                 'slug' => $slug,
                 'type' => $this->type,
-                'days' => $this->days,
-                'features' => $decoded,
+                'features' => $features,
             ]);
         }
 

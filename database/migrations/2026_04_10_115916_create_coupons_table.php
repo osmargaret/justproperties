@@ -28,6 +28,7 @@ return new class extends Migration
             $table->boolean('is_published')->default(false);
             $table->softDeletes();
             $table->timestamps();
+            $table->unique('code');
         });
     }
 

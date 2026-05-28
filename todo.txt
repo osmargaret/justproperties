@@ -1,26 +1,30 @@
 ADMIN[
-    Users => [
-        [Table columns should be: 
-            Details (Avatar,Name,Email,Phone), 
-            Country,
-            Properties (count),
-            Active Subscriptions (e.g 2 Subscriptions | 20 Seats),
-            Actions (View )
+    Done {
+        Users => [
+            [Table columns should be: 
+                Details (Avatar,Name,Email,Phone), 
+                Country,
+                Properties (count),
+                Active Subscriptions (e.g 2 Subscriptions | 20 Seats),
+                Actions (View )
+            ],
+            [Add Search, Sort (by Name, Properties, Seats) ],
+            [
+                User details page should show details of user, 
+                Buttons: Suspend, Delete, View Properties, View Subscriptions
+            ]
         ],
-        [Add Search, Sort (by Name, Properties, Seats) ],
-        [
-            User details page should show details of user, 
-            Buttons: Suspend, Delete, View Properties, View Subscriptions
-        ]
-    ],
-    Subscriptions => [
-        This should show a table with columns => [
-            Date Purchased, Subscription_ID, Plan, User , Seats (2 of 5), Status, Expiry Date, View Invoice
-        ],
-        [View Invoice button should open modal: Show payment information]
+        Subscriptions => [
+            This should show a table with columns => [
+                Date Purchased, Subscription_ID, Plan, User , Seats (2 of 5), Status, Expiry Date, View Invoice
+            ],
+            [View Invoice button should open modal: Show payment information]
 
-        [Add Search by user, Filter by Date Range, Filter by Status, Sort (by Purchase Date,Expiry Date) ],
-    ]
+            [Add Search by user, Filter by Date Range, Filter by Status, Sort (by Purchase Date,Expiry Date) ],
+        ]
+    }
+
+
     Promotions => [
         This should show a table with columns => [
             Date Purchased, 
@@ -110,20 +114,7 @@ ADMIN[
         [Settings->Subscription Plans page should be CRUD],
         [Settings->Promotion Plans page should be CRUD: Blog Post|Featured (views & clicks)|Newsletters],
         [Settings->Staff page should be CRUD],
-        [
-            Settings->Roles and Permissions menu should be listed before Staff on the sidebar.
-            Roles should be page should be CRUD, 
-            Permissions will be things like:[
-                view-users, delete-users, moderate-user,
-                view-properties, delete-property, moderate-property, view-inspections
-                view-post, create-post, update-post, delete-post, moderate-post,
-                view-subscriptions, view-promotions,
-                view-payments, view-coupons, manage-coupons,
-                manage-settings, 
-
-            ]
-            
-        ],
+        
         [Add Currencies Page to perform CRUD on Currencies. We can set a currency as default],
         [
             Settings->Countries page should be CRUD,

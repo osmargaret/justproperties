@@ -27,8 +27,10 @@
                         <td class="px-4 py-3">{{ $user->email }}</td>
                         <td class="px-4 py-3">{{ $user->role?->name ?? '—' }}</td>
                         <td class="px-4 py-3">
-                            <button type="button" wire:click="openEdit({{ $user->id }})" class="text-emerald-600 hover:underline">Edit</button>
-                            <button type="button" wire:click="deleteStaff({{ $user->id }})" wire:confirm="{{ __('Remove this staff member?') }}" class="ml-2 text-red-600 hover:underline">Delete</button>
+                            @if ($user->id !== auth()->id())
+                                <button type="button" wire:click="openEdit({{ $user->id }})" class="text-emerald-600 hover:underline">{{ __('Edit') }}</button>
+                                <button type="button" wire:click="deleteStaff({{ $user->id }})" wire:confirm="{{ __('Remove this staff member?') }}" class="ml-2 text-red-600 hover:underline">{{ __('Remove') }}</button>
+                            @endif
                         </td>
                     </tr>
                 @empty

@@ -10,6 +10,14 @@ use Livewire\Component;
 
 class SubscriptionPlans extends Component
 {
+    const FEATURE_KEYS = [
+        'max_listings',
+        'featured_listings',
+        'api_access',
+        'analytics',
+        'priority_support',
+    ];
+
     public bool $showModal = false;
 
     public ?int $editingId = null;
@@ -22,7 +30,8 @@ class SubscriptionPlans extends Component
 
     public int $days = 30;
 
-    public string $featuresJson = '{}';
+    /** @var list<array{key: string, value: string}> */
+    public array $featureRows = [];
 
     /** @var list<array{currency_id: int|null, amount: string}> */
     public array $priceRows = [];
@@ -34,7 +43,10 @@ class SubscriptionPlans extends Component
         $this->slug = '';
         $this->seats = 1;
         $this->days = 30;
-        $this->featuresJson = '{}';
+        $this->featureRows = array_map(
+            fn ($key) => ['key' => $key, 'value' => ''],
+            self::FEATURE_KEYS
+        );
         $defaultCurrency = Currency::query()->where('is_active', true)->orderByDesc('is_default')->orderBy('code')->value('id');
         $this->priceRows = [['currency_id' => $defaultCurrency, 'amount' => '0']];
         $this->resetErrorBag();
@@ -49,7 +61,10 @@ class SubscriptionPlans extends Component
         $this->slug = (string) ($plan->slug ?? '');
         $this->seats = (int) $plan->seats;
         $this->days = (int) $plan->days;
-        $this->featuresJson = json_encode($plan->features ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $this->featureRows = array_map(function ($key) use ($plan) {
+            $value = $plan->features[$key] ?? '';
+            return ['key' => $key, 'value' => (string) $value];
+        }, self::FEATURE_KEYS);
         $this->priceRows = [];
         foreach ($plan->prices as $p) {
             $this->priceRows[] = ['currency_id' => $p->currency_id, 'amount' => (string) $p->amount];
@@ -90,17 +105,19 @@ class SubscriptionPlans extends Component
             'slug' => ['nullable', 'string', 'max:255'],
             'seats' => ['required', 'integer', 'min:1'],
             'days' => ['required', 'integer', 'min:1'],
-            'featuresJson' => ['nullable', 'string'],
+            'featureRows' => ['nullable', 'array'],
+            'featureRows.*.value' => ['nullable', 'string', 'max:1000'],
             'priceRows' => ['required', 'array', 'min:1'],
             'priceRows.*.currency_id' => ['required', 'integer', 'exists:currencies,id'],
             'priceRows.*.amount' => ['required', 'numeric', 'min:0'],
         ]);
 
-        $decoded = json_decode(trim($this->featuresJson) ?: '{}', true);
-        if (! is_array($decoded)) {
-            $this->addError('featuresJson', __('Must be valid JSON.'));
-
-            return;
+        // Convert feature rows to associative array
+        $features = [];
+        foreach ($this->featureRows as $row) {
+            if (isset($row['key'], $row['value'])) {
+                $features[$row['key']] = $row['value'];
+            }
         }
 
         $slug = $this->slug !== '' ? Str::slug($this->slug) : Str::slug($this->name);
@@ -112,7 +129,7 @@ class SubscriptionPlans extends Component
                 'slug' => $slug,
                 'seats' => $this->seats,
                 'days' => $this->days,
-                'features' => $decoded,
+                'features' => $features,
             ]);
         } else {
             $plan = SubscriptionPlan::query()->create([
@@ -120,7 +137,7 @@ class SubscriptionPlans extends Component
                 'slug' => $slug,
                 'seats' => $this->seats,
                 'days' => $this->days,
-                'features' => $decoded,
+                'features' => $features,
             ]);
         }
 
