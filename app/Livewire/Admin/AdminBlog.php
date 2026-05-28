@@ -40,7 +40,7 @@ class AdminBlog extends Component
         return view('livewire.admin.admin-blog', [
             'posts' => $posts,
             'statuses' => Post::query()->distinct()->pluck('status')->filter()->values(),
-            'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
+            'categories' => Category::query()->orderBy('name','asc')->get(['id', 'name']),
         ]);
     }
 }

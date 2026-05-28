@@ -124,10 +124,10 @@ class AdminCountries extends Component
 
     public function render()
     {
-        $countries = Country::query()->with('currency')->orderBy('name')->get();
+        $countries = Country::query()->with('currency')->orderBy('name','asc')->get();
         $currencies = Currency::query()->where('is_active', true)->orderBy('code')->get();
 
-        return view('livewire.admin.admin-settings.countries', [
+        return view('livewire.admin.settings.admin-countries', [
             'countries' => $countries,
             'currencies' => $currencies,
         ]);

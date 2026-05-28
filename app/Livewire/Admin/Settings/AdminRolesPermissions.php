@@ -114,7 +114,7 @@ class AdminRolesPermissions extends Component
     {
         $roles = Role::query()->orderBy('name','asc')->get();
 
-        return view('livewire.admin.admin-settings.roles-permissions', [
+        return view('livewire.admin.settings.admin-roles-permissions', [
             'roles' => $roles,
         ]);
     }

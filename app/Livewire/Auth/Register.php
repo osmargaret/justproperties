@@ -75,7 +75,7 @@ class Register extends Component
         return view('livewire.auth.register', [
             'countries' => Country::query()
                 ->where('is_active', true)
-                ->orderBy('name')
+                ->orderBy('name','asc')
                 ->get(['id', 'name', 'flag']),
         ]);
     }

@@ -38,7 +38,7 @@ class AdminCountryConfig extends Component
 
         $currencyId = $this->resolveCurrencyId();
         $this->subscriptionAmounts = [];
-        foreach (SubscriptionPlan::query()->orderBy('name')->get() as $plan) {
+        foreach (SubscriptionPlan::query()->orderBy('name','asc')->get() as $plan) {
             $this->subscriptionAmounts[(string) $plan->id] = $this->findAmount(
                 SubscriptionPlan::class,
                 $plan->id,
@@ -46,7 +46,7 @@ class AdminCountryConfig extends Component
             );
         }
         $this->promotionAmounts = [];
-        foreach (PromotionPlan::query()->orderBy('name')->get() as $plan) {
+        foreach (PromotionPlan::query()->orderBy('name','asc')->get() as $plan) {
             $this->promotionAmounts[(string) $plan->id] = $this->findAmount(
                 PromotionPlan::class,
                 $plan->id,
@@ -144,10 +144,10 @@ class AdminCountryConfig extends Component
             ?? Currency::query()->where('is_default', true)->value('code')
             ?? '—';
 
-        $subscriptionPlans = SubscriptionPlan::query()->orderBy('name')->get();
-        $promotionPlans = PromotionPlan::query()->orderBy('name')->get();
+        $subscriptionPlans = SubscriptionPlan::query()->orderBy('name','asc')->get();
+        $promotionPlans = PromotionPlan::query()->orderBy('name','asc')->get();
 
-        return view('livewire.admin.admin-settings.country-config', [
+        return view('livewire.admin.settings.admin-country-config', [
             'subscriptionPlans' => $subscriptionPlans,
             'promotionPlans' => $promotionPlans,
             'currencyCode' => $currencyCode,

@@ -155,7 +155,7 @@ class AdminCurrencies extends Component
     {
         $currencies = Currency::query()->orderByDesc('is_default')->orderBy('code')->get();
 
-        return view('livewire.admin.admin-settings.currencies', [
+        return view('livewire.admin.settings.admin-currencies', [
             'currencies' => $currencies,
         ]);
     }

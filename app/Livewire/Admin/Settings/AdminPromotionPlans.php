@@ -179,12 +179,12 @@ class AdminPromotionPlans extends Component
     {
         $plans = PromotionPlan::query()
             ->with(['prices' => fn ($q) => $q->whereNull('country_id')->with('currency')])
-            ->orderBy('name')
+            ->orderBy('name','asc')
             ->get();
 
         $currencies = Currency::query()->where('is_active', true)->orderBy('code')->get();
 
-        return view('livewire.admin.admin-settings.promotion-plans', [
+        return view('livewire.admin.settings.admin-promotion-plans', [
             'plans' => $plans,
             'currencies' => $currencies,
             'planTypes' => self::TYPES,

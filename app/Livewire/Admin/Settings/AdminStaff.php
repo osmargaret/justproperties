@@ -124,12 +124,12 @@ class AdminStaff extends Component
         $staff = User::query()
             ->with('role')
             ->whereHas('role')
-            ->orderBy('name')
+            ->orderBy('name','asc')
             ->get();
 
         $adminRoles = Role::orderBy('name', 'asc')->get();
 
-        return view('livewire.admin.admin-settings.staff', [
+        return view('livewire.admin.settings.admin-staff', [
             'staff' => $staff,
             'adminRoles' => $adminRoles,
         ]);

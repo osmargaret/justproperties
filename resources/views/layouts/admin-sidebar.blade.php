@@ -12,6 +12,9 @@
         <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? $navActive : $navIdle }}">
             <i class="ri-dashboard-line text-xl"></i><span class="font-medium">Dashboard</span>
         </a>
+        <a href="{{ route('admin.moderations') }}" class="{{ request()->routeIs('admin.moderations') ? $navActive : $navIdle }}">
+            <i class="ri-task-line text-xl"></i><span class="font-medium">Moderations</span>
+        </a>
         <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') || request()->routeIs('admin.users.show') ? $navActive : $navIdle }}">
             <i class="ri-team-line text-xl"></i><span class="font-medium">Users</span>
         </a>
@@ -52,9 +55,7 @@
             </div>
         </details>
 
-        <a href="{{ route('admin.moderations') }}" class="{{ request()->routeIs('admin.moderations') ? $navActive : $navIdle }}">
-            <i class="ri-notification-line text-xl"></i><span class="font-medium">Moderations</span>
-        </a>
+        
         <a href="{{ route('admin.profile') }}" class="{{ request()->routeIs('admin.profile') ? $navActive : $navIdle }}">
             <i class="ri-user-3-line text-xl"></i><span class="font-medium">Profile</span>
         </a>

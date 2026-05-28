@@ -690,19 +690,19 @@ class ListProperty extends Component
     {
         $states = State::query()
             ->where('is_active', true)
-            ->orderBy('name')
+            ->orderBy('name','asc')
             ->get();
         $cities = City::query()
             ->where('is_active', true)
             ->when($this->state_id, fn ($query) => $query->where('state_id', $this->state_id))
-            ->orderBy('name')
+            ->orderBy('name','asc')
             ->get();
 
         return view('livewire.seller.list-property', [
-            'categories' => Category::query()->with('settings')->orderBy('name')->get(),
+            'categories' => Category::query()->with('settings')->orderBy('name','asc')->get(),
             'states' => $states,
             'cities' => $cities,
-            'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name')->get(),
+            'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name','asc')->get(),
             'availableSubscriptions' => $this->availableSubscriptions,
             'activeCurrency' => $this->activeCurrency,
         ]);

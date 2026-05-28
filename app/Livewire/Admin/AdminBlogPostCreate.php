@@ -98,8 +98,8 @@ class AdminBlogPostCreate extends Component
     public function render()
     {
         return view('livewire.admin.admin-blog-post-form', [
-            'categories' => Category::query()->orderBy('name')->get(),
-            'properties' => Property::query()->orderBy('name')->limit(200)->get(['id', 'name']),
+            'categories' => Category::query()->orderBy('name','asc')->get(),
+            'properties' => Property::query()->orderBy('name','asc')->limit(200)->get(['id', 'name']),
             'heading' => __('Create post'),
             'submitLabel' => __('Create'),
         ]);

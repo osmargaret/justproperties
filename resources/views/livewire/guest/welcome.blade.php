@@ -1437,6 +1437,98 @@
         </section>
     </main>
 </div>
-@push('styles')
+@push('scripts')
+    <script>
+        // Property Categories Slider
+        let currentSlide = 4; // Start with slide-4 (Short-Let Apartments) as active
+        const totalSlides = 5;
 
+        // Slide positions configuration
+        const slideConfigs = [{
+                z: 10,
+                opacity: 0.5,
+                scale: 0.9,
+                translateX: '75%',
+                translateXSm: '60%'
+            }, // slide-0
+            {
+                z: 0,
+                opacity: 0,
+                scale: 0.75,
+                translateX: '0%',
+                translateXSm: '0%'
+            }, // slide-1
+            {
+                z: 0,
+                opacity: 0,
+                scale: 0.75,
+                translateX: '0%',
+                translateXSm: '0%'
+            }, // slide-2
+            {
+                z: 10,
+                opacity: 0.5,
+                scale: 0.9,
+                translateX: '-75%',
+                translateXSm: '-60%'
+            }, // slide-3
+            {
+                z: 20,
+                opacity: 1,
+                scale: 1,
+                translateX: '0%',
+                translateXSm: '0%'
+            } // slide-4 (active)
+        ];
+
+        function updateSlides() {
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                const config = slideConfigs[(i - currentSlide + totalSlides) % totalSlides];
+
+                slide.style.zIndex = config.z;
+                slide.style.opacity = config.opacity;
+                slide.style.transform =
+                    `scale(${config.scale}) translateX(${window.innerWidth >= 640 ? config.translateXSm : config.translateX})`;
+            }
+
+            // Update dots
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === currentSlide) {
+                    dot.className =
+                        'transition-all duration-500 rounded-full cursor-pointer w-8 sm:w-10 h-2.5 sm:h-3 bg-emerald-500';
+                } else {
+                    dot.className =
+                        'transition-all duration-500 rounded-full cursor-pointer w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-300 hover:bg-gray-400';
+                }
+            }
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlides();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlides();
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            updateSlides();
+        }
+
+        // Event listeners
+        document.getElementById('next-btn').addEventListener('click', nextSlide);
+        document.getElementById('prev-btn').addEventListener('click', prevSlide);
+
+        for (let i = 0; i < totalSlides; i++) {
+            document.getElementById(`dot-${i}`).addEventListener('click', () => goToSlide(i));
+        }
+
+        // Initialize
+        updateSlides();
+    </script>
 @endpush

@@ -50,7 +50,7 @@ class AdminCategories extends Component
 
     public function mount(): void
     {
-        $this->selectedCategoryId = Category::query()->orderBy('name')->value('id');
+        $this->selectedCategoryId = Category::query()->orderBy('name','asc')->value('id');
         $this->loadCategoryMeta();
     }
 
@@ -273,14 +273,14 @@ class AdminCategories extends Component
     {
         $categories = Category::query()
             ->withCount('settings')
-            ->orderBy('name')
+            ->orderBy('name','asc')
             ->get();
 
         $selectedCategory = $this->selectedCategoryId
             ? Category::query()->with(['settings' => fn ($q) => $q->orderBy('sort_order')])->find($this->selectedCategoryId)
             : null;
 
-        return view('livewire.admin.admin-settings.categories', [
+        return view('livewire.admin.settings.admin-categories', [
             'categories' => $categories,
             'selectedCategory' => $selectedCategory,
             'dataTypeOptions' => $this->dataTypeOptions(),

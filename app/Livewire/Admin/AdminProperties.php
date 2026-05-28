@@ -64,7 +64,7 @@ class AdminProperties extends Component
 
         return view('livewire.admin.admin-properties', [
             'properties' => $properties,
-            'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
+            'categories' => Category::query()->orderBy('name','asc')->get(['id', 'name']),
             'statusOptions' => Property::query()->distinct()->pluck('status')->filter()->values(),
         ]);
     }

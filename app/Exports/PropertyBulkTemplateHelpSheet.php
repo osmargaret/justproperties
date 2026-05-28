@@ -12,7 +12,7 @@ class PropertyBulkTemplateHelpSheet implements FromArray, WithTitle
     public function array(): array
     {
         $slugExamples = Category::query()
-            ->orderBy('name')
+            ->orderBy('name','asc')
             ->pluck('slug')
             ->filter()
             ->implode(', ');

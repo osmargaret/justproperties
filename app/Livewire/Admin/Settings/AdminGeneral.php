@@ -50,6 +50,6 @@ class AdminGeneral extends Component
 
     public function render()
     {
-        return view('livewire.admin.admin-settings.general');
+        return view('livewire.admin.settings.admin-general');
     }
 }
