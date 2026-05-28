@@ -6,7 +6,7 @@ use App\Models\Moderation;
 use App\Models\Property;
 use Livewire\Component;
 
-class PropertyDetails extends Component
+class AdminPropertyDetails extends Component
 {
     public Property $property;
 
@@ -57,6 +57,6 @@ class PropertyDetails extends Component
             ->take(20)
             ->get();
 
-        return view('livewire.admin.property-details', ['moderations' => $moderations]);
+        return view('livewire.admin.admin-property-details', ['moderations' => $moderations]);
     }
 }

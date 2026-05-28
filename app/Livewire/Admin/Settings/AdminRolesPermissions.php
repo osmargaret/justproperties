@@ -6,7 +6,7 @@ use App\Models\Role;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
-class RolesPermissions extends Component
+class AdminRolesPermissions extends Component
 {
     public bool $showRoleModal = false;
 
@@ -114,7 +114,7 @@ class RolesPermissions extends Component
     {
         $roles = Role::query()->orderBy('name','asc')->get();
 
-        return view('livewire.admin.settings.roles-permissions', [
+        return view('livewire.admin.admin-settings.roles-permissions', [
             'roles' => $roles,
         ]);
     }

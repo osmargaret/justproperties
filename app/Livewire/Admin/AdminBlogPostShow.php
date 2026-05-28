@@ -5,7 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Post;
 use Livewire\Component;
 
-class BlogPostShow extends Component
+class AdminBlogPostShow extends Component
 {
     public Post $post;
 
@@ -37,7 +37,7 @@ class BlogPostShow extends Component
 
         $featured = $this->post->media->firstWhere('is_primary', true) ?? $this->post->media->first();
 
-        return view('livewire.admin.blog-post-show', [
+        return view('livewire.admin.admin-blog-post-show', [
             'featured' => $featured,
         ]);
     }

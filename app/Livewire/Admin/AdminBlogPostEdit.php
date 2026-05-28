@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class BlogPostEdit extends Component
+class AdminBlogPostEdit extends Component
 {
     use WithFileUploads;
 
@@ -123,7 +123,7 @@ class BlogPostEdit extends Component
 
     public function render()
     {
-        return view('livewire.admin.blog-post-form', [
+        return view('livewire.admin.admin-blog-post-form', [
             'categories' => Category::query()->orderBy('name')->get(),
             'properties' => Property::query()->orderBy('name')->limit(200)->get(['id', 'name']),
             'heading' => __('Edit post'),

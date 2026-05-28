@@ -37,7 +37,7 @@ class AdminBlog extends Component
             ->latest('created_at')
             ->paginate(10);
 
-        return view('livewire.admin.blog', [
+        return view('livewire.admin.admin-blog', [
             'posts' => $posts,
             'statuses' => Post::query()->distinct()->pluck('status')->filter()->values(),
             'categories' => Category::query()->orderBy('name')->get(['id', 'name']),

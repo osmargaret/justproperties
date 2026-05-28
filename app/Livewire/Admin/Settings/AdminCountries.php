@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
-class Countries extends Component
+class AdminCountries extends Component
 {
     public bool $showModal = false;
 
@@ -127,7 +127,7 @@ class Countries extends Component
         $countries = Country::query()->with('currency')->orderBy('name')->get();
         $currencies = Currency::query()->where('is_active', true)->orderBy('code')->get();
 
-        return view('livewire.admin.settings.countries', [
+        return view('livewire.admin.admin-settings.countries', [
             'countries' => $countries,
             'currencies' => $currencies,
         ]);

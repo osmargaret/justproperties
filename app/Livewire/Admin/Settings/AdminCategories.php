@@ -8,7 +8,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
-class Categories extends Component
+class AdminCategories extends Component
 {
     public ?int $selectedCategoryId = null;
 
@@ -280,7 +280,7 @@ class Categories extends Component
             ? Category::query()->with(['settings' => fn ($q) => $q->orderBy('sort_order')])->find($this->selectedCategoryId)
             : null;
 
-        return view('livewire.admin.settings.categories', [
+        return view('livewire.admin.admin-settings.categories', [
             'categories' => $categories,
             'selectedCategory' => $selectedCategory,
             'dataTypeOptions' => $this->dataTypeOptions(),

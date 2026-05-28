@@ -10,7 +10,7 @@ use App\Models\PromotionPlan;
 use App\Models\SubscriptionPlan;
 use Livewire\Component;
 
-class CountryConfig extends Component
+class AdminCountryConfig extends Component
 {
     public Country $country;
 
@@ -147,7 +147,7 @@ class CountryConfig extends Component
         $subscriptionPlans = SubscriptionPlan::query()->orderBy('name')->get();
         $promotionPlans = PromotionPlan::query()->orderBy('name')->get();
 
-        return view('livewire.admin.settings.country-config', [
+        return view('livewire.admin.admin-settings.country-config', [
             'subscriptionPlans' => $subscriptionPlans,
             'promotionPlans' => $promotionPlans,
             'currencyCode' => $currencyCode,

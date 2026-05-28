@@ -9,7 +9,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class Properties extends Component
+class AdminProperties extends Component
 {
     use WithPagination;
 
@@ -62,7 +62,7 @@ class Properties extends Component
             ->latest('created_at')
             ->paginate(10);
 
-        return view('livewire.admin.properties', [
+        return view('livewire.admin.admin-properties', [
             'properties' => $properties,
             'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
             'statusOptions' => Property::query()->distinct()->pluck('status')->filter()->values(),

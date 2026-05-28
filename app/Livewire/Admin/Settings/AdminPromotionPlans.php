@@ -4,18 +4,24 @@ namespace App\Livewire\Admin\Settings;
 
 use App\Models\Currency;
 use App\Models\Price;
-use App\Models\SubscriptionPlan;
+use App\Models\PromotionPlan;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
-class SubscriptionPlans extends Component
+class AdminPromotionPlans extends Component
 {
-    const FEATURE_KEYS = [
-        'max_listings',
-        'featured_listings',
-        'api_access',
-        'analytics',
-        'priority_support',
+    public const TYPES = [
+        'blog_post' => 'Blog post',
+        'featured' => 'Featured (views & clicks)',
+        'newsletter' => 'Newsletters',
+    ];
+
+    public const FEATURE_KEYS = [
+        'clicks',
+        'posts',
+        'emails',
+        'recipients',
     ];
 
     public bool $showModal = false;
@@ -26,7 +32,7 @@ class SubscriptionPlans extends Component
 
     public string $slug = '';
 
-    public int $seats = 1;
+    public string $type = 'blog_post';
 
     public int $days = 30;
 
@@ -41,7 +47,7 @@ class SubscriptionPlans extends Component
         $this->editingId = null;
         $this->name = '';
         $this->slug = '';
-        $this->seats = 1;
+        $this->type = 'blog_post';
         $this->days = 30;
         $this->featureRows = array_map(
             fn ($key) => ['key' => $key, 'value' => ''],
@@ -55,12 +61,11 @@ class SubscriptionPlans extends Component
 
     public function openEdit(int $id): void
     {
-        $plan = SubscriptionPlan::query()->with(['prices' => fn ($q) => $q->whereNull('country_id')])->findOrFail($id);
+        $plan = PromotionPlan::query()->with(['prices' => fn ($q) => $q->whereNull('country_id')])->findOrFail($id);
         $this->editingId = $plan->id;
         $this->name = $plan->name;
         $this->slug = (string) ($plan->slug ?? '');
-        $this->seats = (int) $plan->seats;
-        $this->days = (int) $plan->days;
+        $this->type = in_array($plan->type, array_keys(self::TYPES), true) ? $plan->type : 'blog_post';
         $this->featureRows = array_map(function ($key) use ($plan) {
             $value = $plan->features[$key] ?? '';
             return ['key' => $key, 'value' => (string) $value];
@@ -103,8 +108,7 @@ class SubscriptionPlans extends Component
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
-            'seats' => ['required', 'integer', 'min:1'],
-            'days' => ['required', 'integer', 'min:1'],
+            'type' => ['required', Rule::in(array_keys(self::TYPES))],
             'featureRows' => ['nullable', 'array'],
             'featureRows.*.value' => ['nullable', 'string', 'max:1000'],
             'priceRows' => ['required', 'array', 'min:1'],
@@ -123,20 +127,18 @@ class SubscriptionPlans extends Component
         $slug = $this->slug !== '' ? Str::slug($this->slug) : Str::slug($this->name);
 
         if ($this->editingId) {
-            $plan = SubscriptionPlan::query()->findOrFail($this->editingId);
+            $plan = PromotionPlan::query()->findOrFail($this->editingId);
             $plan->update([
                 'name' => $this->name,
                 'slug' => $slug,
-                'seats' => $this->seats,
-                'days' => $this->days,
+                'type' => $this->type,
                 'features' => $features,
             ]);
         } else {
-            $plan = SubscriptionPlan::query()->create([
+            $plan = PromotionPlan::query()->create([
                 'name' => $this->name,
                 'slug' => $slug,
-                'seats' => $this->seats,
-                'days' => $this->days,
+                'type' => $this->type,
                 'features' => $features,
             ]);
         }
@@ -148,7 +150,7 @@ class SubscriptionPlans extends Component
                 continue;
             }
             Price::query()->create([
-                'priceable_type' => SubscriptionPlan::class,
+                'priceable_type' => PromotionPlan::class,
                 'priceable_id' => $plan->id,
                 'country_id' => null,
                 'currency_id' => (int) $row['currency_id'],
@@ -156,15 +158,15 @@ class SubscriptionPlans extends Component
             ]);
         }
 
-        session()->flash('status', __('Subscription plan saved.'));
+        session()->flash('status', __('Promotion plan saved.'));
         $this->closeModal();
     }
 
     public function deletePlan(int $id): void
     {
-        $plan = SubscriptionPlan::query()->findOrFail($id);
-        if ($plan->subscriptions()->exists()) {
-            session()->flash('error', __('Cannot delete a plan that has subscriptions.'));
+        $plan = PromotionPlan::query()->findOrFail($id);
+        if ($plan->promotions()->exists()) {
+            session()->flash('error', __('Cannot delete a plan that has promotions.'));
 
             return;
         }
@@ -175,16 +177,17 @@ class SubscriptionPlans extends Component
 
     public function render()
     {
-        $plans = SubscriptionPlan::query()
+        $plans = PromotionPlan::query()
             ->with(['prices' => fn ($q) => $q->whereNull('country_id')->with('currency')])
             ->orderBy('name')
             ->get();
 
         $currencies = Currency::query()->where('is_active', true)->orderBy('code')->get();
 
-        return view('livewire.admin.settings.subscription-plans', [
+        return view('livewire.admin.admin-settings.promotion-plans', [
             'plans' => $plans,
             'currencies' => $currencies,
+            'planTypes' => self::TYPES,
         ]);
     }
 }

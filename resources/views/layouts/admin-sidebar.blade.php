@@ -52,8 +52,8 @@
             </div>
         </details>
 
-        <a href="{{ route('admin.notifications') }}" class="{{ request()->routeIs('admin.notifications') ? $navActive : $navIdle }}">
-            <i class="ri-notification-line text-xl"></i><span class="font-medium">Notifications</span>
+        <a href="{{ route('admin.moderations') }}" class="{{ request()->routeIs('admin.moderations') ? $navActive : $navIdle }}">
+            <i class="ri-notification-line text-xl"></i><span class="font-medium">Moderations</span>
         </a>
         <a href="{{ route('admin.profile') }}" class="{{ request()->routeIs('admin.profile') ? $navActive : $navIdle }}">
             <i class="ri-user-3-line text-xl"></i><span class="font-medium">Profile</span>

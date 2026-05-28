@@ -8,7 +8,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class Coupons extends Component
+class AdminCoupons extends Component
 {
     use WithPagination;
 
@@ -65,7 +65,7 @@ class Coupons extends Component
             $coupon->qty_remaining = max(0, (int) $coupon->quantity - (int) $coupon->payments_count);
         }
 
-        return view('livewire.admin.coupons', [
+        return view('livewire.admin.admin-coupons', [
             'coupons' => $coupons,
         ]);
     }

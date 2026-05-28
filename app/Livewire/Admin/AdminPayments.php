@@ -8,7 +8,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class Payments extends Component
+class AdminPayments extends Component
 {
     use WithPagination;
 
@@ -56,7 +56,7 @@ class Payments extends Component
             ? Payment::query()->with(['user', 'currency'])->find($this->selectedPaymentId)
             : null;
 
-        return view('livewire.admin.payments', [
+        return view('livewire.admin.admin-payments', [
             'payments' => $payments,
             'selectedPayment' => $selectedPayment,
             'statuses' => Payment::query()->distinct()->pluck('status')->filter()->values(),

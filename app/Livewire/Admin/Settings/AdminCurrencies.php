@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
-class Currencies extends Component
+class AdminCurrencies extends Component
 {
     public bool $showModal = false;
 
@@ -155,7 +155,7 @@ class Currencies extends Component
     {
         $currencies = Currency::query()->orderByDesc('is_default')->orderBy('code')->get();
 
-        return view('livewire.admin.settings.currencies', [
+        return view('livewire.admin.admin-settings.currencies', [
             'currencies' => $currencies,
         ]);
     }

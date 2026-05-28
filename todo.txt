@@ -57,15 +57,7 @@ ADMIN[
             ]
         ]
     ]
-    Inspections => [
-        remove everything about inspections from the system. => [
-             remove it from properties migrations and model
-             list-property livewire component and page, 
-             admin pages and sidebar 
-             routes
-        ]
-       
-    ],
+   
     Blog => [
         This should show a table with columns => [
             Date Created, 
@@ -104,6 +96,16 @@ ADMIN[
         [Add Search by code, Filter by Status, Sort (by Qty Remaining, by Qty Used) ],
         Add Create & Edit Pages
     ],
+
+    Profile - add notification settings, 
+    Chat interface with whatsapp
+    Notifications via email: [
+        moderations-> notifications,
+        blog comment -> notifications,
+        blog post -> notifications
+
+    ]
+    change notifications page to moderations
     Settings => [
         [Settings->Content Settings : [
                 Content Generation: Manual / AI ,
@@ -111,11 +113,6 @@ ADMIN[
                 Content min & max word count, 
             ]
         ]
-        [Settings->Subscription Plans page should be CRUD],
-        [Settings->Promotion Plans page should be CRUD: Blog Post|Featured (views & clicks)|Newsletters],
-        [Settings->Staff page should be CRUD],
-        
-        [Add Currencies Page to perform CRUD on Currencies. We can set a currency as default],
         [
             Settings->Countries page should be CRUD,
             [

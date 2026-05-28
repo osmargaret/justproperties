@@ -9,7 +9,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class Promotions extends Component
+class AdminPromotions extends Component
 {
     use WithPagination;
 
@@ -73,7 +73,7 @@ class Promotions extends Component
             }
         }
 
-        return view('livewire.admin.promotions', [
+        return view('livewire.admin.admin-promotions', [
             'promotions' => $promotions,
             'statuses' => Promotion::query()->distinct()->pluck('status')->filter()->values(),
             'types' => Promotion::query()->distinct()->pluck('promotable_type')->filter()->values(),

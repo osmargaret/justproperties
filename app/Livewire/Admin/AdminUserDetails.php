@@ -5,7 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\User;
 use Livewire\Component;
 
-class UserDetails extends Component
+class AdminUserDetails extends Component
 {
     public User $user;
 
@@ -40,6 +40,6 @@ class UserDetails extends Component
     {
         $this->user->loadCount(['properties', 'subscriptions']);
 
-        return view('livewire.admin.user-details');
+        return view('livewire.admin.admin-user-details');
     }
 }

@@ -8,7 +8,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class Users extends Component
+class AdminUsers extends Component
 {
     use WithPagination;
 
@@ -57,6 +57,6 @@ class Users extends Component
             ->orderBy($sortBy, $this->sortDir)
             ->paginate(10);
 
-        return view('livewire.admin.users', ['users' => $users]);
+        return view('livewire.admin.admin-users', ['users' => $users]);
     }
 }

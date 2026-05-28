@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
-class Staff extends Component
+class AdminStaff extends Component
 {
     public bool $showModal = false;
 
@@ -115,7 +115,7 @@ class Staff extends Component
 
             return;
         }
-        $user->update(['role_id' => null]);
+        $user->update(['role_id' => null,'active_role' => 'buyer']);
         session()->flash('status', __('Staff member removed from admin.'));
     }
 
@@ -129,7 +129,7 @@ class Staff extends Component
 
         $adminRoles = Role::orderBy('name', 'asc')->get();
 
-        return view('livewire.admin.settings.staff', [
+        return view('livewire.admin.admin-settings.staff', [
             'staff' => $staff,
             'adminRoles' => $adminRoles,
         ]);

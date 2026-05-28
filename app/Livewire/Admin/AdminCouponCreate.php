@@ -3,13 +3,10 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Coupon;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
-class CouponEdit extends Component
+class AdminCouponCreate extends Component
 {
-    public Coupon $coupon;
-
     public string $name = '';
 
     public string $code = '';
@@ -34,28 +31,11 @@ class CouponEdit extends Component
 
     public bool $is_published = false;
 
-    public function mount(Coupon $coupon): void
-    {
-        $this->coupon = $coupon;
-        $this->name = $coupon->name;
-        $this->code = $coupon->code;
-        $this->quantity = (int) $coupon->quantity;
-        $this->limit_per_user = $coupon->limit_per_user;
-        $this->limit_for_user = $coupon->limit_for_user;
-        $this->start_at = $coupon->start_at?->format('Y-m-d\TH:i');
-        $this->expires_at = $coupon->expires_at?->format('Y-m-d\TH:i');
-        $this->is_percentage = (bool) $coupon->is_percentage;
-        $this->discount = (string) $coupon->discount;
-        $this->discount_cap = $coupon->discount_cap !== null ? (string) $coupon->discount_cap : null;
-        $this->minimum_spend = $coupon->minimum_spend !== null ? (string) $coupon->minimum_spend : null;
-        $this->is_published = (bool) $coupon->is_published;
-    }
-
     protected function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:64', Rule::unique('coupons', 'code')->ignore($this->coupon->id)],
+            'code' => ['required', 'string', 'max:64', 'unique:coupons,code'],
             'quantity' => ['required', 'integer', 'min:1'],
             'limit_per_user' => ['nullable', 'integer', 'min:1'],
             'limit_for_user' => ['nullable', 'integer', 'min:1'],
@@ -69,11 +49,11 @@ class CouponEdit extends Component
         ];
     }
 
-    public function save(): void
+    public function save(): mixed
     {
         $this->validate();
 
-        $this->coupon->update([
+        $coupon = Coupon::query()->create([
             'name' => $this->name,
             'code' => strtoupper(trim($this->code)),
             'quantity' => $this->quantity,
@@ -85,17 +65,20 @@ class CouponEdit extends Component
             'discount' => $this->discount,
             'discount_cap' => $this->discount_cap,
             'minimum_spend' => $this->minimum_spend,
+            'eligible_items' => null,
             'is_published' => $this->is_published,
         ]);
 
-        session()->flash('status', __('Coupon updated.'));
+        session()->flash('status', __('Coupon created.'));
+
+        return redirect()->route('admin.coupons.edit', ['coupon' => $coupon->id]);
     }
 
     public function render()
     {
-        return view('livewire.admin.coupon-form', [
-            'heading' => __('Edit coupon'),
-            'submitLabel' => __('Save'),
+        return view('livewire.admin.admin-coupon-form', [
+            'heading' => __('Create coupon'),
+            'submitLabel' => __('Create'),
         ]);
     }
 }

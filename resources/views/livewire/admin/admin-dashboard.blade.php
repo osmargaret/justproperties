@@ -56,10 +56,10 @@
                                 <div class="text-xs text-gray-500">Listings &amp; reviews</div>
                             </div>
                         </a>
-                        <a href="{{ route('admin.notifications') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('admin.moderations') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-notification-line text-xl"></i></span>
                             <div>
-                                <div class="font-medium text-gray-900">Notifications</div>
+                                <div class="font-medium text-gray-900">Moderations</div>
                                 <div class="text-xs text-gray-500">System &amp; user alerts</div>
                             </div>
                         </a>

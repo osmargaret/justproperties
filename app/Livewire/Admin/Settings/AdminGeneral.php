@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Settings;
 use App\Models\Setting;
 use Livewire\Component;
 
-class General extends Component
+class AdminGeneral extends Component
 {
     public string $generation_mode = 'manual';
 
@@ -50,6 +50,6 @@ class General extends Component
 
     public function render()
     {
-        return view('livewire.admin.settings.general');
+        return view('livewire.admin.admin-settings.general');
     }
 }
