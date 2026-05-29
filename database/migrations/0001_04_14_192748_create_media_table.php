@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('mime_type')->nullable();
             $table->string('size')->nullable();
             $table->string('extension')->nullable();
+            $table->string('path')->nullable();
             $table->boolean('is_primary')->default(false);
             $table->timestamps();
         });

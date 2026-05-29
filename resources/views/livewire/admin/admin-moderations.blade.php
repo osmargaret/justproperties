@@ -16,11 +16,11 @@
         <table class="min-w-full text-left text-sm">
             <thead class="border-b border-gray-200 bg-gray-50 text-gray-600">
                 <tr>
-                    <th class="px-3 py-2">Property</th>
-                    <th class="px-3 py-2">Seller</th>
+                    <th class="px-3 py-2">Item</th>
+                    <th class="px-3 py-2">Owner</th>
+                    <th class="px-3 py-2">Type</th>
                     <th class="px-3 py-2">Status</th>
                     <th class="px-3 py-2">Moderated By</th>
-                    <th class="px-3 py-2">Action</th>
                     <th class="px-3 py-2">Reason</th>
                     <th class="px-3 py-2">Moderated At</th>
                     <th class="px-3 py-2"></th>
@@ -30,11 +30,30 @@
                 @forelse ($moderations as $moderation)
                     <tr>
                         <td class="px-3 py-2">
-                            <a href="{{ route('seller.properties.show', $moderation->property->id, absolute: false) }}" class="text-emerald-600 hover:underline" target="_blank">
-                                {{ $moderation->property->name ?? '—' }}
-                            </a>
+                            @if($moderation->moderatable)
+                                @if($moderation->moderatable_type === 'property')
+                                    <a href="{{ route('admin.properties.show', $moderation->moderatable->id, absolute: false) }}" class="text-emerald-600 hover:underline" target="_blank">
+                                        {{ $moderation->moderatable->name ?? '—' }}
+                                    </a>
+                                @elseif($moderation->moderatable_type === 'user')
+                                    {{ $moderation->moderatable->name ?? '—' }}
+                                @else
+                                    {{ class_basename($moderation->moderatable_type) }} #{{ $moderation->moderatable_id }}
+                                @endif
+                            @else
+                                —
+                            @endif
                         </td>
-                        <td class="px-3 py-2">{{ $moderation->property->user->name ?? '—' }}</td>
+                        <td class="px-3 py-2">
+                            @if($moderation->moderatable_type === 'property')
+                                {{ $moderation->moderatable->user->name ?? '—' }}
+                            @elseif($moderation->moderatable_type === 'user')
+                                {{ $moderation->moderatable->role?->name ?? '—' }}
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td class="px-3 py-2">{{ $moderation->moderatable_type ? class_basename($moderation->moderatable_type) : '—' }}</td>
                         <td class="px-3 py-2">
                             @if($moderation->status === 'pending')
                                 <span class="rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">Pending</span>
@@ -44,8 +63,7 @@
                                 <span class="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Rejected</span>
                             @endif
                         </td>
-                        <td class="px-3 py-2">{{ $moderation->actor->name ?? '—' }}</td>
-                        <td class="px-3 py-2">{{ $moderation->action ?? '—' }}</td>
+                        <td class="px-3 py-2">{{ $moderation->moderator->name ?? '—' }}</td>
                         <td class="px-3 py-2 text-gray-500">{{ $moderation->reason ?? '—' }}</td>
                         <td class="px-3 py-2 text-gray-500">{{ $moderation->created_at?->diffForHumans() ?? '—' }}</td>
                         <td class="px-3 py-2">

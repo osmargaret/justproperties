@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
     'mime_type',
     'size',
     'extension',
+    'path',
     'is_primary',
 ])]
 class Media extends Model

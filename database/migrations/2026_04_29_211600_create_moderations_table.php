@@ -10,15 +10,14 @@ return new class extends Migration
     {
         Schema::create('moderations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained('properties')->cascadeOnDelete();
-            $table->foreignId('actor_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->nullableMorphs('moderatable');
+            $table->foreignId('moderated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('status');
-            $table->string('action');
             $table->text('reason')->nullable();
             $table->timestamps();
 
-            $table->index(['property_id', 'status']);
-            $table->index('actor_id');
+            $table->index(['moderatable_type', 'moderatable_id', 'status']);
+            $table->index('moderated_by');
         });
     }
 

@@ -123,4 +123,7 @@ ADMIN[
         ],
     ],
 
+    in addition to this, I will like us to add verification fields to users table like address, govt_id_number, govt_id_expiry. Then we request users to upload documents like govt_id + address_proof which will be saved to media table and a moderation record will be created. 
+This verification could be done in the pro
+
 ]

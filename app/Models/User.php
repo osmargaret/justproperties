@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'email', 'password', 'phone', 'active_role', 'country_id', 'role_id', 'suspended_at'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'active_role', 'country_id', 'role_id', 'suspended_at', 'govt_id_number', 'govt_id_expiry', 'address', 'verified_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmailContract
 {
@@ -32,6 +33,8 @@ class User extends Authenticatable implements MustVerifyEmailContract
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'suspended_at' => 'datetime',
+            'govt_id_expiry' => 'date',
+            'verified_at' => 'datetime',
         ];
     }
 
@@ -93,6 +96,11 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function blogSubscriptions(): HasMany
     {
         return $this->hasMany(NewsletterSubscription::class);
+    }
+
+    public function moderations(): MorphMany
+    {
+        return $this->morphMany(Moderation::class, 'moderatable');
     }
 
     public function hasPermission(string $permission, string $capability): bool

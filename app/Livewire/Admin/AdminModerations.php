@@ -12,10 +12,14 @@ class AdminModerations extends Component
     public function approve(int $id): void
     {
         $moderation = Moderation::query()->findOrFail($id);
+
+        if ($moderation->moderatable_type === 'user') {
+            $moderation->moderatable?->update(['verified_at' => now()]);
+        }
+
         $moderation->update([
             'status' => 'approved',
-            'actor_id' => auth()->id(),
-            'action' => 'approved',
+            'moderated_by' => auth()->id(),
         ]);
         session()->flash('status', __('Moderation approved.'));
     }
@@ -25,8 +29,7 @@ class AdminModerations extends Component
         $moderation = Moderation::query()->findOrFail($id);
         $moderation->update([
             'status' => 'rejected',
-            'actor_id' => auth()->id(),
-            'action' => 'rejected',
+            'moderated_by' => auth()->id(),
             'reason' => $reason,
         ]);
         session()->flash('status', __('Moderation rejected.'));
@@ -35,7 +38,8 @@ class AdminModerations extends Component
     public function render()
     {
         $query = Moderation::query()
-            ->with(['property.user.country', 'actor'])
+            ->with('moderator')
+            ->with('moderatable')
             ->orderBy('created_at');
 
         if ($this->filter === 'pending') {

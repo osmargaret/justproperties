@@ -99,9 +99,9 @@ class Property extends Model
         return $this->hasMany(FeaturedProperty::class);
     }
 
-    public function moderations(): HasMany
+    public function moderations(): MorphMany
     {
-        return $this->hasMany(Moderation::class);
+        return $this->morphMany(Moderation::class, 'moderatable');
     }
 
     public function subscriptionLinks(): HasMany

@@ -17,9 +17,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('two_factor_enable')->default(false);
+
             $table->string('password');
+
             $table->string('phone')->nullable();
             $table->string('whatsapp')->nullable();
+
             $table->string('facebook')->nullable();
             $table->string('twitter')->nullable();
             $table->string('instagram')->nullable();
@@ -27,10 +30,16 @@ return new class extends Migration
             $table->string('youtube')->nullable();
             $table->string('website')->nullable();
             
-            $table->string('active_role')->nullable()->default(null); // buyer, seller — set when user opens a dashboard
             $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->text('address')->nullable();
+
+            $table->string('active_role')->nullable()->default(null); // buyer, seller — set when user opens a dashboard
             $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
             $table->timestamp('suspended_at')->nullable();
+            
+            $table->string('govt_id_number')->nullable();
+            $table->date('govt_id_expiry')->nullable();
+            $table->timestamp('verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

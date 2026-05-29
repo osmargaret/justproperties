@@ -5,23 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 #[Fillable([
-    'property_id',
-    'actor_id',
+    'moderated_by',
     'status',
-    'action',
     'reason',
+    'moderatable_type',
+    'moderatable_id',
 ])]
 class Moderation extends Model
 {
-    public function property(): BelongsTo
+    public function moderatable(): MorphTo
     {
-        return $this->belongsTo(Property::class);
+        return $this->morphTo();
     }
 
-    public function actor(): BelongsTo
+    public function moderator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'actor_id');
+        return $this->belongsTo(User::class, 'moderated_by');
     }
 }

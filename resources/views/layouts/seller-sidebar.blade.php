@@ -26,16 +26,11 @@
             <i class="ri-megaphone-line text-xl"></i>
             <span class="font-medium">Promotions</span>
         </a>
-        <a href="{{ route('seller.notifications') }}" class="{{ request()->routeIs('seller.notifications') ? $navActive : $navIdle }}">
-            <i class="ri-notification-line text-xl"></i><span class="font-medium">Notifications</span>
-        </a>
+        
         <a href="{{ route('seller.profile') }}" class="{{ request()->routeIs('seller.profile') ? $navActive : $navIdle }}">
             <i class="ri-user-3-line text-xl"></i><span class="font-medium">Profile</span>
         </a>
-        <a href="{{ route('seller.settings') }}" class="{{ request()->routeIs('seller.settings') ? $navActive : $navIdle }}">
-            <i class="ri-settings-3-line text-xl"></i>
-            <span class="font-medium">Settings</span>
-        </a>
+        
 
         <div class="border-t border-gray-200 my-2"></div>
         <form method="POST" action="{{ route('logout') }}">
