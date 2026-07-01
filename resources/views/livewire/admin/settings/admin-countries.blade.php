@@ -18,7 +18,7 @@
                     <th class="px-4 py-3">Code</th>
                     <th class="px-4 py-3">Currency</th>
                     <th class="px-4 py-3">Active</th>
-                    <th class="px-4 py-3">Config</th>
+                    
                     <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
@@ -29,9 +29,7 @@
                         <td class="px-4 py-3">{{ $country->code ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $country->currency?->code ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $country->is_active ? 'Yes' : 'No' }}</td>
-                        <td class="px-4 py-3">
-                            <a href="{{ route('admin.settings.countries.config', $country) }}" class="font-medium text-emerald-600 hover:underline">Open</a>
-                        </td>
+                        
                         <td class="px-4 py-3">
                             <button type="button" wire:click="openEdit({{ $country->id }})" class="text-emerald-600 hover:underline">Edit</button>
                             <button type="button" wire:click="deleteCountry({{ $country->id }})" wire:confirm="{{ __('Delete this country?') }}" class="ml-2 text-red-600 hover:underline">Delete</button>

@@ -19,6 +19,9 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
     'content_source',
     'ai_generated_at',
     'status',
+    'views_count',
+    'click_count',
+    'action_counts',
     'published_at',
     'tags',
 ])]
@@ -28,9 +31,14 @@ class Post extends Model
     {
         return [
             'tags' => 'array',
+            'action_counts' => 'array',
             'published_at' => 'datetime',
             'ai_generated_at' => 'datetime',
         ];
+    }
+
+    public function getRouteKeyName(){
+        return 'slug';
     }
 
     public function user(): BelongsTo
@@ -50,7 +58,12 @@ class Post extends Model
 
     public function blogSubscriptions(): HasMany
     {
-        return $this->hasMany(NewsletterSubscription::class);
+        return $this->hasMany(BlogSubscription::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(PostComment::class);
     }
 
     public function media(): MorphMany

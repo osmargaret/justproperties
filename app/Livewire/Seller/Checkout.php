@@ -2,38 +2,143 @@
 
 namespace App\Livewire\Seller;
 
+use App\Http\Traits\PaymentTrait;
 use App\Models\Payment;
+use App\Models\Promotion;
 use App\Models\Property;
+use App\Models\SubscribedProperty;
+use App\Models\Subscription;
+use App\Services\Payments\CompletesPayment;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Checkout extends Component
 {
+    use PaymentTrait;
+
     public Payment $payment;
+
+    public ?string $gatewayError = null;
+
+    public string $couponCode = '';
+    public ?string $couponMessage = null;
+    public bool $couponSuccess = false;
 
     public function mount(Payment $payment): void
     {
         abort_unless($payment->user_id === Auth::id(), 403);
 
-        $this->payment = $payment;
-    }
+        $this->payment = $payment->load(['currency', 'paymentable', 'user']);
 
-    public function markAsPaidPlaceholder(): mixed
-    {
-        $this->payment->status = 'completed';
-        $this->payment->method = $this->payment->method ?: 'gateway_placeholder';
-        $this->payment->save();
+        if ($this->payment->status === 'success') {
+            session()->flash('status', __('This payment has already been completed.'));
 
-        if ($this->payment->paymentable_type === Property::class && $this->payment->paymentable_id) {
-            Property::query()
-                ->whereKey($this->payment->paymentable_id)
-                ->where('user_id', Auth::id())
-                ->update(['status' => 'active']);
+            return;
         }
 
-        session()->flash('status', __('Payment marked completed (placeholder flow).'));
+        $gateway = $this->payment->currency?->payment_gateway;
+        if (! $gateway) {
+            $this->gatewayError = __('No payment gateway is configured for this currency. Ask an admin to set one under Settings → Currencies.');
+        } elseif (! $this->gatewayIsConfigured($gateway)) {
+            $this->gatewayError = __('Payment gateway credentials are missing in the server environment.');
+        } else {
+            $this->payment->method = $gateway;
+            $this->payment->gateway = $gateway;
+            $this->payment->save();
+        }
+    }
 
-        return redirect()->route('seller.properties.show', ['property' => $this->payment->paymentable_id]);
+    public function applyCouponCode()
+    {
+        $this->couponMessage = null;
+        $this->couponSuccess = false;
+
+        $code = trim($this->couponCode);
+        if (!$code) {
+            $this->couponMessage = 'Please enter a coupon code.';
+            return;
+        }
+
+        $result = $this->applyCoupon($this->payment, $code);
+
+        if ($result['status']) {
+            $this->payment->refresh();
+            $this->couponSuccess = true;
+            $this->couponCode = '';
+            $this->couponMessage = $result['message'];
+        } else {
+            $this->couponMessage = $result['message'];
+        }
+    }
+
+    public function pay(): mixed
+    {
+        if ($this->payment->status === 'success') {
+            return $this->redirectAfterPayment();
+        }
+
+        if ($this->gatewayError) {
+            $this->addError('payment', $this->gatewayError);
+
+            return null;
+        }
+
+        $result = $this->initializePayment($this->payment);
+
+        if (! $result || empty($result['redirect_url'])) {
+            $this->addError('payment', __('Unable to start payment with the selected gateway. Please try again later.'));
+
+            return null;
+        }
+
+        return redirect()->away($result['redirect_url']);
+    }
+
+    public function completePaymentLocally(): mixed
+    {
+        if (! app()->environment('local')) {
+            abort(403);
+        }
+
+        app(CompletesPayment::class)->complete($this->payment, 'local_test');
+        session()->flash('status', __('Payment marked completed (local testing only).'));
+
+        return $this->redirectAfterPayment();
+    }
+
+    protected function gatewayIsConfigured(string $gateway): bool
+    {
+        return match ($gateway) {
+            'paystack' => filled(config('services.paystack.secret')),
+            'flutterwave' => filled(config('services.flutterwave.secret')),
+            default => false,
+        };
+    }
+
+    protected function redirectAfterPayment(): mixed
+    {
+        if ($this->payment->paymentable_type === Promotion::class && $this->payment->paymentable_id) {
+            $propertyId = Promotion::query()->whereKey($this->payment->paymentable_id)->value('property_id');
+
+            return redirect()->route('seller.properties.show', ['property' => $propertyId, 'tab' => 'promotions']);
+        }
+
+        if ($this->payment->paymentable_type === Subscription::class && $this->payment->paymentable_id) {
+            $propertyId = SubscribedProperty::query()
+                ->where('subscription_id', $this->payment->paymentable_id)
+                ->latest('id')
+                ->value('property_id');
+
+            if ($propertyId) {
+                return redirect()->route('seller.properties.show', ['property' => $propertyId]);
+            }
+        }
+
+        if ($this->payment->paymentable_type === Property::class && $this->payment->paymentable_id) {
+            return redirect()->route('seller.properties.show', ['property' => $this->payment->paymentable_id]);
+        }
+
+        return redirect()->route('seller.listed-properties');
     }
 
     public function render()

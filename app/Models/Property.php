@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Observers\PropertyObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 #[Fillable([
     'name',
@@ -22,13 +28,14 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
     'neighborhood',
     'address',
     'show_address',
-    'status',
+    'is_published',
     'contact_name',
     'contact_phone',
     'contact_email',
     'contact_whatsapp',
     'user_id',
 ])]
+#[ObservedBy([PropertyObserver::class])]
 class Property extends Model
 {
     protected function casts(): array
@@ -36,6 +43,7 @@ class Property extends Model
         return [
             'cost' => 'decimal:2',
             'show_address' => 'boolean',
+            'is_published' => 'boolean',
         ];
     }
 
@@ -69,9 +77,9 @@ class Property extends Model
         return $this->hasMany(PropertyFeature::class);
     }
 
-    public function reviews(): HasMany
+    public function reports(): HasMany
     {
-        return $this->hasMany(PropertyReview::class);
+        return $this->hasMany(PropertyReport::class);
     }
 
     public function alerts(): HasMany
@@ -104,14 +112,24 @@ class Property extends Model
         return $this->morphMany(Moderation::class, 'moderatable');
     }
 
-    public function subscriptionLinks(): HasMany
+    /**
+     * Pivot rows in subscribed_properties (property ↔ subscription seat usage).
+     */
+    public function subscribedPropertyLinks(): HasMany
     {
         return $this->hasMany(SubscribedProperty::class);
     }
 
-    public function prices(): MorphMany
+    /** @deprecated Use subscribedPropertyLinks() — kept for existing eager loads */
+    public function subscriptionLinks(): HasMany
     {
-        return $this->morphMany(Price::class, 'priceable');
+        return $this->subscribedPropertyLinks();
+    }
+
+    public function subscriptions(): BelongsToMany
+    {
+        return $this->belongsToMany(Subscription::class, 'subscribed_properties')
+            ->withTimestamps();
     }
 
     public function media(): MorphMany
@@ -122,6 +140,57 @@ class Property extends Model
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function latestModeration(): MorphOne
+    {
+        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
+    }
+
+    /**
+     * The subscribed_properties row tying this listing to an active subscription (if any).
+     */
+    public function activeSubscribedPropertyLink(): HasOne
+    {
+        return $this->hasOne(SubscribedProperty::class)
+            ->whereHas('subscription', function (Builder $query): void {
+                $query->where('status', 'active')
+                    ->where('end_at', '>=', now());
+            })
+            ->latestOfMany();
+    }
+
+    /** @deprecated Use activeSubscribedPropertyLink() */
+    public function activeSubscriptionLink(): HasOne
+    {
+        return $this->activeSubscribedPropertyLink();
+    }
+
+    public function scopeWithOverviewStats(Builder $query): Builder
+    {
+        return $query->withCount([
+            'viewedByUsers',
+            'savedByUsers',
+            'alerts',
+            'reports',
+            'promotions',
+        ]);
+    }
+
+    protected function displayLocation(): Attribute
+    {
+        return Attribute::make(get: function (): string {
+            if (! $this->show_address) {
+                return collect([
+                    $this->neighborhood,
+                    $this->city?->name,
+                    $this->state?->name,
+                    $this->country?->name,
+                ])->filter()->implode(', ');
+            }
+
+            return $this->full_address;
+        });
     }
 
     protected function fullAddress(): Attribute
@@ -135,5 +204,69 @@ class Property extends Model
                 $this->country?->name,
             ])->filter()->implode(', ');
         });
+    }
+
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: function (): string {
+                if (! $this->is_published) {
+                    return 'draft';
+                }
+
+                $hasActiveSubscription = $this->activeSubscribedPropertyLink()->exists();
+                $latestModeration = $this->latestModeration;
+
+                if ($latestModeration) {
+                    switch ($latestModeration->status) {
+                        case 'approved':
+                            return $hasActiveSubscription ? 'live' : 'no subscription';
+                        case 'pending':
+                        case 'rejected':
+                            return $latestModeration->status;
+                        default:
+                            return 'pending';
+                    }
+                }
+
+                // No moderation record - check subscription status
+                return $hasActiveSubscription ? 'live' : 'no subscription';
+            },
+        );
+    }
+
+    public function currency()
+    {
+        return $this->user->country?->currency->symbol ?? '$';
+    }
+
+    public function getPriceAttribute()
+    {
+        if ($this->cost === null) {
+            return null;
+        }
+
+        $value = (float) $this->cost;
+
+        // Define thresholds and their suffixes
+        $thresholds = [
+            1_000_000_000 => 'B',
+            1_000_000 => 'M',
+            1_000 => 'K',
+        ];
+
+        foreach ($thresholds as $threshold => $suffix) {
+            if (abs($value) >= $threshold) {
+                $divided = $value / $threshold;
+
+                // Round to 1 decimal place and remove trailing zeros
+                $formatted = rtrim(rtrim(number_format($divided, 1), '0'), '.');
+
+                return $formatted.$suffix;
+            }
+        }
+
+        // For numbers less than 1000, return as is
+        return (string) $value;
     }
 }

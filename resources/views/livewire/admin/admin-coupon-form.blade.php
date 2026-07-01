@@ -33,11 +33,7 @@
                 <input type="number" wire:model="limit_per_user" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
                 @error('limit_per_user') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Limit for user (legacy)</label>
-                <input type="number" wire:model="limit_for_user" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-                @error('limit_for_user') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-            </div>
+            
         </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -51,26 +47,14 @@
                 @error('expires_at') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <input type="checkbox" wire:model.live="is_percentage" id="is_pct" class="rounded border-gray-300" />
-            <label for="is_pct" class="text-sm font-medium text-gray-700">Percentage discount</label>
-        </div>
+        
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-                <label class="block text-sm font-medium text-gray-700">{{ $is_percentage ? 'Percent' : 'Amount' }}</label>
+                <label class="block text-sm font-medium text-gray-700">Percent</label>
                 <input type="text" wire:model="discount" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
                 @error('discount') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Discount cap</label>
-                <input type="text" wire:model="discount_cap" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-                @error('discount_cap') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Minimum spend</label>
-                <input type="text" wire:model="minimum_spend" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-                @error('minimum_spend') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-            </div>
+            
         </div>
         <div class="flex flex-wrap gap-3 pt-2">
             <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">{{ $submitLabel }}</button>

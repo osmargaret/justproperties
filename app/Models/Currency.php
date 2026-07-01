@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'decimal_multiplier',
     'is_default',
     'is_active',
+    'payment_gateway',
 ])]
 class Currency extends Model
 {

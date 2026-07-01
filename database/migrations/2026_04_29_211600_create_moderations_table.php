@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->nullableMorphs('moderatable');
             $table->foreignId('moderated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('action')->nullable();
             $table->string('status');
             $table->text('reason')->nullable();
             $table->timestamps();

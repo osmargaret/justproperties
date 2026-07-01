@@ -2,21 +2,39 @@
 
 namespace App\Models;
 
+use App\Observers\PromotionObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable(['user_id', 'property_id', 'promotion_plan_id', 'promotable_id', 'promotable_type', 'start_at', 'end_at', 'usage', 'status'])]
+#[Fillable([
+    'user_id',
+    'property_id',
+    'promotion_plan_id',
+    'promotable_id',
+    'promotable_type',
+    'start_at',
+    'usage',
+    'status',
+    'target_type',
+    'target_count',
+    'content_brief',
+    'audience_config',
+])]
+// Register observers
+#[ObservedBy([PromotionObserver::class])]
 class Promotion extends Model
 {
     protected function casts(): array
     {
         return [
             'start_at' => 'datetime',
-            'end_at' => 'datetime',
             'usage' => 'array',
+            'audience_config' => 'array',
+            'target_count' => 'integer',
         ];
     }
 
@@ -40,8 +58,78 @@ class Promotion extends Model
         return $this->morphTo();
     }
 
-    protected function isActive(): Attribute
+    public function payments(): MorphMany
     {
-        return Attribute::make(get: fn (): bool => $this->status === 'active');
+        return $this->morphMany(Payment::class, 'paymentable');
+    }
+
+    public function hasPaidPayment(): bool
+    {
+        return $this->payments()->where('status', 'success')->exists();
+    }
+
+    public function pendingPayment(): ?Payment
+    {
+        return $this->payments()->where('status', 'pending')->latest()->first();
+    }
+
+    public function isPendingPayment(): bool
+    {
+        return $this->status === 'pending_payment';
+    }
+
+    public function isEditable(): bool
+    {
+        return $this->isPendingPayment() && ! $this->hasPaidPayment();
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->hasPaidPayment();
+    }
+
+    public function currentProgress(): int
+    {
+        if (! $this->target_type) {
+            return 0;
+        }
+
+        return (int) ($this->usage[$this->target_type] ?? 0);
+    }
+
+    public function isCompleted(): bool
+    {
+        if ($this->status === 'completed') {
+            return true;
+        }
+
+        if ((int) $this->target_count <= 0) {
+            return false;
+        }
+
+        return $this->currentProgress() >= (int) $this->target_count;
+    }
+
+    public function progressPercent(): int
+    {
+        if ((int) $this->target_count <= 0) {
+            return 0;
+        }
+
+        return (int) min(100, round(($this->currentProgress() / (int) $this->target_count) * 100));
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active'
+            && $this->hasPaidPayment()
+            && ! $this->isCompleted();
+    }
+
+    public function isInProgress(): bool
+    {
+        return in_array($this->status, ['active', 'pending_content'], true)
+            && $this->hasPaidPayment()
+            && ! $this->isCompleted();
     }
 }

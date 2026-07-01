@@ -62,10 +62,10 @@ class SubscriptionsAndPaymentsSeeder extends Seeder
             [
                 'property_id' => $primaryProperty->id,
                 'promotion_plan_id' => $featuredPlan->id,
+                'user_id' => $seller->id,
             ],
             [
                 'start_at' => now()->subDay(),
-                'end_at' => now()->addDays(13),
                 'status' => 'active',
             ]
         );
@@ -85,27 +85,10 @@ class SubscriptionsAndPaymentsSeeder extends Seeder
                 'vat_value' => 0,
                 'total' => 45000,
                 'method' => 'card',
-                'status' => 'completed',
+                'status' => 'success',
             ]
         );
 
-        Payment::query()->updateOrCreate(
-            ['reference' => 'SEED-PAY-COUPON-002'],
-            [
-                'user_id' => $seller->id,
-                'currency_id' => $ngn->id,
-                'paymentable_id' => null,
-                'paymentable_type' => null,
-                'request_id' => 'req_seed_002',
-                'amount' => 100000,
-                'coupon_id' => $coupon->id,
-                'coupon_value' => '10000',
-                'vat_rate' => 7.5,
-                'vat_value' => 6750,
-                'total' => 96750,
-                'method' => 'bank_transfer',
-                'status' => 'completed',
-            ]
-        );
+        
     }
 }

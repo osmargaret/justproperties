@@ -9,7 +9,7 @@
             <!-- Search Bar -->
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search articles..." />
+                    <input type="text" wire:model.live.debounce.300ms="search" class="search-input" placeholder="Search articles..." />
                     <button class="search-btn">
                         <i class="ri-search-line"></i>
                     </button>
@@ -22,180 +22,67 @@
     <main class="main-content">
         <!-- Category Filters -->
         <div class="category-filters">
-            <button class="category-filter active">All Posts</button>
-            <button class="category-filter">Buying Guide</button>
-            <button class="category-filter">Legal Guide</button>
-            <button class="category-filter">Investment</button>
-            <button class="category-filter">Market Trends</button>
-            <button class="category-filter">Property Tips</button>
+            <button wire:click="$set('category', '')" class="category-filter {{ $category === '' ? 'active' : '' }}">All Posts</button>
+            @foreach($categories as $cat)
+                <button wire:click="$set('category', '{{ $cat->slug }}')" class="category-filter {{ $category === $cat->slug ? 'active' : '' }}">{{ $cat->name }}</button>
+            @endforeach
         </div>
 
         <!-- Featured Post -->
+        @if($featuredPost)
         <div class="featured-post">
             <div class="featured-grid">
                 <div class="featured-image">
-                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Lagos Real Estate Market" />
+                    <img src="{{ $featuredPost->media->first()?->url ?? 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }}"
+                        alt="{{ $featuredPost->title }}" />
                 </div>
                 <div class="featured-content">
-                    <span class="featured-category">Market Trends</span>
-                    <h2 class="featured-title">Lagos Real Estate Market Report 2025: Trends & Opportunities</h2>
+                    <span class="featured-category">{{ $featuredPost->category?->name ?? 'Uncategorized' }}</span>
+                    <h2 class="featured-title">{{ $featuredPost->title }}</h2>
                     <div class="featured-meta">
-                        <span><i class="ri-calendar-line"></i> Jan 15, 2025</span>
-                        <span><i class="ri-time-line"></i> 12 min read</span>
-                        <span><i class="ri-eye-line"></i> 3.2k views</span>
+                        <span><i class="ri-calendar-line"></i> {{ $featuredPost->published_at?->format('M d, Y') ?? 'Recently' }}</span>
+                        <span><i class="ri-time-line"></i> {{ ceil(str_word_count(strip_tags($featuredPost->content)) / 200) }} min read</span>
+                        <span><i class="ri-eye-line"></i> {{ number_format($featuredPost->views_count) }} views</span>
                     </div>
                     <p class="featured-excerpt">
-                        Comprehensive analysis of Lagos property market including price trends in Lekki,
-                        Ikorodu, and emerging areas. Discover investment opportunities with the highest
-                        ROI potential for 2025-2026.
+                        {{ $featuredPost->excerpt ?? str($featuredPost->content)->limit(150) }}
                     </p>
-                    <a href="#" class="read-more-btn">
+                    <a href="{{ route('post',$featuredPost) }}" class="read-more-btn">
                         Read Full Article <i class="ri-arrow-right-line"></i>
                     </a>
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- Blog Grid -->
         <div class="blog-grid">
-            <!-- Article 1 -->
+            @forelse($posts as $post)
             <article class="blog-card">
                 <div class="card-image">
-                    <img src="https://images.unsplash.com/photo-1560520031-3a4dc4e9de0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Property Documents" />
-                    <span class="card-category">Legal Guide</span>
+                    <img src="{{ $post->media->first()?->url ?? 'https://images.unsplash.com/photo-1560520031-3a4dc4e9de0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }}"
+                        alt="{{ $post->title }}" />
+                    <span class="card-category">{{ $post->category?->name ?? 'Uncategorized' }}</span>
                 </div>
                 <div class="card-content">
                     <div class="card-meta">
-                        <span><i class="ri-calendar-line"></i> Jan 12, 2025</span>
-                        <span><i class="ri-time-line"></i> 8 min read</span>
+                        <span><i class="ri-calendar-line"></i> {{ $post->published_at?->format('M d, Y') ?? 'Recently' }}</span>
+                        <span><i class="ri-time-line"></i> {{ ceil(str_word_count(strip_tags($post->content)) / 200) }} min read</span>
                     </div>
-                    <h3 class="card-title">How to Verify Property Documents in Nigeria</h3>
+                    <h3 class="card-title">{{ $post->title }}</h3>
                     <p class="card-excerpt">
-                        Complete guide to verifying C of O, Survey Plans, and other essential property
-                        documents to ensure legitimate ownership and avoid fraud.
+                        {{ $post->excerpt ?? str($post->content)->limit(100) }}
                     </p>
-                    <a href="#" class="card-link">
+                    <a href="{{ route('post',$post) }}" class="card-link">
                         Read Article <i class="ri-arrow-right-line"></i>
                     </a>
                 </div>
             </article>
-
-            <!-- Article 2 -->
-            <article class="blog-card">
-                <div class="card-image">
-                    <img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Investment Property" />
-                    <span class="card-category">Investment</span>
+            @empty
+                <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 0; color: #6b7280;">
+                    <p>No articles found matching your criteria.</p>
                 </div>
-                <div class="card-content">
-                    <div class="card-meta">
-                        <span><i class="ri-calendar-line"></i> Jan 10, 2025</span>
-                        <span><i class="ri-time-line"></i> 10 min read</span>
-                    </div>
-                    <h3 class="card-title">Best Locations for Real Estate Investment in Lagos 2025</h3>
-                    <p class="card-excerpt">
-                        Discover the most promising areas in Lagos for property investment with high ROI
-                        potential and strong appreciation rates.
-                    </p>
-                    <a href="#" class="card-link">
-                        Read Article <i class="ri-arrow-right-line"></i>
-                    </a>
-                </div>
-            </article>
-
-            <!-- Article 3 -->
-            <article class="blog-card">
-                <div class="card-image">
-                    <img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="First Time Buyer" />
-                    <span class="card-category">Buying Guide</span>
-                </div>
-                <div class="card-content">
-                    <div class="card-meta">
-                        <span><i class="ri-calendar-line"></i> Jan 8, 2025</span>
-                        <span><i class="ri-time-line"></i> 7 min read</span>
-                    </div>
-                    <h3 class="card-title">First-Time Home Buyer's Guide in Nigeria</h3>
-                    <p class="card-excerpt">
-                        Everything you need to know before buying your first home - from budgeting
-                        and mortgage options to closing the deal.
-                    </p>
-                    <a href="#" class="card-link">
-                        Read Article <i class="ri-arrow-right-line"></i>
-                    </a>
-                </div>
-            </article>
-
-            <!-- Article 4 -->
-            <article class="blog-card">
-                <div class="card-image">
-                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Commercial Real Estate" />
-                    <span class="card-category">Investment</span>
-                </div>
-                <div class="card-content">
-                    <div class="card-meta">
-                        <span><i class="ri-calendar-line"></i> Jan 5, 2025</span>
-                        <span><i class="ri-time-line"></i> 9 min read</span>
-                    </div>
-                    <h3 class="card-title">Commercial Real Estate: A Guide for Investors</h3>
-                    <p class="card-excerpt">
-                        Understanding commercial property investment in Lagos - retail spaces,
-                        offices, and industrial properties.
-                    </p>
-                    <a href="#" class="card-link">
-                        Read Article <i class="ri-arrow-right-line"></i>
-                    </a>
-                </div>
-            </article>
-
-            <!-- Article 5 -->
-            <article class="blog-card">
-                <div class="card-image">
-                    <img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Rental Property" />
-                    <span class="card-category">Property Tips</span>
-                </div>
-                <div class="card-content">
-                    <div class="card-meta">
-                        <span><i class="ri-calendar-line"></i> Jan 3, 2025</span>
-                        <span><i class="ri-time-line"></i> 6 min read</span>
-                    </div>
-                    <h3 class="card-title">10 Tips for Landlords: Managing Rental Properties</h3>
-                    <p class="card-excerpt">
-                        Essential advice for landlords on tenant screening, maintenance,
-                        and maximizing rental income in Nigeria.
-                    </p>
-                    <a href="#" class="card-link">
-                        Read Article <i class="ri-arrow-right-line"></i>
-                    </a>
-                </div>
-            </article>
-
-            <!-- Article 6 -->
-            <article class="blog-card">
-                <div class="card-image">
-                    <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Property Inspection" />
-                    <span class="card-category">Buying Guide</span>
-                </div>
-                <div class="card-content">
-                    <div class="card-meta">
-                        <span><i class="ri-calendar-line"></i> Dec 28, 2024</span>
-                        <span><i class="ri-time-line"></i> 8 min read</span>
-                    </div>
-                    <h3 class="card-title">Property Inspection Checklist: What to Look For</h3>
-                    <p class="card-excerpt">
-                        A comprehensive checklist for inspecting properties before purchase,
-                        including structural issues and hidden problems.
-                    </p>
-                    <a href="#" class="card-link">
-                        Read Article <i class="ri-arrow-right-line"></i>
-                    </a>
-                </div>
-            </article>
+            @endforelse
         </div>
 
         <!-- Newsletter Section -->
@@ -212,69 +99,29 @@
         </section>
 
         <!-- Popular Posts -->
+        @if($popularPosts->count() > 0)
         <section class="popular-section">
             <h2 class="section-title">Most Popular Articles</h2>
             <div class="popular-grid">
+                @foreach($popularPosts as $popPost)
                 <div class="popular-card">
                     <div class="popular-image">
-                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                            alt="Popular Post" />
+                        <img src="{{ $popPost->media->first()?->url ?? 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' }}"
+                            alt="{{ $popPost->title }}" />
                     </div>
                     <div class="popular-info">
-                        <h4>Understanding Land Use Act in Nigeria</h4>
-                        <p><i class="ri-eye-line"></i> 5.2k views</p>
+                        <h4>{{ $popPost->title }}</h4>
+                        <p><i class="ri-eye-line"></i> {{ number_format($popPost->views_count) }} views</p>
                     </div>
                 </div>
-
-                <div class="popular-card">
-                    <div class="popular-image">
-                        <img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                            alt="Popular Post" />
-                    </div>
-                    <div class="popular-info">
-                        <h4>Mortgage Options for Nigerians</h4>
-                        <p><i class="ri-eye-line"></i> 4.8k views</p>
-                    </div>
-                </div>
-
-                <div class="popular-card">
-                    <div class="popular-image">
-                        <img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                            alt="Popular Post" />
-                    </div>
-                    <div class="popular-info">
-                        <h4>Ikorodu: The Next Real Estate Hotspot</h4>
-                        <p><i class="ri-eye-line"></i> 4.2k views</p>
-                    </div>
-                </div>
-
-                <div class="popular-card">
-                    <div class="popular-image">
-                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                            alt="Popular Post" />
-                    </div>
-                    <div class="popular-info">
-                        <h4>Legal Fees in Property Transactions</h4>
-                        <p><i class="ri-eye-line"></i> 3.9k views</p>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </section>
+        @endif
 
         <!-- Pagination -->
-        <div class="pagination">
-            <button class="page-btn disabled">
-                <i class="ri-arrow-left-s-line"></i>
-            </button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <button class="page-btn">4</button>
-            <span class="page-btn disabled">...</span>
-            <button class="page-btn">8</button>
-            <button class="page-btn">
-                <i class="ri-arrow-right-s-line"></i>
-            </button>
+        <div style="margin-top: 2rem;">
+            {{ $posts->links(data: ['scrollTo' => false]) }}
         </div>
     </main>
 

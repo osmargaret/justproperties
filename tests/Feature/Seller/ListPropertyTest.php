@@ -80,13 +80,14 @@ class ListPropertyTest extends TestCase
 
         $property = Property::query()->firstOrFail();
         $payment = Payment::query()->firstOrFail();
+        $subscription = Subscription::query()->firstOrFail();
         $test->assertRedirect(route('seller.checkout', ['payment' => $payment->id]));
 
-        $this->assertSame('pending_payment', $property->status);
+        $this->assertSame('draft', $property->status);
         $this->assertSame('Ikeja', $property->neighborhood);
         $this->assertDatabaseHas('payments', [
-            'paymentable_type' => Property::class,
-            'paymentable_id' => $property->id,
+            'paymentable_type' => Subscription::class,
+            'paymentable_id' => $subscription->id,
             'status' => 'pending',
         ]);
     }
@@ -133,7 +134,7 @@ class ListPropertyTest extends TestCase
             ->assertRedirect();
 
         $property = Property::query()->firstOrFail();
-        $this->assertSame('active', $property->status);
+        $this->assertSame('live', $property->status);
         $this->assertDatabaseCount('payments', 0);
     }
 
@@ -194,9 +195,14 @@ class ListPropertyTest extends TestCase
         $this->assertSame(2, Subscription::query()->where('user_id', $seller->id)->count());
         $property = Property::query()->firstOrFail();
         $payment = Payment::query()->firstOrFail();
+        $subscription = Subscription::query()->latest('id')->firstOrFail();
         $test->assertRedirect(route('seller.checkout', ['payment' => $payment->id]));
-        $this->assertSame('pending_payment', $property->status);
+        $this->assertSame('draft', $property->status);
         $this->assertSame('pending', $payment->status);
+        $this->assertDatabaseHas('payments', [
+            'paymentable_type' => Subscription::class,
+            'paymentable_id' => $subscription->id,
+        ]);
     }
 
     public function test_bulk_upload_creates_draft_rows_and_redirects_to_listed_properties(): void
@@ -214,7 +220,7 @@ class ListPropertyTest extends TestCase
             ->assertRedirect(route('seller.listed-properties'));
 
         $this->assertDatabaseCount('properties', 2);
-        $this->assertSame(2, Property::query()->where('status', 'draft')->count());
+        $this->assertSame(2, Property::query()->where('is_published', false)->count());
     }
 
     public function test_bulk_template_download_route_is_accessible_for_seller(): void

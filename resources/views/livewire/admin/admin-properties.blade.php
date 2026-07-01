@@ -25,7 +25,6 @@
                     <th class="px-4 py-3">Category &amp; Type</th>
                     <th class="px-4 py-3">Property</th>
                     <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -38,16 +37,9 @@
                             <a href="{{ route('admin.properties.show', ['property' => $property->id]) }}" class="text-emerald-600 hover:underline">{{ $property->name }}</a>
                         </td>
                         <td class="px-4 py-3">{{ $property->status }}</td>
-                        <td class="px-4 py-3">
-                            <div class="flex flex-wrap gap-2">
-                                <button wire:click="approve({{ $property->id }})" class="text-xs font-medium text-emerald-600 hover:underline">Approve</button>
-                                <button wire:click="disapprove({{ $property->id }})" class="text-xs font-medium text-amber-600 hover:underline">Disapprove</button>
-                                <button wire:click="delete({{ $property->id }})" wire:confirm="Delete property?" class="text-xs font-medium text-red-600 hover:underline">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
+                        </tr>
                 @empty
-                    <tr><td colspan="6" class="px-4 py-6 text-center text-sm text-gray-500">No properties found.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">No properties found.</td></tr>
                 @endforelse
             </tbody>
         </table>

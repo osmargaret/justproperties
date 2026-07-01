@@ -16,13 +16,18 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->unsignedBigInteger('property_id');
             $table->unsignedBigInteger('promotion_plan_id');
-            $table->unsignedBigInteger('promotable_id')->nullable(); //featured listing id, blog post id, newsletter id, 
-            $table->string('promotable_type')->nullable(); //featured listing, blog post, newsletter, 
+            $table->unsignedBigInteger('promotable_id')->nullable(); // featured listing id, blog post id, newsletter id,
+            $table->string('promotable_type')->nullable(); // featured listing, blog post, newsletter,
             $table->dateTime('start_at');
-            $table->dateTime('end_at')->nullable(); // when promotion expires
             $table->json('usage')->nullable(); // tracks usage of features (clicks, posts, emails, recipients)
             $table->string('status')->default('pending'); // pending, active, inactive, expired, completed
             $table->timestamps();
+            $table->string('target_type')->nullable()->after('status');
+            $table->unsignedBigInteger('target_count')->default(0)->after('target_type');
+            $table->text('content_brief')->nullable()->after('target_count');
+            $table->json('audience_config')->nullable()->after('content_brief');
+
+            $table->index(['target_type', 'target_count']);
             $table->index(['promotable_type', 'promotable_id']);
             $table->index('status');
             $table->index('start_at');

@@ -73,6 +73,7 @@ class GeographySeeder extends Seeder
                 'decimal_multiplier' => '100',
                 'is_default' => true,
                 'is_active' => true,
+                'payment_gateway' => 'paystack',
             ]
         );
 
@@ -90,6 +91,7 @@ class GeographySeeder extends Seeder
                 'decimal_multiplier' => '100',
                 'is_default' => false,
                 'is_active' => true,
+                'payment_gateway' => 'flutterwave',
             ]
         );
 

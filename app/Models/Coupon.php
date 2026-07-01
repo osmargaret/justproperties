@@ -12,13 +12,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'code',
     'quantity',
     'limit_per_user',
-    'limit_for_user',
+
     'start_at',
     'expires_at',
-    'is_percentage',
+
     'discount',
-    'discount_cap',
-    'minimum_spend',
+
     'eligible_items',
     'is_published',
 ])]
@@ -31,10 +30,9 @@ class Coupon extends Model
         return [
             'start_at' => 'datetime',
             'expires_at' => 'datetime',
-            'is_percentage' => 'boolean',
+
             'discount' => 'decimal:2',
-            'discount_cap' => 'decimal:2',
-            'minimum_spend' => 'decimal:2',
+
             'eligible_items' => 'array',
             'is_published' => 'boolean',
         ];

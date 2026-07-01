@@ -33,6 +33,8 @@ class AdminCurrencies extends Component
 
     public bool $is_active = true;
 
+    public ?string $payment_gateway = null;
+
     public function openCreate(): void
     {
         $this->editingId = null;
@@ -46,6 +48,7 @@ class AdminCurrencies extends Component
         $this->decimal_multiplier = 100;
         $this->is_default = false;
         $this->is_active = true;
+        $this->payment_gateway = null;
         $this->resetErrorBag();
         $this->showModal = true;
     }
@@ -64,6 +67,7 @@ class AdminCurrencies extends Component
         $this->decimal_multiplier = (int) ($c->decimal_multiplier ?? 100);
         $this->is_default = (bool) $c->is_default;
         $this->is_active = (bool) $c->is_active;
+        $this->payment_gateway = $c->payment_gateway;
         $this->resetErrorBag();
         $this->showModal = true;
     }
@@ -94,6 +98,7 @@ class AdminCurrencies extends Component
             'decimal_multiplier' => ['required', 'integer', 'min:1'],
             'is_default' => ['boolean'],
             'is_active' => ['boolean'],
+            'payment_gateway' => ['nullable', 'string', Rule::in(['paystack', 'flutterwave'])],
         ]);
 
         $slug = $this->slug !== '' ? Str::slug($this->slug) : Str::slug($this->code);
@@ -108,6 +113,7 @@ class AdminCurrencies extends Component
             'decimal_separator' => $this->decimal_separator,
             'decimal_multiplier' => $this->decimal_multiplier,
             'is_active' => $this->is_active,
+            'payment_gateway' => $this->payment_gateway !== '' ? $this->payment_gateway : null,
         ];
 
         if ($this->is_default) {

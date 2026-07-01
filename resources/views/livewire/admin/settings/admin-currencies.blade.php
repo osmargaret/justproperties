@@ -19,6 +19,7 @@
                     <th class="px-4 py-3">Symbol</th>
                     <th class="px-4 py-3">Default</th>
                     <th class="px-4 py-3">Active</th>
+                    <th class="px-4 py-3">Gateway</th>
                     <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
@@ -30,6 +31,7 @@
                         <td class="px-4 py-3">{{ $c->symbol }}</td>
                         <td class="px-4 py-3">{{ $c->is_default ? 'Yes' : '—' }}</td>
                         <td class="px-4 py-3">{{ $c->is_active ? 'Yes' : 'No' }}</td>
+                        <td class="px-4 py-3 capitalize">{{ $c->payment_gateway ?: '—' }}</td>
                         <td class="px-4 py-3">
                             @if (! $c->is_default)
                                 <button type="button" wire:click="setDefault({{ $c->id }})" class="text-emerald-600 hover:underline">Set default</button>
@@ -39,7 +41,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No currencies.</td></tr>
+                    <tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No currencies.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -102,6 +104,16 @@
                         <input type="checkbox" wire:model="is_active" class="rounded border-gray-300" />
                         Active
                     </label>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Payment gateway</label>
+                        <select wire:model="payment_gateway" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                            <option value="">None</option>
+                            <option value="paystack">Paystack</option>
+                            <option value="flutterwave">Flutterwave</option>
+                        </select>
+                        @error('payment_gateway') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        <p class="mt-1 text-xs text-gray-500">Checkout uses this gateway for payments in this currency. API keys stay in <code>.env</code>.</p>
+                    </div>
                     <div class="flex gap-2 pt-2">
                         <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white">Save</button>
                         <button type="button" wire:click="closeModal" class="rounded-lg border border-gray-200 px-4 py-2 text-sm">Cancel</button>

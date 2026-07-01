@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Property;
+use App\Models\User;
+use App\Models\Promotion;
+use App\Observers\PropertyObserver;
+use App\Observers\UserObserver;
+use App\Observers\PromotionObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;

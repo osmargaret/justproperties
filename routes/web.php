@@ -19,7 +19,6 @@ use App\Livewire\Admin\AdminUserDetails;
 use App\Livewire\Admin\AdminUsers;
 use App\Livewire\Admin\Settings\AdminCategories;
 use App\Livewire\Admin\Settings\AdminCountries;
-use App\Livewire\Admin\Settings\AdminCountryConfig;
 use App\Livewire\Admin\Settings\AdminCurrencies;
 use App\Livewire\Admin\Settings\AdminGeneral;
 use App\Livewire\Admin\Settings\AdminPromotionPlans;
@@ -52,10 +51,9 @@ use App\Livewire\Seller\Checkout as SellerCheckout;
 use App\Livewire\Seller\Documents;
 use App\Livewire\Seller\ListedProperties;
 use App\Livewire\Seller\ListProperty;
-use App\Livewire\Seller\Promotions as SellerPromotions;
+use App\Livewire\Seller\PaymentCallback;
 use App\Livewire\Seller\PropertyDetails as SellerPropertyDetails;
 use App\Livewire\Seller\SellerDashboard;
-use App\Livewire\Seller\Settings;
 use App\Livewire\Seller\Subscriptions;
 use App\Livewire\Seller\Transactions;
 use Illuminate\Support\Facades\Route;
@@ -79,7 +77,7 @@ Route::get('terms-of-service', TermsOfService::class)->name('terms-of-service');
 
 /* Blog Routes */
 Route::get('blog', BlogRoll::class)->name('blog');
-Route::get('blog/post', BlogPost::class)->name('post');
+Route::get('blog/post/{post}', BlogPost::class)->name('post');
 
 /* Properties */
 Route::get('landed-properties', LandedProperty::class)->name('landed-properties');
@@ -121,23 +119,23 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::get('roles', AdminRolesPermissions::class)->name('roles');
             Route::get('currencies', AdminCurrencies::class)->name('currencies');
             Route::get('countries', AdminCountries::class)->name('countries');
-            Route::get('countries/{country}/config', AdminCountryConfig::class)->whereNumber('country')->name('countries.config');
+
         });
     });
 
     Route::middleware(['role.selected'])->prefix('seller')->name('seller.')->group(function () {
         Route::get('dashboard', SellerDashboard::class)->name('dashboard');
         Route::get('profile', Profile::class)->name('profile');
-        
-        Route::get('promotions', SellerPromotions::class)->name('promotions');
+
         Route::get('listed-properties', ListedProperties::class)->name('listed-properties');
         Route::get('properties/{property}', SellerPropertyDetails::class)->whereNumber('property')->name('properties.show');
         Route::get('checkout/{payment}', SellerCheckout::class)->whereNumber('payment')->name('checkout');
+        Route::get('payment/callback', PaymentCallback::class)->name('payment.callback');
         Route::get('bulk-template', fn () => Excel::download(new PropertyBulkTemplateExport, 'property-listings-template.xlsx'))->name('bulk-template.download');
         Route::get('transactions', Transactions::class)->name('transactions');
         Route::get('subscriptions', Subscriptions::class)->name('subscriptions');
         Route::get('documents', Documents::class)->name('documents');
-        Route::get('settings', Settings::class)->name('settings');
+
     });
 
     Route::middleware(['role.selected'])->prefix('buyer')->name('buyer.')->group(function () {
@@ -152,3 +150,5 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+Route::get('/property/{property:slug}', \App\Livewire\Guest\PropertyShow::class)->name('property.show');

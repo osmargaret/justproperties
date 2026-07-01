@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['property_id', 'user_id', 'rating', 'comment'])]
-class PropertyReview extends Model
+#[Fillable(['property_id', 'user_id', 'reason', 'description', 'status'])]
+class PropertyReport extends Model
 {
     use SoftDeletes;
 

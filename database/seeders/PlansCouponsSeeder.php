@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Coupon;
+use App\Models\Price;
 use App\Models\PromotionPlan;
 use App\Models\SubscriptionPlan;
 use Illuminate\Database\Seeder;
@@ -14,7 +15,7 @@ class PlansCouponsSeeder extends Seeder
      */
     public function run(): void
     {
-        SubscriptionPlan::query()->updateOrCreate(
+        $plan = SubscriptionPlan::query()->updateOrCreate(
             ['slug' => 'starter'],
             [
                 'name' => 'Starter',
@@ -23,8 +24,18 @@ class PlansCouponsSeeder extends Seeder
                 'days' => 30,
             ]
         );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 1],
+            ['amount' => 500.00]
+        );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 2],
+            ['amount' => 1.00]
+        );
 
-        SubscriptionPlan::query()->updateOrCreate(
+        $plan = SubscriptionPlan::query()->updateOrCreate(
             ['slug' => 'professional'],
             [
                 'name' => 'Professional',
@@ -33,25 +44,72 @@ class PlansCouponsSeeder extends Seeder
                 'days' => 30,
             ]
         );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 1],
+            ['amount' => 1500.00]
+        );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 2],
+            ['amount' => 5.00]
+        );
 
-        PromotionPlan::query()->updateOrCreate(
+        $plan = PromotionPlan::query()->updateOrCreate(
             ['slug' => 'featured-listing'],
             [
                 'name' => 'Featured listing',
-                'type' => 'featured listings',
-                'features' => ['homepage' => true, 'duration_days' => 14],
-                'days' => 14,
+                'type' => 'featured',
+                'features' => ['clicks' => 1000],
             ]
         );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
+            ['amount' => 500.00]
+        );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => PromotionPlan::class, 'currency_id' => 2],
+            ['amount' => 1.00]
+        );
 
-        PromotionPlan::query()->updateOrCreate(
-            ['slug' => 'extra-views'],
+        $plan = PromotionPlan::query()->updateOrCreate(
+            ['slug' => 'blog-post-starter'],
             [
-                'name' => 'Boost views',
-                'type' => 'views',
-                'features' => ['impressions' => 10000],
-                'days' => 7,
+                'name' => 'Blog post starter',
+                'type' => 'blog_post',
+                'features' => ['clicks' => 500, 'posts' => 1],
             ]
+        );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
+            ['amount' => 1500.00]
+        );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => PromotionPlan::class, 'currency_id' => 2],
+            ['amount' => 5.00]
+        );
+
+        $plan = PromotionPlan::query()->updateOrCreate(
+            ['slug' => 'newsletter-starter'],
+            [
+                'name' => 'Newsletter starter',
+                'type' => 'newsletter',
+                'features' => ['emails' => 1, 'recipients' => 500],
+            ]
+        );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
+            ['amount' => 2500.00]
+        );
+        Price::query()->updateOrCreate(
+            ['priceable_id' => $plan->id,
+                'priceable_type' => PromotionPlan::class, 'currency_id' => 2],
+            ['amount' => 7.00]
         );
 
         Coupon::query()->updateOrCreate(
@@ -60,13 +118,9 @@ class PlansCouponsSeeder extends Seeder
                 'name' => 'Welcome 10% off',
                 'quantity' => 1000,
                 'limit_per_user' => 1,
-                'limit_for_user' => null,
                 'start_at' => now()->subMonth(),
                 'expires_at' => now()->addYear(),
-                'is_percentage' => true,
                 'discount' => 10,
-                'discount_cap' => 50000,
-                'minimum_spend' => 10000,
                 'eligible_items' => ['subscription', 'promotion'],
                 'is_published' => true,
             ]

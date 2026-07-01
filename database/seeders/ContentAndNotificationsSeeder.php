@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\BlogSubscription;
 use App\Models\Category;
-use App\Models\NewsletterSubscription;
 use App\Models\Post;
 use App\Models\Property;
 use App\Models\User;
@@ -36,7 +36,7 @@ class ContentAndNotificationsSeeder extends Seeder
             ]
         );
 
-        NewsletterSubscription::query()->firstOrCreate(
+        BlogSubscription::query()->firstOrCreate(
             [
                 'user_id' => $buyer->id,
                 'category_id' => $blogCategory->id,
@@ -49,7 +49,7 @@ class ContentAndNotificationsSeeder extends Seeder
             ]
         );
 
-        NewsletterSubscription::query()->firstOrCreate(
+        BlogSubscription::query()->firstOrCreate(
             [
                 'user_id' => $buyer->id,
                 'category_id' => $blogCategory->id,

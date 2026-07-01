@@ -53,66 +53,23 @@
 
   <main class="max-w-7xl mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
-      <p class="text-gray-500 text-base">Showing <span class="font-semibold">10</span> completed properties</p>
+      <p class="text-gray-500 text-base">Showing <span class="font-semibold">{{ $this->properties->total() }}</span> completed properties</p>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Property 1 -->
-      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition border border-gray-100">
-        <div class="relative h-56 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition" />
-          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Completed</span>
+      @forelse($this->properties as $property)
+        @include('livewire.guest.partials.property-card', ['property' => $property])
+      @empty
+        <div class="col-span-1 sm:col-span-2 lg:col-span-3 py-12 text-center text-gray-500">
+          <i class="ri-home-smile-line text-4xl mb-3 block text-gray-300"></i>
+          <p class="text-lg">No properties found in this category yet.</p>
         </div>
-        <div class="p-5">
-          <h3 class="font-bold text-gray-900 mb-2 text-lg">Brand New 4-Bedroom Duplex</h3>
-          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Lekki, Lagos</div>
-          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
-            <span><i class="ri-bed-line"></i> 4 Beds</span><span><i class="ri-briefcase-line"></i> 4 Baths</span>
-          </div>
-          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">₦95,000,000</span>
-            <a href="#" class="text-emerald-600 font-medium text-sm">View Details</a>
-          </div>
-        </div>
-      </div>
+      @endforelse
+    </div>
 
-      <!-- Property 2 -->
-      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition border border-gray-100">
-        <div class="relative h-56 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition" />
-          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Completed</span>
-        </div>
-        <div class="p-5">
-          <h3 class="font-bold text-gray-900 mb-2 text-lg">Fully Finished 3-Bedroom Bungalow</h3>
-          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Ikorodu, Lagos</div>
-          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
-            <span><i class="ri-bed-line"></i> 3 Beds</span><span><i class="ri-briefcase-line"></i> 3 Baths</span>
-          </div>
-          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">₦45,000,000</span>
-            <a href="#" class="text-emerald-600 font-medium text-sm">View Details</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Property 3 -->
-      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition border border-gray-100">
-        <div class="relative h-56 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition" />
-          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Completed</span>
-        </div>
-        <div class="p-5">
-          <h3 class="font-bold text-gray-900 mb-2 text-lg">Luxury 5-Bedroom Mansion</h3>
-          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Ikoyi, Lagos</div>
-          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
-            <span><i class="ri-bed-line"></i> 5 Beds</span><span><i class="ri-briefcase-line"></i> 6 Baths</span>
-          </div>
-          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">₦250,000,000</span>
-            <a href="#" class="text-emerald-600 font-medium text-sm">View Details</a>
-          </div>
-        </div>
-      </div>
+    <!-- Pagination -->
+    <div class="mt-12">
+      {{ $this->properties->links() }}
     </div>
   </main>
 </div>

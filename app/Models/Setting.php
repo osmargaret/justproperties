@@ -24,12 +24,19 @@ class Setting extends Model
         $type = $dataType ?? match (true) {
             is_bool($value) => 'boolean',
             is_int($value) => 'integer',
+            is_array($value) => 'json',
             default => 'string',
+        };
+
+        $stored = match ($type) {
+            'boolean' => $value ? '1' : '0',
+            'json' => json_encode($value, JSON_THROW_ON_ERROR),
+            default => (string) $value,
         };
 
         static::query()->updateOrCreate(
             ['name' => $name],
-            ['value' => is_bool($value) ? ($value ? '1' : '0') : (string) $value, 'data_type' => $type]
+            ['value' => $stored, 'data_type' => $type]
         );
     }
 
@@ -42,6 +49,7 @@ class Setting extends Model
         return match ($dataType) {
             'boolean' => $raw === '1' || $raw === 'true',
             'integer' => (int) $raw,
+            'json' => json_decode($raw, true) ?? [],
             default => $raw,
         };
     }

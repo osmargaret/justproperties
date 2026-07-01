@@ -49,7 +49,7 @@
                                 <div class="text-xs text-gray-500">View favourites</div>
                             </div>
                         </a>
-                        <a href="{{ route('buyer.notifications') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="#" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-notification-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Alerts</div>
@@ -113,7 +113,7 @@
                             <li class="flex gap-2"><i class="ri-checkbox-circle-fill text-emerald-300 shrink-0 mt-0.5"></i> Message owners directly from the property page.</li>
                             <li class="flex gap-2"><i class="ri-checkbox-circle-fill text-emerald-300 shrink-0 mt-0.5"></i> Keep your profile verified to speed up enquiries.</li>
                         </ul>
-                        <a href="{{ route('buyer.notifications') }}" class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 border border-white/30 text-sm font-medium transition">
+                        <a href="#" class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 border border-white/30 text-sm font-medium transition">
                             <i class="ri-settings-3-line"></i>
                             Manage notifications
                         </a>

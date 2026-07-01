@@ -20,21 +20,22 @@
 
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         <div class="bg-gray-50 rounded-lg p-4 text-center">
-                            <div class="text-3xl font-bold text-emerald-600">8</div>
+                            <div class="text-3xl font-bold text-emerald-600">{{ $activeListings }}</div>
                             <div class="text-sm text-gray-500">Active listings</div>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-4 text-center">
-                            <div class="text-3xl font-bold text-emerald-600">1.2k</div>
-                            <div class="text-sm text-gray-500">Views (30d)</div>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4 text-center">
-                            <div class="text-3xl font-bold text-emerald-600">34</div>
-                            <div class="text-sm text-gray-500">Inquiries</div>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4 text-center">
-                            <div class="text-3xl font-bold text-emerald-600">2</div>
+                            <div class="text-3xl font-bold text-emerald-600">{{ $pendingReview }}</div>
                             <div class="text-sm text-gray-500">Pending review</div>
                         </div>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-emerald-600">{{ $listingViews >= 1000 ? number_format($listingViews / 1000, 1) . 'k' : number_format($listingViews) }}</div>
+                            <div class="text-sm text-gray-500">Listing Views (30d)</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-emerald-600">{{ $promotionsCount }}</div>
+                            <div class="text-sm text-gray-500">Promotions</div>
+                        </div>
+                        
                     </div>
 
                     <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -56,7 +57,7 @@
                                 <div class="text-xs text-gray-500">Plan &amp; billing</div>
                             </div>
                         </a>
-                        <a href="{{ route('seller.documents') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
+                        <a href="{{ route('seller.profile') }}" class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition">
                             <span class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ri-file-shield-line text-xl"></i></span>
                             <div>
                                 <div class="font-medium text-gray-900">Documents</div>
@@ -91,24 +92,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-3 font-medium text-gray-900">Luxury 5 Bedroom Duplex</td>
-                                <td class="py-3"><span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full">Live</span></td>
-                                <td class="py-3 text-gray-600">1,247</td>
-                                <td class="py-3 text-gray-600">9</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-3 font-medium text-gray-900">4 Bedroom Semi-Detached</td>
-                                <td class="py-3"><span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full">Live</span></td>
-                                <td class="py-3 text-gray-600">892</td>
-                                <td class="py-3 text-gray-600">5</td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 font-medium text-gray-900">2 Bedroom Apartment</td>
-                                <td class="py-3"><span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Review</span></td>
-                                <td class="py-3 text-gray-600">—</td>
-                                <td class="py-3 text-gray-600">—</td>
-                            </tr>
+                            @forelse ($topProperties as $property)
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-3 font-medium text-gray-900">{{ $property->name }}</td>
+                                     <td class="py-3">
+                                         @php
+                                             $statusClass = match($property->status) {
+                                                 'Live' => 'bg-emerald-100 text-emerald-700',
+                                                 'pending' => 'bg-yellow-100 text-yellow-800',
+                                                 'draft' => 'bg-gray-100 text-gray-700',
+                                                 'no subscription' => 'bg-slate-100 text-slate-700',
+                                                 default => 'bg-slate-100 text-slate-700',
+                                             };
+                                         @endphp
+                                         <span class="{{ $statusClass }} text-xs px-2 py-1 rounded-full">{{ ucfirst(str_replace('_', ' ', $property->status)) }}</span>
+                                     </td>
+                                    <td class="py-3 text-gray-600">{{ number_format($property->views ?? 0) }}</td>
+                                    <td class="py-3 text-gray-600">{{ number_format($property->leads ?? 0) }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="py-8 text-center text-gray-500">No active listings yet.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -129,9 +135,9 @@
                                 <i class="ri-upload-cloud-line"></i>
                                 Upload documents
                             </a>
-                            <a href="{{ route('pricing') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition">
+                            <a href="{{ route('seller.listed-properties') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition">
                                 <i class="ri-price-tag-3-line"></i>
-                                View plans
+                                View Listings
                             </a>
                         </div>
                     </div>

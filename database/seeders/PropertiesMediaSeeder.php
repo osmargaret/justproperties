@@ -11,6 +11,7 @@ use App\Models\PropertyFeature;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class PropertiesMediaSeeder extends Seeder
 {
@@ -30,6 +31,7 @@ class PropertiesMediaSeeder extends Seeder
         $props = [
             [
                 'name' => '5 Bedroom Duplex — Lekki Phase 1',
+                'slug' => Str::slug('5 Bedroom Duplex — Lekki Phase 1'),
                 'description' => 'Spacious duplex with BQ, fitted kitchen, and ample parking. Close to major roads.',
                 'cost' => 85000000,
                 'category_id' => $completed->id,
@@ -40,20 +42,15 @@ class PropertiesMediaSeeder extends Seeder
                 'neighborhood' => 'Lekki',
                 'address' => '12 Admiralty Way',
                 'show_address' => true,
-                'accepts_inspection_requests' => true,
-                'inspection_fee' => 15000,
-                'status' => 'active',
+                'is_published' => true,
                 'contact_name' => $seller->name,
                 'contact_phone' => $seller->phone,
                 'contact_email' => $seller->email,
                 'contact_whatsapp' => $seller->phone,
-                'moderated_by' => $admin?->id,
-                'moderation_status' => 'approved',
-                'moderation_reason' => null,
-                'moderated_at' => now()->subDay(),
             ],
             [
                 'name' => 'Uncompleted 4 Bedroom Terrace — Ajah',
+                'slug' => Str::slug('Uncompleted 4 Bedroom Terrace — Ajah'),
                 'description' => 'Shell terrace at roofing stage. Corner unit with extra land.',
                 'cost' => 45000000,
                 'category_id' => $landed->id,
@@ -64,20 +61,15 @@ class PropertiesMediaSeeder extends Seeder
                 'neighborhood' => 'Ajah',
                 'address' => 'Plot 44 Greenfield Estate',
                 'show_address' => true,
-                'accepts_inspection_requests' => true,
-                'inspection_fee' => 10000,
-                'status' => 'draft',
+                'is_published' => false,
                 'contact_name' => $seller->name,
                 'contact_phone' => $seller->phone,
                 'contact_email' => $seller->email,
                 'contact_whatsapp' => $seller->phone,
-                'moderated_by' => null,
-                'moderation_status' => 'pending',
-                'moderation_reason' => null,
-                'moderated_at' => null,
             ],
             [
                 'name' => '3 Bedroom Apartment — Ikeja GRA',
+                'slug' => Str::slug('3 Bedroom Apartment — Ikeja GRA'),
                 'description' => 'Completed apartment in a gated community with 24/7 security.',
                 'cost' => 1200000,
                 'category_id' => $completed->id,
@@ -88,17 +80,11 @@ class PropertiesMediaSeeder extends Seeder
                 'neighborhood' => 'Ikeja',
                 'address' => '8 Joel Ogunnaike Street',
                 'show_address' => false,
-                'accepts_inspection_requests' => true,
-                'inspection_fee' => 8000,
-                'status' => 'pending_payment',
+                'is_published' => false,
                 'contact_name' => $seller->name,
                 'contact_phone' => $seller->phone,
                 'contact_email' => $seller->email,
                 'contact_whatsapp' => $seller->phone,
-                'moderated_by' => null,
-                'moderation_status' => 'pending',
-                'moderation_reason' => null,
-                'moderated_at' => null,
             ],
         ];
 
@@ -125,9 +111,10 @@ class PropertiesMediaSeeder extends Seeder
                 'user_id' => $seller->id,
                 'mediable_id' => $p0->id,
                 'mediable_type' => Property::class,
-                'name' => 'hero-facade.jpg',
+                'name' => $p0->name,
             ],
             [
+                'path' => 'properties/seed/hero-facade.jpg',
                 'type' => 'image',
                 'mime_type' => 'image/jpeg',
                 'size' => '245000',

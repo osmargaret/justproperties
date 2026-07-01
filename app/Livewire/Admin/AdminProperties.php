@@ -30,18 +30,6 @@ class AdminProperties extends Component
         $this->resetPage();
     }
 
-    public function approve(int $propertyId): void
-    {
-        $property = Property::query()->findOrFail($propertyId);
-        $property->update(['status' => 'active']);
-    }
-
-    public function disapprove(int $propertyId): void
-    {
-        $property = Property::query()->findOrFail($propertyId);
-        $property->update(['status' => 'inactive']);
-    }
-
     public function delete(int $propertyId): void
     {
         Property::query()->findOrFail($propertyId)->delete();
@@ -58,14 +46,22 @@ class AdminProperties extends Component
                 });
             })
             ->when($this->category, fn (Builder $query) => $query->where('category_id', $this->category))
-            ->when($this->status !== '', fn (Builder $query) => $query->where('status', $this->status))
+            ->when($this->status !== '', function (Builder $query) {
+                if ($this->status === 'draft') {
+                    $query->where('is_published', false);
+
+                    return;
+                }
+
+                $query->whereHas('latestModeration', fn (Builder $m) => $m->where('status', $this->status));
+            })
             ->latest('created_at')
             ->paginate(10);
 
         return view('livewire.admin.admin-properties', [
             'properties' => $properties,
-            'categories' => Category::query()->orderBy('name','asc')->get(['id', 'name']),
-            'statusOptions' => Property::query()->distinct()->pluck('status')->filter()->values(),
+            'categories' => Category::query()->orderBy('name', 'asc')->get(['id', 'name']),
+            'statusOptions' => ['draft', 'pending', 'live', 'no subscription', 'rejected'],
         ]);
     }
 }

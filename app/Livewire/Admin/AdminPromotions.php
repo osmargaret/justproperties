@@ -66,7 +66,7 @@ class AdminPromotions extends Component
                     'promotion' => $promotion,
                     'views' => (int) ($featured->views_count ?? 0),
                     'clicks' => (int) ($featured->click_count ?? 0),
-                    'clicked_actions' => (int) ($featured->clicked_action_count ?? 0),
+                    'action_counts' => $featured->action_counts ?? [],
                     'target_type' => $featured->target_type,
                     'target_count' => $featured->target_count,
                 ];

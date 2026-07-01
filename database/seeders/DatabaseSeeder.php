@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             PermissionsRolesAndUsersSeeder::class,
             CategoriesSeeder::class,
             PlansCouponsSeeder::class,
+            SettingsSeeder::class,
             PropertiesMediaSeeder::class,
             SubscriptionsAndPaymentsSeeder::class,
             UserEngagementSeeder::class,

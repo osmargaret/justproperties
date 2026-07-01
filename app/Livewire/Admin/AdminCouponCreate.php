@@ -15,19 +15,11 @@ class AdminCouponCreate extends Component
 
     public ?int $limit_per_user = null;
 
-    public ?int $limit_for_user = null;
-
     public ?string $start_at = null;
 
     public ?string $expires_at = null;
 
-    public bool $is_percentage = false;
-
     public string $discount = '0';
-
-    public ?string $discount_cap = null;
-
-    public ?string $minimum_spend = null;
 
     public bool $is_published = false;
 
@@ -38,13 +30,9 @@ class AdminCouponCreate extends Component
             'code' => ['required', 'string', 'max:64', 'unique:coupons,code'],
             'quantity' => ['required', 'integer', 'min:1'],
             'limit_per_user' => ['nullable', 'integer', 'min:1'],
-            'limit_for_user' => ['nullable', 'integer', 'min:1'],
             'start_at' => ['nullable', 'date'],
             'expires_at' => ['nullable', 'date', 'after_or_equal:start_at'],
-            'is_percentage' => ['boolean'],
             'discount' => ['required', 'numeric', 'min:0'],
-            'discount_cap' => ['nullable', 'numeric', 'min:0'],
-            'minimum_spend' => ['nullable', 'numeric', 'min:0'],
             'is_published' => ['boolean'],
         ];
     }
@@ -58,13 +46,9 @@ class AdminCouponCreate extends Component
             'code' => strtoupper(trim($this->code)),
             'quantity' => $this->quantity,
             'limit_per_user' => $this->limit_per_user,
-            'limit_for_user' => $this->limit_for_user,
             'start_at' => $this->start_at ?: null,
             'expires_at' => $this->expires_at ?: null,
-            'is_percentage' => $this->is_percentage,
             'discount' => $this->discount,
-            'discount_cap' => $this->discount_cap,
-            'minimum_spend' => $this->minimum_spend,
             'eligible_items' => null,
             'is_published' => $this->is_published,
         ]);

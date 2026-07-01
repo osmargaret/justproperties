@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,8 +43,29 @@ class Subscription extends Model
         return $this->hasMany(SubscribedProperty::class);
     }
 
-    protected function isActive(): Attribute
+    public function isActive(): bool
     {
-        return Attribute::make(get: fn (): bool => $this->status === 'active');
+        return $this->status === 'active';
+    }
+
+    public function isCurrentlyActive(): bool
+    {
+        return $this->isActive()
+            && $this->end_at !== null
+            && $this->end_at->isFuture();
+    }
+
+    public function usedSeats(): int
+    {
+        if ($this->relationLoaded('subscribed_properties_count')) {
+            return (int) $this->subscribed_properties_count;
+        }
+
+        return (int) $this->subscribedProperties()->count();
+    }
+
+    public function remainingSeats(): int
+    {
+        return max(0, (int) $this->seats - $this->usedSeats());
     }
 }

@@ -8,7 +8,7 @@
        @include('layouts.partials.role-sidebar')
 
        <div class="bg-white">
-<!-- Tab Navigation -->
+        <!-- Tab Navigation -->
           <div class="border-b border-gray-200 mb-6">
             <nav class="flex space-x-8" aria-label="Tabs">
               <button type="button" wire:click="switchTab('basic')" class="px-1 py-4 text-sm font-medium {{ $activeTab === 'basic' ? 'text-emerald-600 border-b-2 border-emerald-600' : 'text-gray-500 hover:text-gray-700' }}">
@@ -38,23 +38,44 @@
             <div class="rounded-xl p-8 shadow-md">
               <h2 class="text-2xl font-semibold mb-6">Personal Information</h2>
 
-              <!-- Stats Cards -->
-              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div class="bg-gray-50 rounded-lg p-4 text-center">
-                  <div class="text-3xl font-bold text-emerald-600">{{ auth()->user()->properties()->count() }}</div>
-                  <div class="text-sm text-gray-500">Properties Listed</div>
+              <!-- Verification Status Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <div class="rounded-xl p-6 text-center {{ auth()->user()->hasVerifiedEmail() ? 'border-2 border-emerald-200 bg-emerald-50' : 'border-2 border-yellow-200 bg-yellow-50' }}">
+                  <div class="flex justify-center mb-3">
+                    @if(auth()->user()->hasVerifiedEmail())
+                      <i class="ri-checkbox-circle-fill text-4xl text-emerald-600"></i>
+                    @else
+                      <i class="ri-time-line text-4xl text-yellow-600"></i>
+                    @endif
+                  </div>
+                  <div class="text-lg font-semibold {{ auth()->user()->hasVerifiedEmail() ? 'text-emerald-800' : 'text-yellow-800' }}">Email Verification</div>
+                  <div class="text-sm {{ auth()->user()->hasVerifiedEmail() ? 'text-emerald-600' : 'text-yellow-600' }} mt-1">
+                    {{ auth()->user()->hasVerifiedEmail() ? 'Verified Successfully' : 'Pending Verification' }}
+                  </div>
                 </div>
-                <div class="bg-gray-50 rounded-lg p-4 text-center">
-                  <div class="text-3xl font-bold text-emerald-600">{{ auth()->user()->properties()->where('status', 'active')->count() }}</div>
-                  <div class="text-sm text-gray-500">Active Listings</div>
+                
+                <div class="rounded-xl p-6 text-center {{ auth()->user()->verified_at ? 'border-2 border-emerald-200 bg-emerald-50' : (auth()->user()->moderations()->where('status', 'pending')->exists() ? 'border-2 border-yellow-200 bg-yellow-50' : 'border-2 border-gray-200 bg-gray-50') }}">
+                  <div class="flex justify-center mb-3">
+                    @if(auth()->user()->verified_at)
+                      <i class="ri-shield-check-fill text-4xl text-emerald-600"></i>
+                    @elseif(auth()->user()->moderations()->where('status', 'pending')->exists())
+                      <i class="ri-hourglass-line text-4xl text-yellow-600"></i>
+                    @else
+                      <i class="ri-shield-close-line text-4xl text-gray-400"></i>
+                    @endif
+                  </div>
+                  <div class="text-lg font-semibold {{ auth()->user()->verified_at ? 'text-emerald-800' : (auth()->user()->moderations()->where('status', 'pending')->exists() ? 'text-yellow-800' : 'text-gray-600') }}">Account Verification</div>
+                  <div class="text-sm {{ auth()->user()->verified_at ? 'text-emerald-600' : (auth()->user()->moderations()->where('status', 'pending')->exists() ? 'text-yellow-600' : 'text-gray-500') }} mt-1">
+                    {{ auth()->user()->verified_at ? 'Verified Successfully' : (auth()->user()->moderations()->where('status', 'pending')->exists() ? 'Verification Pending' : 'Not Verified') }}
+                  </div>
                 </div>
-                <div class="bg-gray-50 rounded-lg p-4 text-center">
-                  <div class="text-3xl font-bold text-emerald-600">156</div>
-                  <div class="text-sm text-gray-500">Total Views</div>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-4 text-center">
-                  <div class="text-3xl font-bold text-emerald-600">23</div>
-                  <div class="text-sm text-gray-500">Inquiries</div>
+                
+                <div class="border-2 border-gray-200 bg-gray-50 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200" wire:click="switchTab('verification')">
+                  <div class="flex justify-center mb-3">
+                    <i class="ri-arrow-right-circle-line text-4xl text-gray-400"></i>
+                  </div>
+                  <div class="text-lg font-semibold text-gray-600">Verification Center</div>
+                  <div class="text-sm text-gray-500 mt-1">Click to manage verification</div>
                 </div>
               </div>
 
@@ -64,30 +85,12 @@
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-user-line text-emerald-600 mr-1"></i> Full Name</label>
-                      <input type="text" value="{{ auth()->user()->name }}"  class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed" />
+                      <input type="text" value="{{ auth()->user()->name }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" />
                     </div>
                     <div>
                       <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-mail-line text-emerald-600 mr-1"></i> Email Address</label>
-                      <input type="email" value="{{ auth()->user()->email }}"  class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed" />
+                      <input type="email" value="{{ auth()->user()->email }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" />
                     </div>
-                    <div>
-                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-user-smile-line text-emerald-600 mr-1"></i> Display Name</label>
-                      <input type="text" value=""  class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed" />
-                    </div>
-                    <div>
-                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-calendar-line text-emerald-600 mr-1"></i> Date of Birth</label>
-                      <input type="date" value=""  class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed" />
-                    </div>
-                    <div>
-                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-map-pin-line text-emerald-600 mr-1"></i> Location</label>
-                      <input type="text" value="{{ auth()->user()->country?->name }}"  class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed" />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="border-b border-gray-200 pb-8 mb-8">
-                  <h3 class="text-lg font-semibold mb-6 flex items-center gap-2"><i class="ri-contacts-line text-emerald-600"></i> Contact Information</h3>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-phone-line text-emerald-600 mr-1"></i> Phone Number</label>
                       <input type="tel" wire:model="phone" class="w-full px-4 py-3 border border-gray-200 rounded-lg" />
@@ -96,17 +99,32 @@
                       <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-whatsapp-line text-emerald-600 mr-1"></i> WhatsApp Number</label>
                       <input type="tel" wire:model="whatsapp" class="w-full px-4 py-3 border border-gray-200 rounded-lg" />
                     </div>
-                    <div>
-                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-global-line text-emerald-600 mr-1"></i> Website (Optional)</label>
-                      <input type="url" wire:model="website" class="w-full px-4 py-3 border border-gray-200 rounded-lg" />
-                    </div>
+                    
+                    
                   </div>
                 </div>
 
                 <div class="border-b border-gray-200 pb-8 mb-8">
-                  <h3 class="text-lg font-semibold mb-6 flex items-center gap-2"><i class="ri-file-text-line text-emerald-600"></i> About Me</h3>
-                  <textarea  class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed" rows="4"></textarea>
+                  <h3 class="text-lg font-semibold mb-6 flex items-center gap-2"><i class="ri-flag-line text-emerald-600"></i> Location Information</h3>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-map-pin-line text-emerald-600 mr-1"></i> Country</label>
+                      <input type="text" value="{{ auth()->user()->country?->name }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" />
+                    </div>
+                    <div>
+                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-map-pin-line text-emerald-600 mr-1"></i> State</label>
+                      <input type="text" value="{{ auth()->user()->state }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50" />
+                    </div>
+                    
+                  </div>
+                   <div>
+                    <label class="block font-medium text-sm text-gray-700 mb-2">Address</label>
+                    <textarea wire:model="address" class="w-full px-4 py-3 border border-gray-200 rounded-lg" rows="3"></textarea>
+                    @error('address') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                  </div>
                 </div>
+
+                
 
                 <div>
                   <h3 class="text-lg font-semibold mb-6 flex items-center gap-2"><i class="ri-share-line text-emerald-600"></i> Social Media Links</h3>
@@ -127,6 +145,14 @@
                       <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-linkedin-line text-emerald-600 mr-1"></i> LinkedIn</label>
                       <input type="url" wire:model="linkedin" class="w-full px-4 py-3 border border-gray-200 rounded-lg" />
                     </div>
+                    <div>
+                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-youtube-line text-emerald-600 mr-1"></i> Youtube</label>
+                      <input type="url" wire:model="youtube" class="w-full px-4 py-3 border border-gray-200 rounded-lg" />
+                    </div>
+                    <div>
+                      <label class="block font-medium text-sm text-gray-700 mb-2"><i class="ri-global-line text-emerald-600 mr-1"></i> Website </label>
+                      <input type="url" wire:model="website" class="w-full px-4 py-3 border border-gray-200 rounded-lg" />
+                    </div>
                   </div>
                 </div>
 
@@ -135,7 +161,7 @@
             </div>
           @endif
 
-<!-- Notification Settings Tab -->
+          <!-- Notification Settings Tab -->
           @if ($activeTab === 'notifications')
             <div class="rounded-xl p-8 shadow-md">
               <h2 class="text-2xl font-semibold mb-6">Notification Settings</h2>
@@ -186,7 +212,7 @@
             </div>
           @endif
 
-<!-- Verification Tab -->
+          <!-- Verification Tab -->
           @if ($activeTab === 'verification')
             <div class="rounded-xl p-8 shadow-md">
               <h2 class="text-2xl font-semibold mb-6">Verification</h2>
@@ -213,11 +239,7 @@
                       @error('govt_id_expiry') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                   </div>
-                  <div>
-                    <label class="block font-medium text-sm text-gray-700 mb-2">Address</label>
-                    <textarea wire:model="address" class="w-full px-4 py-3 border border-gray-200 rounded-lg" rows="3"></textarea>
-                    @error('address') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
-                  </div>
+                 
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label class="block font-medium text-sm text-gray-700 mb-2">Govt ID File</label>

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
     'reason',
     'moderatable_type',
     'moderatable_id',
+    'action',
 ])]
 class Moderation extends Model
 {

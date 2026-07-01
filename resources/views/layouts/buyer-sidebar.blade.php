@@ -20,9 +20,7 @@
         <a href="{{ route('buyer.blog-subscriptions') }}" class="{{ request()->routeIs('buyer.blog-subscriptions') ? $navActive : $navIdle }}">
             <i class="ri-mail-send-line text-xl"></i><span class="font-medium">Blog Subscriptions</span>
         </a>
-        <a href="{{ route('buyer.notifications') }}" class="{{ request()->routeIs('buyer.notifications') ? $navActive : $navIdle }}">
-            <i class="ri-notification-line text-xl"></i><span class="font-medium">Notifications</span>
-        </a>
+        
         <a href="{{ route('buyer.profile') }}" class="{{ request()->routeIs('buyer.profile') ? $navActive : $navIdle }}">
             <i class="ri-user-3-line text-xl"></i><span class="font-medium">Profile</span>
         </a>

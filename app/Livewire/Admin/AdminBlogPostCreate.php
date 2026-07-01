@@ -81,7 +81,8 @@ class AdminBlogPostCreate extends Component
                 'user_id' => Auth::id(),
                 'mediable_id' => $post->id,
                 'mediable_type' => Post::class,
-                'name' => $path,
+                'name' => $post->title ?: 'Featured image',
+                'path' => $path,
                 'type' => 'image',
                 'mime_type' => $this->featuredImage->getMimeType(),
                 'size' => (string) $this->featuredImage->getSize(),
@@ -98,8 +99,8 @@ class AdminBlogPostCreate extends Component
     public function render()
     {
         return view('livewire.admin.admin-blog-post-form', [
-            'categories' => Category::query()->orderBy('name','asc')->get(),
-            'properties' => Property::query()->orderBy('name','asc')->limit(200)->get(['id', 'name']),
+            'categories' => Category::query()->orderBy('name', 'asc')->get(),
+            'properties' => Property::query()->orderBy('name', 'asc')->limit(200)->get(['id', 'name']),
             'heading' => __('Create post'),
             'submitLabel' => __('Create'),
         ]);

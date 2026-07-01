@@ -14,9 +14,24 @@
             </div>
         </div>
         <div class="rounded-lg border border-gray-200 p-4">
-            <h3 class="mb-2 font-semibold text-gray-900">Subscription and promotions</h3>
-            <p class="text-sm text-gray-600">Subscriptions: {{ $property->subscriptionLinks->count() }}</p>
-            <p class="text-sm text-gray-600">Promotions: {{ $property->promotions->count() }}</p>
+            <h3 class="mb-2 font-semibold text-gray-900">Subscription seats</h3>
+            <p class="text-sm text-gray-600 mb-3">Each row is a seat used on the owner&apos;s subscription (via <code class="text-xs">subscribed_properties</code>).</p>
+            @if ($property->subscribedPropertyLinks->isEmpty())
+                <p class="text-sm text-gray-500">Not assigned to any subscription.</p>
+            @else
+                <ul class="space-y-2 text-sm">
+                    @foreach ($property->subscribedPropertyLinks as $link)
+                        <li class="rounded border border-gray-100 px-3 py-2">
+                            <span class="font-medium">{{ $link->subscription?->plan?->name ?? 'Plan' }}</span>
+                            <span class="text-gray-500">· {{ ucfirst($link->subscription?->status ?? 'unknown') }}</span>
+                            @if ($link->subscription?->end_at)
+                                <span class="text-gray-400 text-xs block">Ends {{ $link->subscription->end_at->format('M d, Y') }}</span>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+            <p class="text-sm text-gray-600 mt-4">Promotions: {{ $property->promotions->count() }}</p>
         </div>
     </div>
 

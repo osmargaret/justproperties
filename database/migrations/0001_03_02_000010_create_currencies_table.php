@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('decimal_multiplier')->nullable();
             $table->boolean('is_default')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->string('payment_gateway')->nullable();
             $table->timestamps();
         });
     }

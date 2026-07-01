@@ -54,7 +54,7 @@
   <!-- Properties Grid -->
   <main class="max-w-7xl mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
-      <p class="text-gray-500 text-base">Showing <span class="font-semibold text-gray-900">18</span> landed properties</p>
+      <p class="text-gray-500 text-base">Showing <span class="font-semibold text-gray-900">{{ $this->properties->total() }}</span> landed properties</p>
       <select class="border-none bg-transparent text-gray-700 font-medium outline-none text-sm">
         <option>Newest First</option>
         <option>Price: Low to High</option>
@@ -63,77 +63,19 @@
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Property 1 -->
-      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 border border-gray-100">
-        <div class="relative h-56 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Property" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">For Sale</span>
-          <button class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow"><i class="ri-heart-line text-gray-400"></i></button>
+      @forelse($this->properties as $property)
+        @include('livewire.guest.partials.property-card', ['property' => $property])
+      @empty
+        <div class="col-span-1 sm:col-span-2 lg:col-span-3 py-12 text-center text-gray-500">
+          <i class="ri-home-smile-line text-4xl mb-3 block text-gray-300"></i>
+          <p class="text-lg">No properties found in this category yet.</p>
         </div>
-        <div class="p-5">
-          <h3 class="font-bold text-gray-900 mb-2 text-lg">Luxury 5-Bedroom Duplex</h3>
-          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Ikorodu, Lagos</div>
-          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
-            <span><i class="ri-bed-line"></i> 5 Beds</span>
-            <span><i class="ri-briefcase-line"></i> 5 Baths</span>
-            <span><i class="ri-ruler-line"></i> 450sqft</span>
-          </div>
-          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">₦65,000,000</span>
-            <a href="#" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Property 2 -->
-      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 border border-gray-100">
-        <div class="relative h-56 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Property" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">For Sale</span>
-        </div>
-        <div class="p-5">
-          <h3 class="font-bold text-gray-900 mb-2 text-lg">4-Bedroom Bungalow</h3>
-          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Gbaga, Ikorodu</div>
-          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
-            <span><i class="ri-bed-line"></i> 4 Beds</span>
-            <span><i class="ri-briefcase-line"></i> 3 Baths</span>
-            <span><i class="ri-ruler-line"></i> 300sqft</span>
-          </div>
-          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">₦35,000,000</span>
-            <a href="#" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Property 3 -->
-      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 border border-gray-100">
-        <div class="relative h-56 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Property" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-          <span class="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">For Sale</span>
-        </div>
-        <div class="p-5">
-          <h3 class="font-bold text-gray-900 mb-2 text-lg">6-Bedroom Mansion</h3>
-          <div class="flex items-center gap-2 text-gray-500 mb-3 text-sm"><i class="ri-map-pin-line"></i> Agric, Ikorodu</div>
-          <div class="flex gap-4 text-gray-500 mb-3 text-xs">
-            <span><i class="ri-bed-line"></i> 6 Beds</span>
-            <span><i class="ri-briefcase-line"></i> 7 Baths</span>
-            <span><i class="ri-ruler-line"></i> 700sqft</span>
-          </div>
-          <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">₦120,000,000</span>
-            <a href="#" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
-          </div>
-        </div>
-      </div>
+      @endforelse
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-center items-center gap-2 mt-12">
-      <button class="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg text-gray-400"><i class="ri-arrow-left-s-line"></i></button>
-      <button class="w-10 h-10 flex items-center justify-center rounded-lg text-white bg-emerald-600">1</button>
-      <button class="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50">2</button>
-      <button class="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500"><i class="ri-arrow-right-s-line"></i></button>
+    <div class="mt-12">
+      {{ $this->properties->links() }}
     </div>
   </main>
 </div>

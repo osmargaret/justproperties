@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('contact_phone', 40)->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_whatsapp', 40)->nullable();
-            $table->string('status')->default('draft');
+             $table->boolean('is_published')->default(false);
             $table->foreignId('user_id')->constrained('users');
             
             $table->timestamps();

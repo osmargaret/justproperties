@@ -23,7 +23,6 @@
                     <th class="px-3 py-2">Moderated By</th>
                     <th class="px-3 py-2">Reason</th>
                     <th class="px-3 py-2">Moderated At</th>
-                    <th class="px-3 py-2"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -31,12 +30,14 @@
                     <tr>
                         <td class="px-3 py-2">
                             @if($moderation->moderatable)
-                                @if($moderation->moderatable_type === 'property')
+                                @if($moderation->moderatable_type === 'App\Models\Property')
                                     <a href="{{ route('admin.properties.show', $moderation->moderatable->id, absolute: false) }}" class="text-emerald-600 hover:underline" target="_blank">
                                         {{ $moderation->moderatable->name ?? '—' }}
                                     </a>
-                                @elseif($moderation->moderatable_type === 'user')
-                                    {{ $moderation->moderatable->name ?? '—' }}
+                                @elseif($moderation->moderatable_type === 'App\Models\User')
+                                    <a href="{{ route('admin.users.show', $moderation->moderatable->id, absolute: false) }}" class="text-emerald-600 hover:underline" target="_blank">
+                                        User Verification
+                                    </a>
                                 @else
                                     {{ class_basename($moderation->moderatable_type) }} #{{ $moderation->moderatable_id }}
                                 @endif
@@ -45,13 +46,13 @@
                             @endif
                         </td>
                         <td class="px-3 py-2">
-                            @if($moderation->moderatable_type === 'property')
-                                {{ $moderation->moderatable->user->name ?? '—' }}
-                            @elseif($moderation->moderatable_type === 'user')
-                                {{ $moderation->moderatable->role?->name ?? '—' }}
-                            @else
-                                —
-                            @endif
+                            @if($moderation->moderatable_type === 'App\Models\Property')
+                                    {{ $moderation->moderatable->user->name ?? '—' }}
+                                
+                                @else
+                                    {{ $moderation->moderatable->name ?? '—' }}
+                                @endif
+                             
                         </td>
                         <td class="px-3 py-2">{{ $moderation->moderatable_type ? class_basename($moderation->moderatable_type) : '—' }}</td>
                         <td class="px-3 py-2">
@@ -65,16 +66,10 @@
                         </td>
                         <td class="px-3 py-2">{{ $moderation->moderator->name ?? '—' }}</td>
                         <td class="px-3 py-2 text-gray-500">{{ $moderation->reason ?? '—' }}</td>
-                        <td class="px-3 py-2 text-gray-500">{{ $moderation->created_at?->diffForHumans() ?? '—' }}</td>
-                        <td class="px-3 py-2">
-                            @if($moderation->status === 'pending')
-                                <button type="button" wire:click="approve({{ $moderation->id }})" class="text-emerald-600 hover:underline">Approve</button>
-                                <button type="button" wire:click="reject({{ $moderation->id }})" wire:confirm="{{ __('Reject this item?') }}" class="ml-2 text-red-600 hover:underline">Reject</button>
-                            @endif
-                        </td>
+                        <td class="px-3 py-2 text-gray-500">{{ $moderation->moderated_at?->diffForHumans() ?? '—' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="px-4 py-6 text-center text-gray-500">No moderations found.</td></tr>
+                    <tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No moderations found.</td></tr>
                 @endforelse
             </tbody>
         </table>

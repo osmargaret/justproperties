@@ -88,6 +88,8 @@ class ListProperty extends Component
      */
     public array $dynamicAttributes = [];
 
+    private ?int $latestPendingPaymentId = null;
+
     public function mount(): void
     {
         /** @var User|null $user */
@@ -188,22 +190,23 @@ class ListProperty extends Component
     public function submitListing(): mixed
     {
         $property = $this->persistPropertyWorkflow('submit');
-        if ($property->status === 'pending_payment') {
+        $requiresPayment = $this->requiresPayment();
+
+        if ($requiresPayment) {
             session()->flash('status', __('Listing saved. Complete checkout to publish it.'));
-            $payment = Payment::query()
+            $paymentId = $this->latestPendingPaymentId ?? Payment::query()
                 ->where('user_id', Auth::id())
-                ->where('paymentable_type', Property::class)
-                ->where('paymentable_id', $property->id)
+                ->where('paymentable_type', Subscription::class)
                 ->where('status', 'pending')
                 ->latest('id')
-                ->first();
+                ->value('id');
 
-            if ($payment) {
-                return redirect()->route('seller.checkout', ['payment' => $payment->id]);
+            if ($paymentId) {
+                return redirect()->route('seller.checkout', ['payment' => $paymentId]);
             }
-        } else {
-            session()->flash('status', __('Listing submitted successfully.'));
         }
+
+        session()->flash('status', __('Listing submitted successfully.'));
 
         return redirect()->route('seller.properties.show', ['property' => $property->id]);
     }
@@ -250,7 +253,7 @@ class ListProperty extends Component
                     'neighborhood' => (string) ($row['neighborhood'] ?? ''),
                     'address' => (string) ($row['address'] ?? ''),
                     'show_address' => filter_var($row['show_address'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                    'status' => 'draft',
+                    'is_published' => false,
                     'contact_name' => (string) ($row['contact_name'] ?? $user->name),
                     'contact_phone' => (string) ($row['contact_phone'] ?? $user->phone),
                     'contact_email' => (string) ($row['contact_email'] ?? $user->email),
@@ -498,7 +501,8 @@ class ListProperty extends Component
                 'user_id' => Auth::id(),
                 'mediable_id' => $property->id,
                 'mediable_type' => Property::class,
-                'name' => $storedPath,
+                'name' => Media::propertyImageLabel($property->name, $index + 1),
+                'path' => $storedPath,
                 'type' => 'image',
                 'mime_type' => $file->getMimeType(),
                 'size' => (string) $file->getSize(),
@@ -620,10 +624,11 @@ class ListProperty extends Component
             ]);
         }
 
+        $this->latestPendingPaymentId = null;
         $requiresPayment = $mode === 'submit' ? $this->requiresPayment() : false;
         $targetStatus = $mode === 'draft'
-            ? 'draft'
-            : ($requiresPayment ? 'pending_payment' : 'active');
+            ? 0
+            : ($requiresPayment ? 0 : 1);
 
         return DB::transaction(function () use ($mode, $requiresPayment, $targetStatus): Property {
             /** @var User $user */
@@ -642,7 +647,7 @@ class ListProperty extends Component
                 'neighborhood' => $this->neighborhood !== '' ? $this->neighborhood : null,
                 'address' => $this->address,
                 'show_address' => $this->show_address,
-                'status' => $targetStatus,
+                'is_published' => $targetStatus,
                 'contact_name' => $this->contact_name,
                 'contact_phone' => $this->contact_phone,
                 'contact_email' => $this->contact_email,
@@ -664,23 +669,25 @@ class ListProperty extends Component
                     ]);
                 }
 
-                if ($requiresPayment && $this->activeCurrency && $this->totalAmount() > 0) {
-                    Payment::query()->create([
-                        'user_id' => $user->id,
-                        'currency_id' => $this->activeCurrency->id,
-                        'paymentable_id' => $property->id,
-                        'paymentable_type' => Property::class,
-                        'reference' => 'LIST-'.Str::upper(Str::random(12)),
-                        'request_id' => null,
-                        'amount' => $this->subtotalAmount(),
-                        'vat_rate' => $this->vatRate(),
-                        'vat_value' => $this->vatAmount(),
-                        'total' => $this->totalAmount(),
-                        'method' => null,
-                        'status' => 'pending',
-                    ]);
+                    if ($requiresPayment && $this->activeCurrency && $this->totalAmount() > 0 && $subscriptionForListing) {
+                        $payment = Payment::query()->create([
+                            'user_id' => $user->id,
+                            'currency_id' => $this->activeCurrency->id,
+                            'paymentable_id' => $subscriptionForListing->id,
+                            'paymentable_type' => Subscription::class,
+                            'reference' => 'LIST-'.Str::upper(Str::random(12)),
+                            'request_id' => null,
+                            'amount' => $this->subtotalAmount(),
+                            'vat_rate' => $this->vatRate(),
+                            'vat_value' => $this->vatAmount(),
+                            'total' => $this->totalAmount(),
+                            'method' => null,
+                            'status' => 'pending',
+                        ]);
+
+                        $this->latestPendingPaymentId = $payment->id;
+                    }
                 }
-            }
 
             return $property;
         });
@@ -690,19 +697,19 @@ class ListProperty extends Component
     {
         $states = State::query()
             ->where('is_active', true)
-            ->orderBy('name','asc')
+            ->orderBy('name', 'asc')
             ->get();
         $cities = City::query()
             ->where('is_active', true)
             ->when($this->state_id, fn ($query) => $query->where('state_id', $this->state_id))
-            ->orderBy('name','asc')
+            ->orderBy('name', 'asc')
             ->get();
 
         return view('livewire.seller.list-property', [
-            'categories' => Category::query()->with('settings')->orderBy('name','asc')->get(),
+            'categories' => Category::query()->with('settings')->orderBy('name', 'asc')->get(),
             'states' => $states,
             'cities' => $cities,
-            'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name','asc')->get(),
+            'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name', 'asc')->get(),
             'availableSubscriptions' => $this->availableSubscriptions,
             'activeCurrency' => $this->activeCurrency,
         ]);

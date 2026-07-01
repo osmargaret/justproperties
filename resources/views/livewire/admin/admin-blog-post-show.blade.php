@@ -1,5 +1,5 @@
 @php
-    $featuredUrl = $featured ? asset('storage/'.$featured->name) : null;
+    $featuredUrl = $featured?->url;
 @endphp
 <x-admin.page :title="$post->title" description="Admin view: promotion ties, property link, and actions.">
     @if (session('status'))

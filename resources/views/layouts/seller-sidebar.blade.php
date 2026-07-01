@@ -8,9 +8,7 @@
         <a href="{{ route('seller.dashboard') }}" class="{{ request()->routeIs('seller.dashboard') ? $navActive : $navIdle }}">
             <i class="ri-dashboard-line text-xl"></i><span class="font-medium">Dashboard</span>
         </a>
-        <a href="{{ route('list-property') }}" class="{{ request()->routeIs('list-property') ? $navActive : $navIdle }}">
-            <i class="ri-add-circle-line text-xl"></i><span class="font-medium">List Property</span>
-        </a>
+        
         <a href="{{ route('seller.listed-properties') }}" class="{{ request()->routeIs('seller.listed-properties') ? $navActive : $navIdle }}">
             <i class="ri-home-4-line text-xl"></i><span class="font-medium">My Listings</span>
         </a>
@@ -18,15 +16,13 @@
             <i class="ri-vip-diamond-line text-xl"></i>
             <span class="font-medium">Subscriptions</span>
         </a>
+        
         <a href="{{ route('seller.transactions') }}" class="{{ request()->routeIs('seller.transactions') ? $navActive : $navIdle }}">
+
             <i class="ri-money-dollar-circle-line text-xl"></i>
             <span class="font-medium">Transactions</span>
         </a>
-        <a href="{{ route('seller.promotions') }}" class="{{ request()->routeIs('seller.promotions') ? $navActive : $navIdle }}">
-            <i class="ri-megaphone-line text-xl"></i>
-            <span class="font-medium">Promotions</span>
-        </a>
-        
+       
         <a href="{{ route('seller.profile') }}" class="{{ request()->routeIs('seller.profile') ? $navActive : $navIdle }}">
             <i class="ri-user-3-line text-xl"></i><span class="font-medium">Profile</span>
         </a>

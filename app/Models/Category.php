@@ -51,6 +51,6 @@ class Category extends Model
 
     public function blogSubscriptions(): HasMany
     {
-        return $this->hasMany(NewsletterSubscription::class);
+        return $this->hasMany(BlogSubscription::class);
     }
 }

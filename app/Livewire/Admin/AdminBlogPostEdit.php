@@ -107,7 +107,8 @@ class AdminBlogPostEdit extends Component
                 'user_id' => Auth::id(),
                 'mediable_id' => $this->post->id,
                 'mediable_type' => Post::class,
-                'name' => $path,
+                'name' => $this->post->title ?: 'Featured image',
+                'path' => $path,
                 'type' => 'image',
                 'mime_type' => $this->featuredImage->getMimeType(),
                 'size' => (string) $this->featuredImage->getSize(),
@@ -124,8 +125,8 @@ class AdminBlogPostEdit extends Component
     public function render()
     {
         return view('livewire.admin.admin-blog-post-form', [
-            'categories' => Category::query()->orderBy('name','asc')->get(),
-            'properties' => Property::query()->orderBy('name','asc')->limit(200)->get(['id', 'name']),
+            'categories' => Category::query()->orderBy('name', 'asc')->get(),
+            'properties' => Property::query()->orderBy('name', 'asc')->limit(200)->get(['id', 'name']),
             'heading' => __('Edit post'),
             'submitLabel' => __('Save'),
         ]);

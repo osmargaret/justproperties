@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'property_id',
     'views_count',
-    'clicked_action_count',
+    'action_counts',
     'click_count',
     'target_type',
     'target_count',
@@ -22,7 +22,7 @@ class FeaturedProperty extends Model
     {
         return [
             'views_count' => 'integer',
-            'clicked_action_count' => 'integer',
+            'action_counts' => 'array',
             'click_count' => 'integer',
             'target_count' => 'integer',
             'start_at' => 'datetime',

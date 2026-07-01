@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('property_id')->constrained('properties')->cascadeOnDelete();
             $table->unsignedBigInteger('views_count')->default(0);
-            $table->unsignedBigInteger('clicked_action_count')->default(0);
             $table->unsignedBigInteger('click_count')->default(0);
+            $table->json('action_counts')->nullable();
             $table->string('target_type')->nullable();
             $table->unsignedBigInteger('target_count')->default(0);
             $table->dateTime('start_at')->nullable();

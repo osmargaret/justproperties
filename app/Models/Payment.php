@@ -66,8 +66,25 @@ class Payment extends Model
         return $this->morphTo();
     }
 
+    protected function payable(): Attribute
+    {
+        return Attribute::make(get: fn (): float => (float) $this->total);
+    }
+
+
+
+    protected function currencyCode(): Attribute
+    {
+        return Attribute::make(get: fn (): string => strtoupper((string) ($this->currency?->code ?? 'NGN')));
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
     protected function isSuccessful(): Attribute
     {
-        return Attribute::make(get: fn (): bool => $this->status === 'completed');
+        return Attribute::make(get: fn (): bool => $this->status === 'success');
     }
 }

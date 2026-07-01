@@ -32,7 +32,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-mono text-xs">{{ $coupon->code }}</td>
                         <td class="px-4 py-3">
-                            {{ $coupon->name }} · {{ $coupon->is_percentage ? $coupon->discount.'%' : $coupon->discount }}
+                            {{ $coupon->name }} · {{ $coupon->discount.'%' }}
                         </td>
                         <td class="px-4 py-3">{{ $coupon->quantity }}</td>
                         <td class="px-4 py-3">{{ $coupon->qty_used }}</td>

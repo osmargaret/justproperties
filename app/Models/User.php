@@ -2,24 +2,27 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
+use App\Observers\UserObserver;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
 #[Fillable(['name', 'email', 'password', 'phone', 'active_role', 'country_id', 'role_id', 'suspended_at', 'govt_id_number', 'govt_id_expiry', 'address', 'verified_at'])]
 #[Hidden(['password', 'remember_token'])]
+#[ObservedBy([UserObserver::class])]
+
 class User extends Authenticatable implements MustVerifyEmailContract
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -95,12 +98,17 @@ class User extends Authenticatable implements MustVerifyEmailContract
 
     public function blogSubscriptions(): HasMany
     {
-        return $this->hasMany(NewsletterSubscription::class);
+        return $this->hasMany(BlogSubscription::class);
     }
 
     public function moderations(): MorphMany
     {
         return $this->morphMany(Moderation::class, 'moderatable');
+    }
+
+    public function latestModeration(): MorphOne
+    {
+        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
     }
 
     public function hasPermission(string $permission, string $capability): bool

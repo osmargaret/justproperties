@@ -17,14 +17,44 @@ class AdminPropertyDetails extends Component
 
     public function approve(): void
     {
-        $this->property->update(['status' => 'active']);
+        $pendingModeration = Moderation::query()
+            ->where('moderatable_type', Property::class)
+            ->where('moderatable_id', $this->property->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($pendingModeration) {
+            $pendingModeration->update([
+                'status' => 'approved',
+                'moderated_by' => auth()->id(),
+            ]);
+        }
+
+        $this->property->update(['is_published' => true]);
+        $this->property->refresh();
         $this->logModeration('approved', 'approve');
+        session()->flash('status', __('Property approved.'));
     }
 
     public function disapprove(): void
     {
-        $this->property->update(['status' => 'inactive']);
+        $pendingModeration = Moderation::query()
+            ->where('moderatable_type', Property::class)
+            ->where('moderatable_id', $this->property->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($pendingModeration) {
+            $pendingModeration->update([
+                'status' => 'rejected',
+                'moderated_by' => auth()->id(),
+            ]);
+        }
+
+        $this->property->update(['is_published' => false]);
+        $this->property->refresh();
         $this->logModeration('rejected', 'disapprove');
+        session()->flash('status', __('Property disapproved.'));
     }
 
     public function delete(): mixed
@@ -40,8 +70,9 @@ class AdminPropertyDetails extends Component
     private function logModeration(string $status, string $action): void
     {
         Moderation::query()->create([
-            'property_id' => $this->property->id,
-            'actor_id' => auth()->id(),
+            'moderatable_type' => Property::class,
+            'moderatable_id' => $this->property->id,
+            'moderated_by' => auth()->id(),
             'status' => $status,
             'action' => $action,
             'reason' => null,
@@ -50,9 +81,16 @@ class AdminPropertyDetails extends Component
 
     public function render()
     {
-        $this->property->load(['user', 'category', 'media', 'subscriptionLinks.subscription.plan', 'promotions.plan']);
+        $this->property->load([
+            'user',
+            'category',
+            'media',
+            'subscribedPropertyLinks.subscription.plan',
+            'promotions.plan',
+        ]);
         $moderations = Moderation::query()
-            ->where('property_id', $this->property->id)
+            ->where('moderatable_type', Property::class)
+            ->where('moderatable_id', $this->property->id)
             ->latest('created_at')
             ->take(20)
             ->get();

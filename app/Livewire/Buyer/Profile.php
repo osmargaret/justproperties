@@ -4,6 +4,7 @@ namespace App\Livewire\Buyer;
 
 use App\Models\Media;
 use App\Models\Moderation;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
@@ -45,6 +46,7 @@ class Profile extends Component
     public string $twitter = '';
 
     public string $instagram = '';
+
     public string $youtube = '';
 
     public string $linkedin = '';
@@ -58,7 +60,7 @@ class Profile extends Component
     public function mount(): void
     {
         $user = Auth::user();
-        
+
         $this->phone = $user->phone ?? '';
         $this->whatsapp = $user->whatsapp ?? '';
         $this->website = $user->website ?? '';
@@ -93,22 +95,32 @@ class Profile extends Component
             $file = $this->{$fileField};
             if ($file) {
                 $path = $file->store('verification', 'public');
+                $type = $fileField === 'facial_image' ? 'facial' : ($fileField === 'govt_id_file' ? 'govt_id' : 'address_proof');
                 $media[] = [
-                    'mediable_type' => 'user',
+                    'user_id' => $user->id,
+                    'mediable_type' => User::class,
                     'mediable_id' => $user->id,
+                    'name' => Media::verificationDocumentLabel($type),
                     'path' => $path,
-                    'type' => $fileField === 'facial_image' ? 'facial' : ($fileField === 'govt_id_file' ? 'govt_id' : 'address_proof'),
+                    'type' => $type,
+                    'mime_type' => $file->getMimeType(),
+                    'size' => (string) $file->getSize(),
+                    'extension' => $file->getClientOriginalExtension() ?: null,
+                    'is_primary' => false,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
         }
 
-        Media::insert($media);
+        if ($media !== []) {
+            Media::insert($media);
+        }
 
         Moderation::create([
-            'moderatable_type' => 'user',
+            'moderatable_type' => User::class,
             'moderatable_id' => $user->id,
+            'action' => 'created',
             'status' => 'pending',
         ]);
 

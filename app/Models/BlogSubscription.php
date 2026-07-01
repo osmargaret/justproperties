@@ -15,11 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'get_new_posts',
     'get_comments',
 ])]
-class NewsletterSubscription extends Model
+class BlogSubscription extends Model
 {
     use SoftDeletes;
-
-    protected $table = 'blog_subscriptions';
 
     protected function casts(): array
     {
