@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Property;
 use App\Models\PropertyAlert;
-use App\Models\PropertyReview;
 use App\Models\SavedProperty;
 use App\Models\User;
 use App\Models\ViewedProperty;
@@ -50,14 +49,6 @@ class UserEngagementSeeder extends Seeder
                 'property_id' => null,
                 'status' => 'active',
                 'last_sent_at' => null,
-            ]
-        );
-
-        PropertyReview::query()->firstOrCreate(
-            ['property_id' => $p1->id, 'user_id' => $buyer->id],
-            [
-                'rating' => 5,
-                'comment' => 'Excellent listing and transparent communication during the inspection process.',
             ]
         );
     }
