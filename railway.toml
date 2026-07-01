@@ -1,5 +1,5 @@
-[deploy]
-
-[deploy.variables]
-RAILPACK_PHP_VERSION = "8.4"
-RAILPACK_PHP_EXTENSIONS = "gd"
+[build]
+# Pins PHP version and enables required extensions
+[build.env]
+PHP_VERSION = "8.4"
+RAILPACK_PHP_EXTENSIONS = "gd,mbstring,pdo_mysql" # Include other required extensions here
