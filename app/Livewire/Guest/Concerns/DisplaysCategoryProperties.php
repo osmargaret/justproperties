@@ -19,7 +19,9 @@ trait DisplaysCategoryProperties
         return Property::whereHas('category', function ($query) {
                 $query->where('slug', $this->getCategorySlug());
             })
-            ->where('status', 'published')
+            // ->whereHas('latestModeration', function ($q) {
+            //     $q->where('status', 'approved');
+            // })
             ->with(['media', 'features'])
             ->latest()
             ->paginate(12);

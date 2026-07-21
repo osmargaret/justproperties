@@ -28,7 +28,7 @@
             <span><i class="ri-briefcase-line"></i> {{ $property->featureValue('bathrooms') ?? 'N/A' }} Baths</span>
         </div>
         <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">{{ $property->currency?->symbol ?? '₦' }}{{ number_format($property->cost) }}</span>
+            <span class="font-bold text-emerald-600 text-xl">{{ $property->currency()?->symbol ?? '₦' }}{{ number_format($property->cost) }}</span>
             <a href="{{ route('property.show', $property) }}" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
         </div>
     </div>

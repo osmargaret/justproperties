@@ -97,6 +97,17 @@ class Property extends Model
         return $this->hasMany(ViewedProperty::class);
     }
 
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+
+
     public function promotions(): HasMany
     {
         return $this->hasMany(Promotion::class);
@@ -111,6 +122,17 @@ class Property extends Model
     {
         return $this->morphMany(Moderation::class, 'moderatable');
     }
+    public function latestModeration(): MorphOne
+    {
+        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
+    }
+
+    
+    public function subscriptions(): BelongsToMany
+    {
+        return $this->belongsToMany(Subscription::class, 'subscribed_properties')
+            ->withTimestamps();
+    }
 
     /**
      * Pivot rows in subscribed_properties (property ↔ subscription seat usage).
@@ -124,27 +146,6 @@ class Property extends Model
     public function subscriptionLinks(): HasMany
     {
         return $this->subscribedPropertyLinks();
-    }
-
-    public function subscriptions(): BelongsToMany
-    {
-        return $this->belongsToMany(Subscription::class, 'subscribed_properties')
-            ->withTimestamps();
-    }
-
-    public function media(): MorphMany
-    {
-        return $this->morphMany(Media::class, 'mediable');
-    }
-
-    public function posts(): HasMany
-    {
-        return $this->hasMany(Post::class);
-    }
-
-    public function latestModeration(): MorphOne
-    {
-        return $this->morphOne(Moderation::class, 'moderatable')->latestOfMany();
     }
 
     /**
@@ -238,6 +239,11 @@ class Property extends Model
     public function currency()
     {
         return $this->user->country?->currency->symbol ?? '$';
+    }
+
+    public function featureValue(string $feature): ?string
+    {
+        return $this->features->firstWhere('feature', $feature)?->value;
     }
 
     public function getPriceAttribute()
