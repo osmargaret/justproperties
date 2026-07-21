@@ -35,6 +35,14 @@ class AdminCurrencies extends Component
 
     public ?string $payment_gateway = null;
 
+    // Manual payment / bank details
+    public bool $show_manual_payment = false;
+    public string $bank_name = '';
+    public string $bank_account_number = '';
+    public string $account_name = '';
+    public string $swift_code = '';
+    public string $bank_instructions = '';
+
     public function openCreate(): void
     {
         $this->editingId = null;
@@ -49,6 +57,12 @@ class AdminCurrencies extends Component
         $this->is_default = false;
         $this->is_active = true;
         $this->payment_gateway = null;
+        $this->show_manual_payment = false;
+        $this->bank_name = '';
+        $this->bank_account_number = '';
+        $this->account_name = '';
+        $this->swift_code = '';
+        $this->bank_instructions = '';
         $this->resetErrorBag();
         $this->showModal = true;
     }
@@ -68,6 +82,15 @@ class AdminCurrencies extends Component
         $this->is_default = (bool) $c->is_default;
         $this->is_active = (bool) $c->is_active;
         $this->payment_gateway = $c->payment_gateway;
+
+        $bankDetails = $c->bank_details ?? [];
+        $this->show_manual_payment = ! empty($bankDetails);
+        $this->bank_name = $bankDetails['bank_name'] ?? '';
+        $this->bank_account_number = $bankDetails['bank_account_number'] ?? '';
+        $this->account_name = $bankDetails['account_name'] ?? '';
+        $this->swift_code = $bankDetails['swift_code'] ?? '';
+        $this->bank_instructions = $bankDetails['instructions'] ?? '';
+
         $this->resetErrorBag();
         $this->showModal = true;
     }
@@ -99,6 +122,11 @@ class AdminCurrencies extends Component
             'is_default' => ['boolean'],
             'is_active' => ['boolean'],
             'payment_gateway' => ['nullable', 'string', Rule::in(['paystack', 'flutterwave'])],
+            'bank_name' => [$this->show_manual_payment ? 'required' : 'nullable', 'string', 'max:255'],
+            'bank_account_number' => [$this->show_manual_payment ? 'required' : 'nullable', 'string', 'max:255'],
+            'account_name' => [$this->show_manual_payment ? 'required' : 'nullable', 'string', 'max:255'],
+            'swift_code' => ['nullable', 'string', 'max:255'],
+            'bank_instructions' => ['nullable', 'string'],
         ]);
 
         $slug = $this->slug !== '' ? Str::slug($this->slug) : Str::slug($this->code);
@@ -114,6 +142,13 @@ class AdminCurrencies extends Component
             'decimal_multiplier' => $this->decimal_multiplier,
             'is_active' => $this->is_active,
             'payment_gateway' => $this->payment_gateway !== '' ? $this->payment_gateway : null,
+            'bank_details' => $this->show_manual_payment ? [
+                'bank_name' => $this->bank_name,
+                'bank_account_number' => $this->bank_account_number,
+                'account_name' => $this->account_name,
+                'swift_code' => $this->swift_code,
+                'instructions' => $this->bank_instructions,
+            ] : null,
         ];
 
         if ($this->is_default) {

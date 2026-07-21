@@ -65,7 +65,7 @@ class Promotion extends Model
 
     public function hasPaidPayment(): bool
     {
-        return $this->payments()->where('status', 'success')->exists();
+        return $this->payments()->whereIn('status', ['completed', 'success'])->exists();
     }
 
     public function pendingPayment(): ?Payment

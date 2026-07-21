@@ -42,4 +42,21 @@
             </button>
         @endif
     @endif
+
+    <input type="file" id="profile_photo_input" class="hidden" wire:model="photo" accept="image/*" onchange="previewProfileImage(this)">
+
+    <script>
+        function previewProfileImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var img = document.getElementById('profile_image');
+                    if (img) {
+                        img.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 </div>

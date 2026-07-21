@@ -1,54 +1,173 @@
-Seller[
-    List-Property =>[
-        [remove promotion from this page. A payment cannot be related to both subscription and promotion at the same time],
-    ],
-    Listed Properties => [
-        Add property first image thumbnail to table,
-        Visibility of property depends on status and moderation relationship,
-        Add Edit-Property page,
-    ],
-    Listed-Property Details view => [
-        Show subscription used for property. Allow user to change subscription from subscriptions with available seats. 
-        Add button to promote property- onclick show modal with promotional plans, coupon field and button to pay
-        If promotion content exist, show promotion details and anaylytics.  => [
-            Blog Promotion => [
-                Show title of Post with href link,
-                Show views, Date created, published,
-            ],
-            Newsletter => [
-                Show email title and content,
-                Show number of recipient, emails sent, emails opened,
-            ],
-            Featured Listing => [
-                Show start date, target type, target count, 
-                Show target_achieved
-            ]
+Payment{
+    in Admin/Settings/AdminCurrencies create & edit mode{
+        Admin should select: Show Manual Payment Option
+        Admin should enter Bank Name, Bank Account number, Account Name, Swift Code, etc 
+    }
+    in database, add bank_details (json) field to currencies table and model
+    On Checkout page, if Manual payment is selected, {
+        display bank account details to user as option,
+        display upload payment receipt field (with button to upload)
+        payment status field should default to pending
+    }
+    in database, add receipt field to payments table
+    In Admin/AdminPayments, {
+        if payment status is pending and payment method is manual, Admin should have an option to view payment receipt and confirm payment
+        If confirmed payment, change payment status to completed
+    }
+}
 
-        ],
-        if promotion exist but not content => [
-            Blog Promotion => [
-                if not available,show pending.. generating,
-                if available, show button to preview => [
-                    Show 3 posts and ask the user to pick 1. Each post shows title, content,
-                ]
-            ],
-            Newsletter => [
-                if not available,show pending.. generating,
-                if available, show button to preview => [
-                    Show 3 emails and ask the user to pick 1. Each email shows subject, content,
-                ]
-            ],
-            Featured Listing => [
-                if analysis does not exist, show generating
-                else, show targets and target achieved
-            ]
-
-        ]
-    ],
-    Subscriptions => [
-        List the subscriptions in table with filter on active. 
-        Allow users to change filter to inactive
-        For each subscription, show number of seats, plan, start date, expiry date, button to renew, invoice
-    ],
+Orientation page update (role-welcome){
+    Currently we have buyer & seller sections. 
+    We need to split them into 6 based on what the user wants to do:
+    Rent | Shortlet | Buy | Sell | Seller Dashboard | Buyer Dashboard
     
-]
+}
+
+FAQ{
+   on app.blade.php{
+      Open the chat on the bottom right corner
+      Add questions the bot can answer
+      Let each question be clickable and the answer should display in the chat
+      Also let there be a button that can return the user to start all over
+   } 
+   add new page on admin to add/update/delete FAQ
+   Add table to store FAQs. Should contain id, question, answer, is_active, show_on_contact_page,created_at, updated_at
+   Show faq where show_on_contact_page is true on Contact page
+}
+Contact us{
+    Add Feedback & Adverts to Subject options
+    Submit of form should send email to admin's support email env(MAIL_FROM_ADDRESS).
+    Show user their contact message has been sent or failed.
+}
+Pricing Page{
+    Create Livewire class and convert view.
+    Load subscription plan and prices
+    If user logged in, selected country is user country else
+    use default country.
+    Show country switcher.  
+}
+Seeders {
+    Write Seeders for users (10 users), blogs (20 blogs) and properties of different types (50 properties)
+    When seeding properties, automatically create moderation record with 'approved' status in PropertyObserver
+}
+Posts should use comma separated strings for tags{
+    In Post Create & Edit Page (AdminBlogPostCreate & AdminBlogPostEdit)
+    In Blogroll.php and BlogPost.php
+    In Post List, show tags as comma separated strings with links to display blog post pages under the tags
+    BlogPost view should filter post by tags
+}
+Categories {
+    Add a column 'is_property' boolean to category table
+    Add 'Facilities' to property categories.{
+        types are{ 
+            factory, warehouses, industrial, hotel, hospital, school, shopping mall, tank farm, etc.
+        }
+    }
+    Add a non-property categories to CategoriesSeeder. Ensure categories use UpdateOrCreate{
+        Mortgage & Financing Guide
+        Tax & Insurance Advice
+        Property Management Tips
+        Investment Guide
+        Legal Tips
+    }
+    In Post Create & Edit Page (AdminBlogPostCreate & AdminBlogPostEdit), Show all categories.  
+    In Admin/Settings/AdminCategories{
+        load only categories where is_property is true. 
+        Remove category creation.   
+    }
+    On Welcome.php, load categories where('is_property', true)
+    On footer.blade.php under resources, list those non property categories, with links to display blog post pages under the categories   
+}
+
+Advertisement{
+    Create a new page for advertize.. and link to footer.blade.php
+    On the page{
+        Show users  that justproperties  can help them advertize their properties to millions of visitors worldwide
+        Show people who can benefit{
+            Legal Practitioners
+            Real Estate Agents
+            Property Developers
+            Mortgage Companies
+            Investment Firms
+            Property Management Companies
+            Tax Consultants
+            Insurance Companies
+            Law Firms
+            Banks
+            Finance Companies
+            etc
+        }
+        Show ad areas & types{            
+            Banners{ 
+                Homepage - Ready to Find Your Dream Property?
+                About - Ready to Find Your Dream Property?
+                Landed properties page at the bottom - 
+                Contact Page bottom
+                Pricing page
+            }
+            Sidebar{ 
+                Blog Page sidebar
+            }
+            Blog Post
+        }
+        Show CTA button to contact us        
+    }
+    
+    Add table to store advertisements {
+        id, image, description, placement, company, amount, payment_method, payment_status, receipt, start_date, end_date, created_at, updated_at
+        
+    }
+    Add Advertisement menu to admin page
+}
+
+Use countrystate&city api to populat states & cities{
+    when a user registers..
+    check if we have states in the registered country. 
+    if not, use api to fetch states.{
+        curl -X GET 'https://api.countrystatecity.in/v1/countries/{country_code}/states' \
+            -H 'X-CSCAPI-KEY: config('services.countrystatecity.key')'
+        Use Http Facade
+    }
+    States Sample {
+        [
+            {
+                "id": 4008,
+                "name": "Maharashtra",
+                "iso2": "MH",
+                "country_id": 101,
+                "country_code": "IN",
+                "latitude": "19.75147980",
+                "longitude": "75.71388840",
+                "timezone": "Asia/Kolkata"
+            }
+        ]
+    }
+    save states to database
+    then check if we have cities in the registered country. 
+    if not, use api to fetch cities.{
+        curl -X GET 'https://api.countrystatecity.in/v1/countries/{country_code}/cities' \
+            -H 'X-CSCAPI-KEY: config('services.countrystatecity.key')'
+        Use Http Facade
+    }
+    Cities Sample {
+        [
+            {
+                "id": 133024,
+                "name": "Mumbai",
+                "state_id": 4008,
+                "state_code": "MH",
+                "country_id": 101,
+                "country_code": "IN",
+                "latitude": "19.07283000",
+                "longitude": "72.88261000",
+                "timezone": "Asia/Kolkata",
+                "population": 12442373,
+                "type": null,
+                "level": null,
+                "parent_id": null,
+                "native": "मुंबई"
+            }
+        ]
+    }
+    save cities to database.
+}

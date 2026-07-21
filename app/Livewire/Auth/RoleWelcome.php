@@ -30,6 +30,30 @@ class RoleWelcome extends Component
         }
     }
 
+    /**
+     * Set the user's active role and redirect to the appropriate dashboard.
+     */
+    public function chooseRole(string $role): void
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            $this->redirect(route('login'));
+            return;
+        }
+
+        $validRoles = ['buyer', 'seller'];
+
+        if (! in_array($role, $validRoles)) {
+            return;
+        }
+
+        $user->active_role = $role;
+        $user->save();
+
+        $this->redirect($user->dashboard_url, navigate: true);
+    }
+
     public function render()
     {
         return view('livewire.auth.role-welcome');

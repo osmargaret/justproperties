@@ -31,13 +31,9 @@
                                     class="ri-home-4-line absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base sm:text-lg"></i><select
                                     class="w-full pl-10 sm:pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none text-sm cursor-pointer">
                                     <option value="">Property Type</option>
-                                    <option value="landed">Landed Property</option>
-                                    <option value="uncompleted">
-                                        Uncompleted Structure
-                                    </option>
-                                    <option value="completed">Completed Property</option>
-                                    <option value="rented">Rent/Lease</option>
-                                    <option value="shortlet">Short-Let</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->slug }}">{{ $category->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="relative">

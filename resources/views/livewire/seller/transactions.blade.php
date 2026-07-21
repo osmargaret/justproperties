@@ -32,7 +32,7 @@
                         <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 text-2xl mb-4">
                             <i class="ri-check-line"></i>
                         </div>
-                        <div class="text-3xl font-bold mb-1">{{ $this->payments->where('status', 'success')->count() }}</div>
+                        <div class="text-3xl font-bold mb-1">{{ $this->payments->whereIn('status', ['completed', 'success'])->count() }}</div>
                         <div class="text-gray-500 text-sm">Successful</div>
                     </div>
                     <div class="bg-white rounded-xl p-6 shadow-md hover:-translate-y-1 transition-transform">
@@ -70,7 +70,7 @@
                             <label class="block font-medium text-sm text-gray-700 mb-2">Status</label>
                             <select wire:model.live="status" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                                 <option value="all">All Status</option>
-                                <option value="success">Successful</option>
+                                <option value="completed">Completed</option>
                                 <option value="pending">Pending</option>
                                 <option value="failed">Failed</option>
                                 <option value="refunded">Refunded</option>
@@ -139,7 +139,7 @@
                                             <td class="py-4 px-4">{{ str_replace('_', ' ', class_basename($payment->paymentable_type)) }}</td>
                                             <td class="py-4 px-4"><span class="font-medium">{{ ucfirst($payment->method ?? 'Unknown') }}</span></td>
                                             <td class="py-4 px-4">
-                                                @if($payment->status === 'success')
+                                                @if($payment->status === 'completed' || $payment->status === 'success')
                                                     <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
                                                         <i class="ri-check-line"></i> Completed
                                                     </span>

@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'gateway_payload',
     'status',
     'paid_at',
+    'receipt',
 ])]
 class Payment extends Model
 {
@@ -83,8 +84,13 @@ class Payment extends Model
         return $this->status === 'pending';
     }
 
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed' || $this->status === 'success';
+    }
+
     protected function isSuccessful(): Attribute
     {
-        return Attribute::make(get: fn (): bool => $this->status === 'success');
+        return Attribute::make(get: fn (): bool => $this->isCompleted());
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'slug', 'code', 'state_id', 'country_id', 'is_active'])]
+#[Fillable(['name', 'slug', 'code', 'state_id', 'country_id', 'is_active', 'latitude', 'longitude', 'timezone', 'population'])]
 class City extends Model
 {
     protected function casts(): array

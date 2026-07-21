@@ -7,6 +7,8 @@ use App\Models\Property;
 
 class PropertyObserver
 {
+    public static bool $seeding = false;
+
     public function created(Property $property): void
     {
         if ($property->is_published && $this->hasSubscription($property)) {
@@ -36,7 +38,7 @@ class PropertyObserver
             'moderatable_type' => Property::class,
             'moderatable_id' => $property->id,
             'action' => $action,
-            'status' => 'pending',
+            'status' => self::$seeding ? 'approved' : 'pending',
             'reason' => null,
             'moderated_by' => null,
         ]);

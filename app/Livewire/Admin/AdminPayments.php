@@ -36,6 +36,19 @@ class AdminPayments extends Component
         $this->selectedPaymentId = null;
     }
 
+    public function confirmPayment(int $paymentId): void
+    {
+        $payment = Payment::query()->findOrFail($paymentId);
+        if ($payment->isCompleted()) {
+            return;
+        }
+
+        app(\App\Services\Payments\CompletesPayment::class)->complete($payment, 'bank_transfer');
+        session()->flash('status', __('Payment confirmed successfully.'));
+        // Refresh selected payment to update view
+        $this->selectedPaymentId = $payment->id;
+    }
+
     public function render()
     {
         $payments = Payment::query()

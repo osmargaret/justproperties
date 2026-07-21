@@ -22,12 +22,14 @@ class CategoriesSeeder extends Seeder
      */
     public function run(): void
     {
+        // --- Property categories (is_property = true) ---
         $catalogue = [
             $this->landedProperties(),
             $this->uncompletedProperties(),
             $this->completedProperties(),
             $this->rentLease(),
             $this->shortLet(),
+            $this->facilities(),
         ];
 
         foreach ($catalogue as $row) {
@@ -35,11 +37,32 @@ class CategoriesSeeder extends Seeder
             $category = Category::query()->updateOrCreate(
                 ['slug' => $row['slug']],
                 [
-                    'name' => $row['name'],
+                    'name'        => $row['name'],
                     'requirements' => null,
+                    'is_property' => true,
                 ]
             );
             $this->syncCategorySettings($category, $requirements);
+        }
+
+        // --- Blog-only categories (is_property = false) ---
+        $blogCategories = [
+            ['name' => 'Mortgage & Financing Guide', 'slug' => 'mortgage-financing-guide'],
+            ['name' => 'Tax & Insurance Advice',     'slug' => 'tax-insurance-advice'],
+            ['name' => 'Property Management Tips',   'slug' => 'property-management-tips'],
+            ['name' => 'Investment Guide',            'slug' => 'investment-guide'],
+            ['name' => 'Legal Tips',                  'slug' => 'legal-tips'],
+        ];
+
+        foreach ($blogCategories as $row) {
+            Category::query()->updateOrCreate(
+                ['slug' => $row['slug']],
+                [
+                    'name'        => $row['name'],
+                    'requirements' => null,
+                    'is_property' => false,
+                ]
+            );
         }
     }
 
@@ -410,6 +433,41 @@ class CategoriesSeeder extends Seeder
                 'linen_towels_provided' => ['Yes', 'Yes (premium)', 'Bring your own'],
                 'kitchen_equipment_tier' => ['Basic', 'Full', 'Chef-ready'],
                 'occupancy_tax_or_vat_note' => 'input',
+            ],
+        ];
+    }
+
+    private function facilities(): array
+    {
+        return [
+            'slug' => 'facilities',
+            'name' => 'Facilities',
+            'requirements' => [
+                'type' => [
+                    'Factory / Warehouse',
+                    'Industrial Space',
+                    'Hotel / Guest House',
+                    'Hospital / Clinic',
+                    'School / Educational',
+                    'Church / Religious',
+                    'Event Centre / Hall',
+                    'Shopping Complex',
+                    'Filling Station',
+                    'Cold Room / Storage',
+                    'Office Complex',
+                    'Other',
+                ],
+                'area'          => 'input',
+                'area_unit'     => ['sqm', 'sqft', 'hectare', 'acre'],
+                'floors'        => 'input',
+                'capacity'      => 'input',
+                'water_supply'  => ['Borehole', 'Municipal', 'Water truck', 'Well'],
+                'power_supply'  => ['NEPA/PHCN only', 'Generator', 'Solar', 'Generator + Solar'],
+                'security'      => ['Fenced', 'Fenced + Guard', 'CCTV', 'CCTV + Guard'],
+                'parking_spaces' => 'input',
+                'condition'     => ['New', 'Good', 'Fair', 'Needs renovation'],
+                'available_for' => ['Sale', 'Lease', 'Lease + Purchase option'],
+                'year_built'    => 'input',
             ],
         ];
     }

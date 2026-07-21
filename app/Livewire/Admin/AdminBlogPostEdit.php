@@ -43,7 +43,7 @@ class AdminBlogPostEdit extends Component
         $this->content = $post->content;
         $this->category_id = $post->category_id;
         $this->property_id = $post->property_id;
-        $this->tagsInput = is_array($post->tags) ? implode(', ', $post->tags) : '';
+        $this->tagsInput = is_string($post->tags) ? $post->tags : (is_array($post->tags) ? implode(', ', $post->tags) : '');
         $this->status = $post->status;
         $this->content_source = $post->content_source ?? 'manual';
     }
@@ -67,7 +67,7 @@ class AdminBlogPostEdit extends Component
     {
         $this->validate();
 
-        $tags = array_values(array_filter(array_map('trim', explode(',', $this->tagsInput))));
+        $tagsString = implode(', ', array_values(array_filter(array_map('trim', explode(',', $this->tagsInput)))));
 
         $slug = Str::slug($this->title);
         if ($slug !== $this->post->slug) {
@@ -96,7 +96,7 @@ class AdminBlogPostEdit extends Component
             'property_id' => $this->property_id,
             'status' => $this->status,
             'published_at' => $publishedAt,
-            'tags' => $tags,
+            'tags'         => $tagsString ?: null,
             'content_source' => $this->content_source,
         ]);
 

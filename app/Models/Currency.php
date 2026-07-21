@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'is_default',
     'is_active',
     'payment_gateway',
+    'bank_details',
 ])]
 class Currency extends Model
 {
@@ -28,6 +29,7 @@ class Currency extends Model
         return [
             'is_default' => 'boolean',
             'is_active' => 'boolean',
+            'bank_details' => 'array',
         ];
     }
 

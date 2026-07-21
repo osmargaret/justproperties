@@ -14,9 +14,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             GeographySeeder::class,
             PermissionsRolesAndUsersSeeder::class,
+            UsersSeeder::class,
             CategoriesSeeder::class,
             PlansCouponsSeeder::class,
             SettingsSeeder::class,
+            BlogPostsSeeder::class,
+            PropertiesSeeder::class,
             PropertiesMediaSeeder::class,
             SubscriptionsAndPaymentsSeeder::class,
             UserEngagementSeeder::class,

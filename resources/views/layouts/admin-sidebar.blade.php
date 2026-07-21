@@ -36,6 +36,12 @@
         <a href="{{ route('admin.coupons') }}" class="{{ request()->routeIs('admin.coupons*') ? $navActive : $navIdle }}">
             <i class="ri-coupon-3-line text-xl"></i><span class="font-medium">Coupons</span>
         </a>
+        <a href="{{ route('admin.faqs') }}" class="{{ request()->routeIs('admin.faqs*') ? $navActive : $navIdle }}">
+            <i class="ri-question-answer-line text-xl"></i><span class="font-medium">FAQs</span>
+        </a>
+        <a href="{{ route('admin.advertisements') }}" class="{{ request()->routeIs('admin.advertisements*') ? $navActive : $navIdle }}">
+            <i class="ri-advertisement-line text-xl"></i><span class="font-medium">Advertisements</span>
+        </a>
 
         <details class="group" {{ $settingsOpen ? 'open' : '' }}>
             <summary class="{{ $summaryClass }}">

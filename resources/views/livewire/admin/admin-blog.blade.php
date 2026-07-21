@@ -37,7 +37,17 @@
                         <td class="px-4 py-3">{{ $post->created_at->format('Y-m-d') }}</td>
                         <td class="px-4 py-3">{{ $post->user?->name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $post->title }}</td>
-                        <td class="px-4 py-3">{{ $post->category?->name ?? '—' }} / {{ is_array($post->tags) ? implode(', ', $post->tags) : '—' }}</td>
+                        <td class="px-4 py-3">
+                            {{ $post->category?->name ?? '—' }} /
+                            @php $adminTags = $post->tags ? array_filter(array_map('trim', explode(',', $post->tags))) : []; @endphp
+                            @if(count($adminTags) > 0)
+                                @foreach($adminTags as $t)
+                                    <a href="{{ route('blog', ['tag' => $t]) }}" target="_blank" class="text-xs text-emerald-600 hover:underline">#{{ $t }}</a>{{ !$loop->last ? ', ' : '' }}
+                                @endforeach
+                            @else
+                                —
+                            @endif
+                        </td>
                         <td class="px-4 py-3">{{ $post->property?->name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $post->status }}</td>
                         <td class="px-4 py-3">

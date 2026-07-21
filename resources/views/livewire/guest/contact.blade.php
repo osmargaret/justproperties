@@ -69,35 +69,59 @@
         <h2 class="font-bold font-serif text-gray-900 mb-2 text-4xl leading-tight">Send us a Message</h2>
         <p class="text-gray-500 mb-8">Fill out the form below and we'll get back to you as soon as possible.</p>
         
-        <form id="contact-form" class="space-y-6">
+        @if (session('status'))
+            <div class="mb-6 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <form wire:submit.prevent="send" class="space-y-6">
           <div>
             <label for="name" class="block font-semibold text-gray-700 mb-2 text-sm">Full Name *</label>
-            <input type="text" id="name" name="name" required placeholder="Enter your full name" class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-base" />
+            <input type="text" id="name" wire:model="name" required placeholder="Enter your full name" class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-base" />
+            @error('name') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
           </div>
+          
           <div>
             <label for="email" class="block font-semibold text-gray-700 mb-2 text-sm">Email Address *</label>
-            <input type="email" id="email" name="email" required placeholder="your.email@example.com" class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-base" />
+            <input type="email" id="email" wire:model="email" required placeholder="your.email@example.com" class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-base" />
+            @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
           </div>
+          
           <div>
             <label for="phone" class="block font-semibold text-gray-700 mb-2 text-sm">Phone Number *</label>
-            <input type="tel" id="phone" name="phone" required placeholder="08012345678" class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-base" />
+            <input type="tel" id="phone" wire:model="phone" required placeholder="08012345678" class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-base" />
+            @error('phone') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
           </div>
+          
           <div>
             <label for="subject" class="block font-semibold text-gray-700 mb-2 text-sm">Subject *</label>
-            <select id="subject" name="subject" required class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition appearance-none bg-white text-base">
+            <select id="subject" wire:model="subject" required class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition appearance-none bg-white text-base">
               <option value="">Select a subject</option>
+              <option value="Feedback">Feedback</option>
+              <option value="Adverts">Adverts / Advertising</option>
               <option value="List Property">List a Property</option>
               <option value="Property Inquiry">Property Inquiry</option>
               <option value="Technical Support">Technical Support</option>
               <option value="Payment Issue">Payment Issue</option>
               <option value="General Question">General Question</option>
             </select>
+            @error('subject') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
           </div>
-          <div>
+          
+          <div x-data="{ count: @entangle('message').live.defer ? @entangle('message').live.defer.length : 0 }">
             <label for="message" class="block font-semibold text-gray-700 mb-2 text-sm">Message *</label>
-            <textarea id="message" name="message" required maxlength="500" placeholder="Tell us how we can help you..." class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition resize-none min-h-[120px] text-base"></textarea>
-            <p class="text-gray-400 text-right mt-1 text-xs">0/500 characters</p>
+            <textarea id="message" wire:model="message" x-on:input="count = $event.target.value.length" required maxlength="1000" placeholder="Tell us how we can help you..." class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition resize-none min-h-[120px] text-base"></textarea>
+            @error('message') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+            <p class="text-gray-400 text-right mt-1 text-xs"><span x-text="count"></span>/1000 characters</p>
           </div>
+
           <button type="submit" class="w-full py-4 text-white font-semibold rounded-lg transition-all hover:-translate-y-1 flex items-center justify-center gap-2 bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-700 hover:via-emerald-600 hover:to-emerald-500 shadow-md hover:shadow-lg text-base">
             <i class="ri-send-plane-line text-lg"></i>
             Send Message
@@ -118,30 +142,16 @@
     <section class="mt-16">
       <h2 class="font-bold font-serif text-gray-900 text-center mb-6 text-4xl leading-tight">Frequently Asked Questions</h2>
       <div class="grid md:grid-cols-2 gap-6">
-        <div class="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">How do I list my property?</h3>
-          <p class="text-gray-500 text-[0.95rem] leading-relaxed">Simply create an account, click on "List Property," fill in the details about your property, upload photos, and pay the one-time listing fee of ₦5,000. Your property will be live within 24 hours after approval.</p>
-        </div>
-        <div class="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">What payment methods do you accept?</h3>
-          <p class="text-gray-500 text-[0.95rem] leading-relaxed">We accept payments through Paystack, which supports debit/credit cards, bank transfers, and USSD payments. All transactions are secure and encrypted.</p>
-        </div>
-        <div class="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">How do I contact a property owner?</h3>
-          <p class="text-gray-500 text-[0.95rem] leading-relaxed">Each property listing displays the owner's phone number and WhatsApp contact. You can call, WhatsApp, or email them directly without any intermediaries.</p>
-        </div>
-        <div class="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">Is there a commission on sales?</h3>
-          <p class="text-gray-500 text-[0.95rem] leading-relaxed">No, JustProperties does not charge any commission on property sales or rentals. We only charge a one-time listing fee of ₦5,000 to property owners.</p>
-        </div>
-        <div class="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">How long does it take to get my property listed?</h3>
-          <p class="text-gray-500 text-[0.95rem] leading-relaxed">After submitting your property details and payment, our team reviews the listing within 24 hours. Once approved, your property will be visible to thousands of potential buyers and renters.</p>
-        </div>
-        <div class="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">Can I boost my property listing?</h3>
-          <p class="text-gray-500 text-[0.95rem] leading-relaxed">Yes, you can boost your listing for increased visibility. Boosted properties appear at the top of search results and receive more views. Contact us for boost pricing options.</p>
-        </div>
+        @forelse ($faqs as $faq)
+          <div class="bg-white rounded-2xl p-6 shadow-lg">
+            <h3 class="font-bold text-gray-900 mb-3 text-lg">{{ $faq->question }}</h3>
+            <p class="text-gray-500 text-[0.95rem] leading-relaxed">{{ $faq->answer }}</p>
+          </div>
+        @empty
+          <div class="col-span-2 bg-white rounded-2xl p-8 shadow-lg text-center text-gray-500">
+            No FAQs are configured to show on the contact page at the moment.
+          </div>
+        @endforelse
       </div>
     </section>
   </main>

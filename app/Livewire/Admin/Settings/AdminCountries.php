@@ -89,14 +89,14 @@ class AdminCountries extends Component
         ]);
 
         $payload = [
-            'name' => $this->name,
-            'code' => $this->code !== '' ? strtoupper($this->code) : null,
-            'slug' => $this->slug !== '' ? Str::slug($this->slug) : null,
-            'flag' => $this->flag !== '' ? $this->flag : null,
-            'phone_code' => $this->phone_code !== '' ? $this->phone_code : null,
+            'name'          => $this->name,
+            'code'          => $this->code !== '' ? strtoupper($this->code) : null,
+            'slug'          => $this->slug !== '' ? Str::slug($this->slug) : null,
+            'flag'          => $this->flag !== '' ? $this->flag : null,
+            'phone_code'    => $this->phone_code !== '' ? $this->phone_code : null,
             'language_code' => $this->language_code !== '' ? $this->language_code : null,
-            'is_active' => $this->is_active,
-            'currency_id' => $this->currency_id,
+            'is_active'     => $this->is_active,
+            'currency_id'   => $this->currency_id,
         ];
 
         if ($this->editingId) {

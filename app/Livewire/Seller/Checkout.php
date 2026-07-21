@@ -11,10 +11,12 @@ use App\Models\Subscription;
 use App\Services\Payments\CompletesPayment;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Checkout extends Component
 {
     use PaymentTrait;
+    use WithFileUploads;
 
     public Payment $payment;
 
@@ -24,26 +26,43 @@ class Checkout extends Component
     public ?string $couponMessage = null;
     public bool $couponSuccess = false;
 
+    public string $paymentMethod = '';
+    public $receiptFile;
+
     public function mount(Payment $payment): void
     {
         abort_unless($payment->user_id === Auth::id(), 403);
 
         $this->payment = $payment->load(['currency', 'paymentable', 'user']);
 
-        if ($this->payment->status === 'success') {
+        if ($this->payment->isCompleted()) {
             session()->flash('status', __('This payment has already been completed.'));
 
             return;
         }
 
         $gateway = $this->payment->currency?->payment_gateway;
-        if (! $gateway) {
-            $this->gatewayError = __('No payment gateway is configured for this currency. Ask an admin to set one under Settings → Currencies.');
-        } elseif (! $this->gatewayIsConfigured($gateway)) {
-            $this->gatewayError = __('Payment gateway credentials are missing in the server environment.');
+        $hasBankDetails = ! empty($this->payment->currency?->bank_details);
+
+        if (! $gateway && ! $hasBankDetails) {
+            $this->gatewayError = __('No payment method is configured for this currency. Ask an admin to set one under Settings → Currencies.');
+        } elseif ($gateway && ! $this->gatewayIsConfigured($gateway)) {
+            if ($hasBankDetails) {
+                $this->paymentMethod = 'bank_transfer';
+            } else {
+                $this->gatewayError = __('Payment gateway credentials are missing in the server environment.');
+            }
         } else {
-            $this->payment->method = $gateway;
-            $this->payment->gateway = $gateway;
+            if ($gateway) {
+                $this->paymentMethod = $gateway;
+            } elseif ($hasBankDetails) {
+                $this->paymentMethod = 'bank_transfer';
+            }
+        }
+
+        if ($this->paymentMethod && $this->paymentMethod !== 'bank_transfer') {
+            $this->payment->method = $this->paymentMethod;
+            $this->payment->gateway = $this->paymentMethod;
             $this->payment->save();
         }
     }
@@ -73,7 +92,24 @@ class Checkout extends Component
 
     public function pay(): mixed
     {
-        if ($this->payment->status === 'success') {
+        if ($this->payment->isCompleted()) {
+            return $this->redirectAfterPayment();
+        }
+
+        if ($this->paymentMethod === 'bank_transfer') {
+            $this->validate([
+                'receiptFile' => ['required', 'file', 'image', 'max:5120'], // 5MB max
+            ]);
+
+            $path = $this->receiptFile->store('receipts', 'public');
+            $this->payment->method = 'bank_transfer';
+            $this->payment->gateway = 'bank_transfer';
+            $this->payment->receipt = $path;
+            $this->payment->status = 'pending';
+            $this->payment->save();
+
+            session()->flash('status', __('Receipt uploaded successfully. Your payment is awaiting admin verification.'));
+
             return $this->redirectAfterPayment();
         }
 

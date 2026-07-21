@@ -13,12 +13,12 @@ class CompletesPayment
 {
     public function complete(Payment $payment, ?string $gatewayMethod = null, ?array $gatewayPayload = null): void
     {
-        if ($payment->status === 'success') {
+        if ($payment->status === 'completed' || $payment->status === 'success') {
             return;
         }
 
         DB::transaction(function () use ($payment, $gatewayMethod, $gatewayPayload) {
-            $payment->status = 'success';
+            $payment->status = 'completed';
             $payment->paid_at = now();
             if ($gatewayMethod) {
                 $payment->method = $gatewayMethod;

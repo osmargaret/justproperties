@@ -30,9 +30,8 @@ class Post extends Model
     protected function casts(): array
     {
         return [
-            'tags' => 'array',
             'action_counts' => 'array',
-            'published_at' => 'datetime',
+            'published_at'  => 'datetime',
             'ai_generated_at' => 'datetime',
         ];
     }

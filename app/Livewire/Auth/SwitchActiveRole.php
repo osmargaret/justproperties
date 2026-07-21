@@ -6,14 +6,21 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
+
 #[Layout('layouts.auth')]
 class SwitchActiveRole extends Component
 {
+    use WithFileUploads;
+
     public $user;
 
     public $isAdmin;
 
     public $role;
+
+    public $photo;
 
     public function mount(): void
     {
@@ -51,6 +58,25 @@ class SwitchActiveRole extends Component
         $user->save();
 
         $this->redirect($user->fresh()->dashboard_url);
+    }
+
+    public function updatedPhoto()
+    {
+        $this->validate([
+            'photo' => 'image|max:2048', // 2MB Max
+        ]);
+
+        $path = $this->photo->store('profile-photos', 'public');
+
+        $user = Auth::user();
+        if ($user && $user->photo) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        if ($user) {
+            $user->photo = $path;
+            $user->save();
+        }
     }
 
     public function render()

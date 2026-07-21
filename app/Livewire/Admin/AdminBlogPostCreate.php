@@ -52,7 +52,7 @@ class AdminBlogPostCreate extends Component
     {
         $this->validate();
 
-        $tags = array_values(array_filter(array_map('trim', explode(',', $this->tagsInput))));
+        $tagsString = implode(', ', array_values(array_filter(array_map('trim', explode(',', $this->tagsInput)))));
 
         $slug = Str::slug($this->title);
         $base = $slug;
@@ -72,7 +72,7 @@ class AdminBlogPostCreate extends Component
             'content_source' => $this->content_source,
             'status' => $this->status,
             'published_at' => $this->status === 'published' ? now() : null,
-            'tags' => $tags,
+            'tags'           => $tagsString ?: null,
         ]);
 
         if ($this->featuredImage) {

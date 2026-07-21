@@ -165,21 +165,116 @@
 
         {{ $slot }}
 
-    
-        <livewire:guest.footer />
-        <button
-            class="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 flex items-center justify-center group cursor-pointer"
-            aria-label="WhatsApp Support">
-            <i class="ri-customer-service-2-line text-xl sm:text-2xl group-hover:scale-110 transition-transform"></i>
-            <div
-                class="absolute right-full mr-3 sm:mr-4 bg-gray-900 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap hidden sm:block">
-                Need Help? Chat with us
-                <div class="absolute top-1/2 -right-1 -translate-y-1/2 w-2 h-2 bg-gray-900 transform rotate-45">
+        {{-- FAQ Chat Widget --}}
+        @php
+            $widgetFaqs = \App\Models\Faq::query()->where('is_active', true)->latest()->get();
+        @endphp
+
+        {{-- FAQ Panel --}}
+        <div id="faqPanel" class="fixed bottom-6 right-4 sm:right-6 z-50 hidden w-80 sm:w-96 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-gray-200 max-h-[70vh]" style="display:none;">
+            <div class="flex items-center justify-between bg-emerald-600 px-4 py-3">
+                <div class="flex items-center gap-2 text-white">
+                    <i class="ri-question-answer-line text-lg"></i>
+                    <span class="font-semibold text-sm">Frequently Asked Questions</span>
                 </div>
+                <button id="faqClose" class="text-white hover:text-emerald-200 transition-colors" aria-label="Close FAQ panel">
+                    <i class="ri-close-line text-xl"></i>
+                </button>
+            </div>
+
+            {{-- Question list view --}}
+            <div id="faqList" class="flex-1 overflow-y-auto divide-y divide-gray-100">
+                @forelse($widgetFaqs as $faq)
+                    <button type="button"
+                        class="faq-question-btn w-full text-left px-4 py-3 hover:bg-emerald-50 transition-colors text-sm text-gray-700 flex items-center justify-between gap-2 group"
+                        data-question="{{ e($faq->question) }}"
+                        data-answer="{{ e($faq->answer) }}">
+                        <span class="flex-1 leading-snug">{{ $faq->question }}</span>
+                        <i class="ri-arrow-right-s-line text-gray-400 group-hover:text-emerald-600 shrink-0"></i>
+                    </button>
+                @empty
+                    <p class="px-4 py-6 text-sm text-gray-400 text-center">No FAQs available right now.</p>
+                @endforelse
+            </div>
+
+            {{-- Answer view (hidden by default) --}}
+            <div id="faqAnswer" class="hidden flex-col" style="display:none;">
+                <button type="button" id="faqBackBtn" class="flex items-center gap-1 px-4 py-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium border-b border-gray-100 transition-colors">
+                    <i class="ri-arrow-left-s-line"></i> Back to questions
+                </button>
+                <div class="flex-1 overflow-y-auto px-4 py-4">
+                    <h3 id="faqAnswerQuestion" class="font-semibold text-gray-800 text-sm mb-3 leading-snug"></h3>
+                    <p id="faqAnswerText" class="text-sm text-gray-600 leading-relaxed"></p>
+                </div>
+                <div class="border-t border-gray-100 px-4 py-3 text-xs text-gray-400 text-center">
+                    Still need help? <a href="{{ route('contact') }}" class="text-emerald-600 hover:underline">Contact us</a>
+                </div>
+            </div>
+        </div>
+
+        {{-- Support / FAQ toggle button --}}
+        <button id="faqToggle"
+            class="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 flex items-center justify-center group cursor-pointer"
+            aria-label="FAQ Support">
+            <i class="ri-customer-service-2-line text-xl sm:text-2xl group-hover:scale-110 transition-transform"></i>
+            <div class="absolute right-full mr-3 sm:mr-4 bg-gray-900 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap hidden sm:block">
+                Need Help? View FAQs
+                <div class="absolute top-1/2 -right-1 -translate-y-1/2 w-2 h-2 bg-gray-900 transform rotate-45"></div>
             </div>
             <span class="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75"></span>
         </button>
-    </div>
+        <livewire:guest.footer />
+        <script>
+        (function () {
+            const panel      = document.getElementById('faqPanel');
+            const toggleBtn  = document.getElementById('faqToggle');
+            const closeBtn   = document.getElementById('faqClose');
+            const backBtn    = document.getElementById('faqBackBtn');
+            const listView   = document.getElementById('faqList');
+            const answerView = document.getElementById('faqAnswer');
+            const answerQ    = document.getElementById('faqAnswerQuestion');
+            const answerT    = document.getElementById('faqAnswerText');
+            const qBtns      = document.querySelectorAll('.faq-question-btn');
+
+            function openPanel() {
+                panel.style.display = 'flex';
+                panel.style.flexDirection = 'column';
+                toggleBtn.style.display = 'none';
+                showList();
+            }
+
+            function closePanel() {
+                panel.style.display = 'none';
+                toggleBtn.style.display = 'flex';
+            }
+
+            function showList() {
+                listView.style.display = 'block';
+                answerView.style.display = 'none';
+                answerView.classList.add('hidden');
+            }
+
+            function showAnswer(question, answer) {
+                answerQ.textContent = question;
+                answerT.textContent = answer;
+                listView.style.display = 'none';
+                answerView.style.display = 'flex';
+                answerView.style.flexDirection = 'column';
+                answerView.classList.remove('hidden');
+            }
+
+            toggleBtn.addEventListener('click', openPanel);
+            closeBtn.addEventListener('click', closePanel);
+            backBtn.addEventListener('click', showList);
+
+            qBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    showAnswer(btn.dataset.question, btn.dataset.answer);
+                });
+            });
+        })();
+        </script>
+
 
     <script>
         // Mobile menu toggle

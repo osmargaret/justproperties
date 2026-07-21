@@ -50,7 +50,7 @@ class AdminCategories extends Component
 
     public function mount(): void
     {
-        $this->selectedCategoryId = Category::query()->orderBy('name','asc')->value('id');
+        $this->selectedCategoryId = Category::query()->where('is_property', true)->orderBy('name','asc')->value('id');
         $this->loadCategoryMeta();
     }
 
@@ -272,6 +272,7 @@ class AdminCategories extends Component
     public function render(): View
     {
         $categories = Category::query()
+            ->where('is_property', true)
             ->withCount('settings')
             ->orderBy('name','asc')
             ->get();

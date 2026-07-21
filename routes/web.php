@@ -9,6 +9,8 @@ use App\Livewire\Admin\AdminCouponCreate;
 use App\Livewire\Admin\AdminCouponEdit;
 use App\Livewire\Admin\AdminCoupons;
 use App\Livewire\Admin\AdminDashboard;
+use App\Livewire\Admin\AdminFaqs;
+use App\Livewire\Admin\AdminAdvertisements;
 use App\Livewire\Admin\AdminModerations;
 use App\Livewire\Admin\AdminPayments;
 use App\Livewire\Admin\AdminPromotions;
@@ -36,6 +38,7 @@ use App\Livewire\Buyer\PropertyAlerts;
 use App\Livewire\Buyer\SavedBlogPosts;
 use App\Livewire\Buyer\Security;
 use App\Livewire\Guest\About;
+use App\Livewire\Guest\Advertise;
 use App\Livewire\Guest\BlogPost;
 use App\Livewire\Guest\BlogRoll;
 use App\Livewire\Guest\CompletedProperty;
@@ -44,6 +47,7 @@ use App\Livewire\Guest\LandedProperty;
 use App\Livewire\Guest\PrivacyPolicy;
 use App\Livewire\Guest\RentLease;
 use App\Livewire\Guest\ShortLet;
+use App\Livewire\Guest\Pricing;
 use App\Livewire\Guest\TermsOfService;
 use App\Livewire\Guest\UncompletedProperty;
 use App\Livewire\Guest\Welcome;
@@ -71,7 +75,8 @@ require __DIR__.'/auth.php';
 /* Guest Routes */
 Route::get('about', About::class)->name('about');
 Route::get('contact', Contact::class)->name('contact');
-Route::view('pricing', 'livewire.plan')->name('pricing');
+Route::get('advertise', Advertise::class)->name('advertise');
+Route::get('pricing', Pricing::class)->name('pricing');
 Route::get('privacy-policy', PrivacyPolicy::class)->name('privacy-policy');
 Route::get('terms-of-service', TermsOfService::class)->name('terms-of-service');
 
@@ -110,6 +115,8 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('coupons', AdminCoupons::class)->name('coupons');
         Route::get('coupons/create', AdminCouponCreate::class)->name('coupons.create');
         Route::get('coupons/{coupon}/edit', AdminCouponEdit::class)->whereNumber('coupon')->name('coupons.edit');
+        Route::get('faqs', AdminFaqs::class)->name('faqs');
+        Route::get('advertisements', AdminAdvertisements::class)->name('advertisements');
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('general', AdminGeneral::class)->name('general');
             Route::get('categories', AdminCategories::class)->name('categories');

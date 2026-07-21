@@ -17,7 +17,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'email', 'password', 'phone', 'active_role', 'country_id', 'role_id', 'suspended_at', 'govt_id_number', 'govt_id_expiry', 'address', 'verified_at'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'active_role', 'country_id', 'role_id', 'suspended_at', 'govt_id_number', 'govt_id_expiry', 'address', 'verified_at', 'photo'])]
 #[Hidden(['password', 'remember_token'])]
 #[ObservedBy([UserObserver::class])]
 
@@ -138,6 +138,15 @@ class User extends Authenticatable implements MustVerifyEmailContract
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    protected function profilePhotoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->photo 
+                ? asset('storage/' . $this->photo) 
+                : 'https://randomuser.me/api/portraits/men/32.jpg'
+        );
     }
 
     protected function position(): Attribute

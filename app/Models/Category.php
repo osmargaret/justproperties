@@ -19,13 +19,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Field definitions for forms live in {@see CategorySetting} (`category_settings` table).
  * The legacy `requirements` JSON column is deprecated: keep null and use {@see self::settings()} only.
  */
-#[Fillable(['name', 'slug', 'requirements'])]
+#[Fillable(['name', 'slug', 'requirements', 'is_property'])]
 class Category extends Model
 {
     protected function casts(): array
     {
         return [
             'requirements' => 'array',
+            'is_property' => 'boolean',
         ];
     }
 

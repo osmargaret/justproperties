@@ -36,7 +36,7 @@ class PaymentCallback extends Component
             return redirect()->route('seller.listed-properties');
         }
 
-        if ($payment->status === 'success') {
+        if ($payment->isCompleted()) {
             return $this->redirectAfterPayment($payment);
         }
 

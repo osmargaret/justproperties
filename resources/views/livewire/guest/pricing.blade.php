@@ -1,1211 +1,298 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subscription Plans - JustProperties</title>
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css" />
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f3f4f6 0%, #f9fafb 100%);
-      color: #111827;
-      line-height: 1.5;
-      min-height: 100vh;
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Playfair Display', serif;
-    }
-
-    /* Navigation */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      background: white;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    .nav-container {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 70px;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .nav-brand img {
-      height: 40px;
-      width: auto;
-    }
-
-    .nav-brand h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #111827;
-    }
-
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 1rem;
-      background: #f3f4f6;
-      border-radius: 2rem;
-      cursor: pointer;
-    }
-
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #059669;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 600;
-    }
-
-    /* Main Content */
-    .main-content {
-      max-width: 1280px;
-      margin: 90px auto 2rem;
-      padding: 0 1rem;
-    }
-
-    /* Header */
-    .page-header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .page-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 1rem;
-    }
-
-    .page-subtitle {
-      font-size: 1.125rem;
-      color: #6b7280;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* Billing Toggle */
-    .billing-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 3rem;
-    }
-
-    .toggle-label {
-      font-weight: 500;
-      color: #374151;
-    }
-
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 32px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #e5e7eb;
-      transition: .3s;
-      border-radius: 34px;
-    }
-
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 24px;
-      width: 24px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
-    }
-
-    input:checked + .toggle-slider {
-      background-color: #059669;
-    }
-
-    input:checked + .toggle-slider:before {
-      transform: translateX(28px);
-    }
-
-    .save-badge {
-      background: #dcfce7;
-      color: #059669;
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    /* Plans Grid */
-    .plans-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
-    @media (min-width: 640px) {
-      .plans-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .plans-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .plan-card {
-      background: white;
-      border-radius: 1.5rem;
-      padding: 2rem 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      position: relative;
-      border: 2px solid transparent;
-    }
-
-    .plan-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-    }
-
-    .plan-card.popular {
-      border-color: #059669;
-      transform: scale(1.05);
-      z-index: 10;
-    }
-
-    .plan-card.popular:hover {
-      transform: scale(1.05) translateY(-8px);
-    }
-
-    .popular-badge {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #059669;
-      color: white;
-      padding: 0.25rem 1.5rem;
-      border-radius: 2rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .plan-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .plan-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .plan-price {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #059669;
-      margin-bottom: 0.25rem;
-    }
-
-    .plan-price span {
-      font-size: 1rem;
-      font-weight: 400;
-      color: #6b7280;
-    }
-
-    .plan-period {
-      font-size: 0.875rem;
-      color: #6b7280;
-    }
-
-    .plan-savings {
-      font-size: 0.75rem;
-      color: #059669;
-      font-weight: 600;
-      margin-top: 0.5rem;
-    }
-
-    .plan-features {
-      list-style: none;
-      margin-bottom: 2rem;
-    }
-
-    .plan-features li {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid #f3f4f6;
-      font-size: 0.875rem;
-    }
-
-    .plan-features li:last-child {
-      border-bottom: none;
-    }
-
-    .plan-features i {
-      color: #059669;
-      font-size: 1.125rem;
-    }
-
-    .plan-features .unavailable {
-      color: #d1d5db;
-    }
-
-    .plan-features .unavailable i {
-      color: #d1d5db;
-    }
-
-    .plan-btn {
-      width: 100%;
-      padding: 1rem;
-      background: transparent;
-      border: 2px solid #059669;
-      color: #059669;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .plan-btn:hover,
-    .plan-btn.current {
-      background: #059669;
-      color: white;
-    }
-
-    .plan-btn.current {
-      cursor: default;
-    }
-
-    /* Feature Comparison Table */
-    .comparison-section {
-      background: white;
-      border-radius: 1.5rem;
-      padding: 2rem;
-      margin-bottom: 3rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-
-    .section-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 2rem;
-    }
-
-    .comparison-table {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    .comparison-table table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .comparison-table th {
-      text-align: left;
-      padding: 1rem;
-      background: #f9fafb;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    .comparison-table td {
-      padding: 1rem;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .comparison-table .feature-name {
-      font-weight: 500;
-    }
-
-    .comparison-table .check {
-      color: #059669;
-      font-size: 1.25rem;
-    }
-
-    .comparison-table .times {
-      color: #ef4444;
-      font-size: 1.25rem;
-    }
-
-    .comparison-table .highlight {
-      background: #f0fdf4;
-    }
-
-    /* FAQ Section */
-    .faq-section {
-      margin-bottom: 3rem;
-    }
-
-    .faq-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    @media (min-width: 640px) {
-      .faq-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .faq-item {
-      background: white;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .faq-item:hover {
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    }
-
-    .faq-question {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .faq-answer {
-      font-size: 0.875rem;
-      color: #6b7280;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-
-    .faq-item.active .faq-answer {
-      max-height: 200px;
-      margin-top: 1rem;
-    }
-
-    .faq-item.active .faq-question i {
-      transform: rotate(180deg);
-    }
-
-    /* Payment Methods */
-    .payment-section {
-      background: white;
-      border-radius: 1.5rem;
-      padding: 2rem;
-      margin-bottom: 3rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-
-    .payment-methods {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-      margin: 2rem 0;
-    }
-
-    .payment-method {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 1rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 0.75rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .payment-method:hover {
-      border-color: #059669;
-    }
-
-    .payment-method.selected {
-      border-color: #059669;
-      background: #f0fdf4;
-    }
-
-    .payment-method input[type="radio"] {
-      width: 1.25rem;
-      height: 1.25rem;
-      accent-color: #059669;
-    }
-
-    .payment-method img {
-      height: 24px;
-      width: auto;
-    }
-
-    .payment-method span {
-      font-weight: 500;
-    }
-
-    /* Promo Code */
-    .promo-section {
-      display: flex;
-      gap: 1rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-
-    .promo-input {
-      flex: 1;
-      min-width: 250px;
-      padding: 1rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 0.75rem;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    .promo-input:focus {
-      outline: none;
-      border-color: #059669;
-    }
-
-    .promo-btn {
-      padding: 1rem 2rem;
-      background: #059669;
-      color: white;
-      border: none;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .promo-btn:hover {
-      background: #047857;
-    }
-
-    /* Order Summary */
-    .order-summary {
-      background: #f9fafb;
-      border-radius: 1rem;
-      padding: 1.5rem;
-    }
-
-    .summary-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    .summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .summary-total {
-      display: flex;
-      justify-content: space-between;
-      padding: 1rem 0;
-      font-weight: 700;
-      font-size: 1.125rem;
-    }
-
-    .summary-total .amount {
-      color: #059669;
-      font-size: 1.5rem;
-    }
-
-    .checkout-btn {
-      width: 100%;
-      padding: 1rem;
-      background: #059669;
-      color: white;
-      border: none;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      font-size: 1.125rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 1rem;
-    }
-
-    .checkout-btn:hover {
-      background: #047857;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    }
-
-    .secure-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      color: #6b7280;
-      font-size: 0.875rem;
-    }
-
-    .secure-badge i {
-      color: #059669;
-    }
-
-    /* Testimonials */
-    .testimonials-section {
-      margin: 3rem 0;
-    }
-
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    @media (min-width: 640px) {
-      .testimonials-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .testimonials-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .testimonial-card {
-      background: white;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-
-    .testimonial-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .testimonial-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .testimonial-name {
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    .testimonial-plan {
-      font-size: 0.75rem;
-      color: #059669;
-      font-weight: 500;
-    }
-
-    .testimonial-text {
-      font-size: 0.875rem;
-      color: #4b5563;
-      margin-bottom: 1rem;
-      line-height: 1.6;
-    }
-
-    .testimonial-rating {
-      color: #fbbf24;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .page-title {
-        font-size: 2rem;
-      }
-
-      .plan-card.popular {
-        transform: scale(1);
-      }
-
-      .plan-card.popular:hover {
-        transform: translateY(-8px);
-      }
-
-      .sub-details {
-        flex-direction: column;
-        gap: 1rem;
-        width: 100%;
-      }
-
-      .sub-actions {
-        width: 100%;
-      }
-
-      .sub-btn {
-        flex: 1;
-      }
-    }
-  </style>
-</head>
-<body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="{{ route('welcome') }}" class="nav-brand">
-        <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="JustProperties" />
-        <h1>JustProperties</h1>
-      </a>
-
-      <div class="user-menu">
-        <div class="user-info" onclick="alert('User menu (Demo)')">
-          <div class="user-avatar">JD</div>
-          <span>John Doe</span>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Page Header -->
-    <div class="page-header">
-      <h1 class="page-title">Choose Your Perfect Plan</h1>
-      <p class="page-subtitle">Select a subscription that fits your needs. All plans include access to our property listing platform.</p>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30" data-navbar="solid">
+
+    {{-- Page Header --}}
+    <div class="pt-28 pb-12 text-center px-4">
+        <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
+            Subscription Plans
+        </span>
+        <h1 class="font-serif text-4xl sm:text-5xl font-bold text-gray-900 mb-4">Choose Your Perfect Plan</h1>
+        <p class="text-lg text-gray-500 max-w-xl mx-auto">
+            Select a subscription that fits your needs. All plans include access to our property listing platform.
+        </p>
     </div>
 
-    
-
-    <!-- Billing Toggle -->
-    <div class="billing-toggle">
-      <span class="toggle-label">Monthly</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="billingToggle" checked onchange="toggleBilling()">
-        <span class="toggle-slider"></span>
-      </label>
-      <span class="toggle-label">Yearly</span>
-      <span class="save-badge">Save up to 30%</span>
-    </div>
-
-    <!-- Plans Grid -->
-    <div class="plans-grid">
-      <!-- Free Plan -->
-      <div class="plan-card">
-        <div class="plan-header">
-          <div class="plan-name">Free</div>
-          <div class="plan-price">₦0 <span>/month</span></div>
-          <div class="plan-period">Free forever</div>
-        </div>
-        <ul class="plan-features">
-          <li><i class="ri-check-line"></i> 1 property listing</li>
-          <li><i class="ri-check-line"></i> Standard visibility</li>
-          <li><i class="ri-check-line"></i> Basic analytics</li>
-          <li><i class="ri-check-line"></i> Email support</li>
-          <li class="unavailable"><i class="ri-close-line"></i> Featured listing</li>
-          <li class="unavailable"><i class="ri-close-line"></i> WhatsApp business</li>
-        </ul>
-        <button class="plan-btn" onclick="selectPlan('free')">Get Started</button>
-      </div>
-
-      <!-- Basic Plan -->
-      <div class="plan-card">
-        <div class="plan-header">
-          <div class="plan-name">Basic</div>
-          <div class="plan-price" id="basic-price">₦5,000 <span>/month</span></div>
-          <div class="plan-period" id="basic-period">Billed monthly</div>
-          <div class="plan-savings" id="basic-savings"></div>
-        </div>
-        <ul class="plan-features">
-          <li><i class="ri-check-line"></i> 3 property listings</li>
-          <li><i class="ri-check-line"></i> Standard visibility</li>
-          <li><i class="ri-check-line"></i> Basic analytics</li>
-          <li><i class="ri-check-line"></i> Email support</li>
-          <li><i class="ri-check-line"></i> WhatsApp support</li>
-          <li class="unavailable"><i class="ri-close-line"></i> Featured listing</li>
-        </ul>
-        <button class="plan-btn" onclick="selectPlan('basic')">Select Basic</button>
-      </div>
-
-      <!-- Professional Plan (Popular) -->
-      <div class="plan-card popular">
-        <div class="popular-badge">MOST POPULAR</div>
-        <div class="plan-header">
-          <div class="plan-name">Professional</div>
-          <div class="plan-price" id="pro-price">₦12,000 <span>/month</span></div>
-          <div class="plan-period" id="pro-period">Billed monthly</div>
-          <div class="plan-savings" id="pro-savings"></div>
-        </div>
-        <ul class="plan-features">
-          <li><i class="ri-check-line"></i> 10 property listings</li>
-          <li><i class="ri-check-line"></i> Featured visibility</li>
-          <li><i class="ri-check-line"></i> Advanced analytics</li>
-          <li><i class="ri-check-line"></i> Priority support</li>
-          <li><i class="ri-check-line"></i> WhatsApp business</li>
-          <li><i class="ri-check-line"></i> 1 featured listing</li>
-        </ul>
-        <button class="plan-btn current" onclick="selectPlan('professional')">Current Plan</button>
-      </div>
-
-      <!-- Business Plan -->
-      <div class="plan-card">
-        <div class="plan-header">
-          <div class="plan-name">Business</div>
-          <div class="plan-price" id="business-price">₦25,000 <span>/month</span></div>
-          <div class="plan-period" id="business-period">Billed monthly</div>
-          <div class="plan-savings" id="business-savings"></div>
-        </div>
-        <ul class="plan-features">
-          <li><i class="ri-check-line"></i> Unlimited listings</li>
-          <li><i class="ri-check-line"></i> Premium visibility</li>
-          <li><i class="ri-check-line"></i> Real-time analytics</li>
-          <li><i class="ri-check-line"></i> 24/7 phone support</li>
-          <li><i class="ri-check-line"></i> Dedicated account manager</li>
-          <li><i class="ri-check-line"></i> 5 featured listings</li>
-        </ul>
-        <button class="plan-btn" onclick="selectPlan('business')">Select Business</button>
-      </div>
-    </div>
-
-    <!-- Feature Comparison Table -->
-    <div class="comparison-section">
-      <h2 class="section-title">Compare All Features</h2>
-      <div class="comparison-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>Free</th>
-              <th>Basic</th>
-              <th>Professional</th>
-              <th>Business</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="feature-name">Monthly Listings</td>
-              <td>1</td>
-              <td>3</td>
-              <td>10</td>
-              <td>Unlimited</td>
-            </tr>
-            <tr>
-              <td class="feature-name">Listing Duration</td>
-              <td>30 days</td>
-              <td>60 days</td>
-              <td>90 days</td>
-              <td>Permanent</td>
-            </tr>
-            <tr>
-              <td class="feature-name">Featured Listings</td>
-              <td><i class="times ri-close-line"></i></td>
-              <td><i class="times ri-close-line"></i></td>
-              <td>1 per month</td>
-              <td>5 per month</td>
-            </tr>
-            <tr>
-              <td class="feature-name">Visibility Boost</td>
-              <td>Standard</td>
-              <td>Standard</td>
-              <td>Featured</td>
-              <td>Premium</td>
-            </tr>
-            <tr>
-              <td class="feature-name">Analytics</td>
-              <td>Basic</td>
-              <td>Basic</td>
-              <td>Advanced</td>
-              <td>Real-time</td>
-            </tr>
-            <tr>
-              <td class="feature-name">Support</td>
-              <td>Email</td>
-              <td>Email + WhatsApp</td>
-              <td>Priority</td>
-              <td>24/7 Phone</td>
-            </tr>
-            <tr>
-              <td class="feature-name">Verified Owner Badge</td>
-              <td><i class="times ri-close-line"></i></td>
-              <td><i class="check ri-check-line"></i></td>
-              <td><i class="check ri-check-line"></i></td>
-              <td><i class="check ri-check-line"></i></td>
-            </tr>
-            <tr>
-              <td class="feature-name">Bulk Upload</td>
-              <td><i class="times ri-close-line"></i></td>
-              <td><i class="times ri-close-line"></i></td>
-              <td><i class="check ri-check-line"></i></td>
-              <td><i class="check ri-check-line"></i></td>
-            </tr>
-            <tr>
-              <td class="feature-name">API Access</td>
-              <td><i class="times ri-close-line"></i></td>
-              <td><i class="times ri-close-line"></i></td>
-              <td><i class="times ri-close-line"></i></td>
-              <td><i class="check ri-check-line"></i></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Payment Section -->
-    <div class="payment-section">
-      <h2 class="section-title">Complete Your Subscription</h2>
-      
-      <!-- Selected Plan Summary -->
-      <div class="order-summary" style="margin-bottom: 2rem;">
-        <div class="summary-title">Order Summary</div>
-        <div class="summary-item">
-          <span>Professional Plan</span>
-          <span id="selected-plan-price">₦12,000</span>
-        </div>
-        <div class="summary-item">
-          <span>Billing Period</span>
-          <span id="selected-billing">Monthly</span>
-        </div>
-        <div class="summary-item">
-          <span>VAT (7.5%)</span>
-          <span id="vat-amount">₦900</span>
-        </div>
-        <div class="summary-total">
-          <span>Total</span>
-          <span class="amount" id="total-amount">₦12,900</span>
-        </div>
-      </div>
-
-      <!-- Payment Methods -->
-      <h3 style="margin-bottom: 1rem;">Select Payment Method</h3>
-      <div class="payment-methods">
-        <label class="payment-method selected" onclick="selectPayment(this)">
-          <input type="radio" name="payment" checked>
-          <img src="https://public.readdy.ai/ai/img_res/card-payment.svg" alt="Card">
-          <span>Card</span>
-        </label>
-        <label class="payment-method" onclick="selectPayment(this)">
-          <input type="radio" name="payment">
-          <img src="https://public.readdy.ai/ai/img_res/paystack.svg" alt="Paystack">
-          <span>Paystack</span>
-        </label>
-        <label class="payment-method" onclick="selectPayment(this)">
-          <input type="radio" name="payment">
-          <img src="https://public.readdy.ai/ai/img_res/bank-transfer.svg" alt="Bank">
-          <span>Bank Transfer</span>
-        </label>
-        <label class="payment-method" onclick="selectPayment(this)">
-          <input type="radio" name="payment">
-          <img src="https://public.readdy.ai/ai/img_res/usdt.svg" alt="USDT">
-          <span>USDT</span>
-        </label>
-      </div>
-
-      <!-- Promo Code -->
-      <div class="promo-section">
-        <input type="text" class="promo-input" placeholder="Enter promo code" id="promoCode">
-        <button class="promo-btn" onclick="applyPromo()">Apply</button>
-      </div>
-
-      <!-- Checkout Button -->
-      <button class="checkout-btn" onclick="checkout()">
-        <i class="ri-lock-line"></i>
-        Proceed to Payment
-      </button>
-      <div class="secure-badge">
-        <i class="ri-shield-check-line"></i>
-        <span>Secured by Paystack • 256-bit SSL Encrypted</span>
-      </div>
-    </div>
-
-    <!-- FAQ Section -->
-    <div class="faq-section">
-      <h2 class="section-title">Frequently Asked Questions</h2>
-      <div class="faq-grid">
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            Can I switch plans anytime?
-            <i class="ri-arrow-down-s-line"></i>
-          </div>
-          <div class="faq-answer">
-            Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
-          </div>
-        </div>
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            What payment methods do you accept?
-            <i class="ri-arrow-down-s-line"></i>
-          </div>
-          <div class="faq-answer">
-            We accept all major credit/debit cards, Paystack, bank transfers, and USDT cryptocurrency.
-          </div>
-        </div>
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            Is there a refund policy?
-            <i class="ri-arrow-down-s-line"></i>
-          </div>
-          <div class="faq-answer">
-            Yes, we offer a 14-day money-back guarantee if you're not satisfied with our service.
-          </div>
-        </div>
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            What happens to my listings if I cancel?
-            <i class="ri-arrow-down-s-line"></i>
-          </div>
-          <div class="faq-answer">
-            Your listings will remain active until the end of your billing period. You can renew anytime.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Testimonials -->
-    <div class="testimonials-section">
-      <h2 class="section-title">What Our Users Say</h2>
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="testimonial-header">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" class="testimonial-avatar">
-            <div>
-              <div class="testimonial-name">Adebayo Johnson</div>
-              <div class="testimonial-plan">Professional Plan</div>
+    <div class="max-w-7xl mx-auto px-4 pb-20">
+        @if (session()->has('error'))
+            <div class="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 max-w-xl mx-auto text-center">
+                {{ session('error') }}
             </div>
-          </div>
-          <div class="testimonial-text">
-            "The Professional plan has been perfect for my real estate business. Featured listings get so much more visibility!"
-          </div>
-          <div class="testimonial-rating">
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-          </div>
+        @endif
+
+        {{-- Country Switcher + Billing Toggle --}}
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+            {{-- Country Switcher --}}
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500 font-medium">Pricing for:</span>
+                <div class="relative">
+                    <select
+                        wire:change="switchCountry($event.target.value)"
+                        class="appearance-none bg-white border border-gray-200 rounded-lg pl-3 pr-8 py-2 text-sm font-medium text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+                    >
+                        @foreach($countries as $country)
+                            <option value="{{ $country->id }}" {{ $country->id == $selectedCountryId ? 'selected' : '' }}>
+                                {{ $country->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <i class="ri-arrow-down-s-line absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+            </div>
+
+            {{-- Divider --}}
+            <span class="hidden sm:block text-gray-300">|</span>
+
+            {{-- Billing toggle --}}
+            <div class="flex items-center gap-3">
+                <button
+                    wire:click="setBillingCycle('monthly')"
+                    class="text-sm font-medium px-4 py-2 rounded-lg transition-all {{ $billingCycle === 'monthly' ? 'bg-emerald-600 text-white shadow' : 'text-gray-500 hover:text-gray-700' }}"
+                >
+                    Monthly
+                </button>
+                <button
+                    wire:click="setBillingCycle('yearly')"
+                    class="text-sm font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-2 {{ $billingCycle === 'yearly' ? 'bg-emerald-600 text-white shadow' : 'text-gray-500 hover:text-gray-700' }}"
+                >
+                    Yearly
+                    <span class="text-xs {{ $billingCycle === 'yearly' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700' }} px-2 py-0.5 rounded-full font-semibold">
+                        Save 30%
+                    </span>
+                </button>
+            </div>
         </div>
 
-        <div class="testimonial-card">
-          <div class="testimonial-header">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" class="testimonial-avatar">
-            <div>
-              <div class="testimonial-name">Chioma Okafor</div>
-              <div class="testimonial-plan">Business Plan</div>
+        {{-- Plans Grid --}}
+        @if($plans->isEmpty())
+            <div class="text-center py-20 text-gray-400">
+                <i class="ri-price-tag-3-line text-5xl mb-4 block"></i>
+                <p class="text-lg">No plans available yet. Please check back soon.</p>
             </div>
-          </div>
-          <div class="testimonial-text">
-            "With unlimited listings and dedicated support, the Business plan helped me scale my property portfolio significantly."
-          </div>
-          <div class="testimonial-rating">
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-          </div>
+        @else
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ min(4, $plans->count()) }} gap-6 mb-14">
+            @foreach($plans as $plan)
+                @php
+                    $price = $plan->prices->first();
+                    $currency = $price?->currency;
+                    $monthlyAmount = $price ? (float) $price->amount : null;
+                    $yearlyAmount = $monthlyAmount ? round($monthlyAmount * 12 * 0.70) : null; // 30% off
+                    $displayAmount = $billingCycle === 'yearly' ? $yearlyAmount : $monthlyAmount;
+                    $isPopular = $loop->iteration === 3;
+                    $currencySymbol = $currency?->symbol ?? '$';
+                @endphp
+
+                <div class="relative bg-white rounded-2xl p-6 shadow-md border-2 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
+                    {{ $isPopular ? 'border-emerald-500 scale-105 z-10' : 'border-transparent' }}"
+                >
+                    @if($isPopular)
+                        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold tracking-wider uppercase px-5 py-1 rounded-full whitespace-nowrap">
+                            Most Popular
+                        </div>
+                    @endif
+
+                    {{-- Plan Header --}}
+                    <div class="text-center mb-6">
+                        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-3
+                            {{ $isPopular ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-600' }}">
+                            <i class="ri-vip-crown-line text-2xl"></i>
+                        </div>
+                        <h2 class="font-serif text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
+
+                        @if($displayAmount !== null)
+                            <div class="mt-3">
+                                <span class="text-4xl font-bold text-emerald-600">
+                                    {{ $currencySymbol }}{{ number_format($displayAmount) }}
+                                </span>
+                                <span class="text-gray-400 text-sm">
+                                    /{{ $billingCycle === 'yearly' ? 'year' : 'month' }}
+                                </span>
+                            </div>
+                            @if($billingCycle === 'yearly' && $monthlyAmount)
+                                <p class="text-xs text-emerald-600 font-semibold mt-1">
+                                    Save {{ $currencySymbol }}{{ number_format($monthlyAmount * 12 - $yearlyAmount) }}/year
+                                </p>
+                            @endif
+                        @else
+                            <div class="mt-3">
+                                <span class="text-3xl font-bold text-gray-400">No price set</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Contact us for pricing in your region</p>
+                        @endif
+                    </div>
+
+                    {{-- Features --}}
+                    <ul class="space-y-3 mb-6">
+                        @if($plan->features && count($plan->features) > 0)
+                            @foreach($plan->features as $feature)
+                                <li class="flex items-start gap-2.5 text-sm text-gray-600">
+                                    <i class="ri-check-line text-emerald-500 mt-0.5 shrink-0 text-base"></i>
+                                    <span>{{ $feature }}</span>
+                                </li>
+                            @endforeach
+                        @else
+                            <li class="flex items-center gap-2.5 text-sm text-gray-400">
+                                <i class="ri-information-line shrink-0"></i>
+                                <span>Features coming soon</span>
+                            </li>
+                        @endif
+
+                        @if($plan->seats)
+                            <li class="flex items-center gap-2.5 text-sm text-gray-600">
+                                <i class="ri-home-4-line text-emerald-500 shrink-0"></i>
+                                <span><strong>{{ $plan->seats }}</strong> property listing{{ $plan->seats > 1 ? 's' : '' }}</span>
+                            </li>
+                        @endif
+
+                        @if($plan->days)
+                            <li class="flex items-center gap-2.5 text-sm text-gray-600">
+                                <i class="ri-calendar-check-line text-emerald-500 shrink-0"></i>
+                                <span>Listings active for <strong>{{ $plan->days }} days</strong></span>
+                            </li>
+                        @endif
+                    </ul>
+
+                    {{-- CTA Button --}}
+                    @auth
+                        <button wire:click="selectPlan({{ $plan->id }})"
+                           class="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200
+                               {{ $isPopular
+                                   ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-200'
+                                   : 'border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white' }}"
+                        >
+                            Get {{ $plan->name }}
+                        </button>
+                    @else
+                        <a href="{{ route('login') }}"
+                           class="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200
+                               {{ $isPopular
+                                   ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-200'
+                                   : 'border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white' }}"
+                        >
+                            Get Started
+                        </a>
+                    @endauth
+                </div>
+            @endforeach
+        </div>
+        @endif
+
+        {{-- Feature Comparison Table --}}
+        <div class="bg-white rounded-2xl shadow-md p-6 sm:p-8 mb-12">
+            <h2 class="font-serif text-2xl font-bold text-gray-900 mb-6">Compare All Features</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100">
+                            <th class="text-left py-3 pr-4 font-semibold text-gray-600 w-1/3">Feature</th>
+                            @foreach($plans as $plan)
+                                <th class="py-3 px-2 font-semibold text-gray-700 text-center">{{ $plan->name }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <tr>
+                            <td class="py-3 pr-4 text-gray-600 font-medium">Property Listings</td>
+                            @foreach($plans as $plan)
+                                <td class="py-3 px-2 text-center font-semibold text-gray-800">
+                                    {{ $plan->seats ?? '—' }}
+                                </td>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            <td class="py-3 pr-4 text-gray-600 font-medium">Listing Duration</td>
+                            @foreach($plans as $plan)
+                                <td class="py-3 px-2 text-center text-gray-700">
+                                    {{ $plan->days ? $plan->days.' days' : '—' }}
+                                </td>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            <td class="py-3 pr-4 text-gray-600 font-medium">Email Support</td>
+                            @foreach($plans as $plan)
+                                <td class="py-3 px-2 text-center">
+                                    <i class="ri-check-line text-emerald-500 text-lg"></i>
+                                </td>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            <td class="py-3 pr-4 text-gray-600 font-medium">WhatsApp Support</td>
+                            @foreach($plans as $planItem)
+                                @php $isPaid = $planItem->prices->isNotEmpty() && (float)$planItem->prices->first()?->amount > 0; @endphp
+                                <td class="py-3 px-2 text-center">
+                                    @if($isPaid)
+                                        <i class="ri-check-line text-emerald-500 text-lg"></i>
+                                    @else
+                                        <i class="ri-close-line text-gray-300 text-lg"></i>
+                                    @endif
+                                </td>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            <td class="py-3 pr-4 text-gray-600 font-medium">Featured Listing Boost</td>
+                            @foreach($plans as $planItem)
+                                @php $isHighTier = $loop->iteration >= 3; @endphp
+                                <td class="py-3 px-2 text-center">
+                                    @if($isHighTier)
+                                        <i class="ri-check-line text-emerald-500 text-lg"></i>
+                                    @else
+                                        <i class="ri-close-line text-gray-300 text-lg"></i>
+                                    @endif
+                                </td>
+                            @endforeach
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="testimonial-card">
-          <div class="testimonial-header">
-            <img src="https://randomuser.me/api/portraits/men/75.jpg" class="testimonial-avatar">
-            <div>
-              <div class="testimonial-name">Ibrahim Musa</div>
-              <div class="testimonial-plan">Basic Plan</div>
+        {{-- FAQ Section --}}
+        <div class="mb-12">
+            <h2 class="font-serif text-2xl font-bold text-gray-900 mb-6 text-center">Frequently Asked Questions</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @php
+                    $pricingFaqs = [
+                        ['q' => 'Can I switch plans anytime?', 'a' => 'Yes, you can upgrade or downgrade your plan at any time. Changes take effect on your next billing cycle.'],
+                        ['q' => 'What payment methods do you accept?', 'a' => 'We accept bank transfers and other local payment options. Details are provided at checkout based on your country.'],
+                        ['q' => 'Is there a refund policy?', 'a' => 'We offer a 14-day money-back guarantee if you\'re not satisfied with our service.'],
+                        ['q' => 'What happens to my listings if I cancel?', 'a' => 'Your listings remain active until the end of your billing period. You can renew at any time.'],
+                    ];
+                @endphp
+                @foreach($pricingFaqs as $faq)
+                    <div
+                        x-data="{ open: false }"
+                        class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 cursor-pointer select-none"
+                        @click="open = !open"
+                    >
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="font-semibold text-gray-800 text-sm">{{ $faq['q'] }}</h3>
+                            <i class="ri-arrow-down-s-line text-gray-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        </div>
+                        <p x-show="open" x-collapse class="mt-3 text-sm text-gray-500 leading-relaxed">
+                            {{ $faq['a'] }}
+                        </p>
+                    </div>
+                @endforeach
             </div>
-          </div>
-          <div class="testimonial-text">
-            "Great value for money. The Basic plan gives me everything I need to list my properties and connect with buyers."
-          </div>
-          <div class="testimonial-rating">
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-half-fill"></i>
-          </div>
         </div>
-      </div>
+
+        {{-- CTA Banner --}}
+        <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl p-8 text-center text-white shadow-xl">
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold mb-2">Ready to get started?</h2>
+            <p class="text-emerald-100 mb-6 max-w-md mx-auto">
+                Join thousands of property owners already listing on JustProperties.
+            </p>
+            @guest
+                <a href="{{ route('register') }}" class="inline-block bg-white text-emerald-700 font-semibold px-8 py-3 rounded-xl hover:bg-emerald-50 transition shadow-md">
+                    Create Free Account
+                </a>
+            @else
+                <a href="{{ route('list-property') }}" class="inline-block bg-white text-emerald-700 font-semibold px-8 py-3 rounded-xl hover:bg-emerald-50 transition shadow-md">
+                    List Your Property
+                </a>
+            @endguest
+        </div>
+
     </div>
-  </main>
 
-  <script>
-    let selectedPlan = 'professional';
-    let isYearly = true;
+    @livewire('guest.footer')
 
-    // Toggle billing (monthly/yearly)
-    function toggleBilling() {
-      isYearly = document.getElementById('billingToggle').checked;
-      
-      // Update prices
-      if (isYearly) {
-        // Yearly prices (with discounts)
-        document.getElementById('basic-price').innerHTML = '₦45,000 <span>/year</span>';
-        document.getElementById('basic-period').innerText = 'Billed yearly';
-        document.getElementById('basic-savings').innerText = 'Save 25%';
-        
-        document.getElementById('pro-price').innerHTML = '₦100,800 <span>/year</span>';
-        document.getElementById('pro-period').innerText = 'Billed yearly';
-        document.getElementById('pro-savings').innerText = 'Save 30%';
-        
-        document.getElementById('business-price').innerHTML = '₦210,000 <span>/year</span>';
-        document.getElementById('business-period').innerText = 'Billed yearly';
-        document.getElementById('business-savings').innerText = 'Save 30%';
-      } else {
-        // Monthly prices
-        document.getElementById('basic-price').innerHTML = '₦5,000 <span>/month</span>';
-        document.getElementById('basic-period').innerText = 'Billed monthly';
-        document.getElementById('basic-savings').innerText = '';
-        
-        document.getElementById('pro-price').innerHTML = '₦12,000 <span>/month</span>';
-        document.getElementById('pro-period').innerText = 'Billed monthly';
-        document.getElementById('pro-savings').innerText = '';
-        
-        document.getElementById('business-price').innerHTML = '₦25,000 <span>/month</span>';
-        document.getElementById('business-period').innerText = 'Billed monthly';
-        document.getElementById('business-savings').innerText = '';
-      }
-      
-      updateOrderSummary();
-    }
-
-    // Select plan
-    function selectPlan(plan) {
-      selectedPlan = plan;
-      const buttons = document.querySelectorAll('.plan-btn');
-      buttons.forEach(btn => {
-        if (btn.classList.contains('current')) {
-          btn.classList.remove('current');
-        }
-      });
-      
-      // Highlight selected plan button
-      event.target.classList.add('current');
-      
-      updateOrderSummary();
-    }
-
-    // Update order summary
-    function updateOrderSummary() {
-      let planPrice = 0;
-      let planName = '';
-      
-      switch(selectedPlan) {
-        case 'free':
-          planPrice = 0;
-          planName = 'Free Plan';
-          break;
-        case 'basic':
-          planPrice = isYearly ? 45000 : 5000;
-          planName = 'Basic Plan';
-          break;
-        case 'professional':
-          planPrice = isYearly ? 100800 : 12000;
-          planName = 'Professional Plan';
-          break;
-        case 'business':
-          planPrice = isYearly ? 210000 : 25000;
-          planName = 'Business Plan';
-          break;
-      }
-      
-      const vat = Math.round(planPrice * 0.075);
-      const total = planPrice + vat;
-      
-      document.querySelector('#selected-plan-price').textContent = `₦${planPrice.toLocaleString()}`;
-      document.querySelector('#selected-billing').textContent = isYearly ? 'Yearly' : 'Monthly';
-      document.querySelector('#vat-amount').textContent = `₦${vat.toLocaleString()}`;
-      document.querySelector('#total-amount').textContent = `₦${total.toLocaleString()}`;
-    }
-
-    // Select payment method
-    function selectPayment(element) {
-      const methods = document.querySelectorAll('.payment-method');
-      methods.forEach(m => m.classList.remove('selected'));
-      element.classList.add('selected');
-      element.querySelector('input[type="radio"]').checked = true;
-    }
-
-    // Apply promo code
-    function applyPromo() {
-      const code = document.getElementById('promoCode').value;
-      if (code.trim()) {
-        alert(`Promo code "${code}" applied! 10% discount (Demo)`);
-        // Apply 10% discount
-        const totalElement = document.querySelector('#total-amount');
-        const currentTotal = parseInt(totalElement.textContent.replace(/[^0-9]/g, ''));
-        const discountedTotal = Math.round(currentTotal * 0.9);
-        totalElement.textContent = `₦${discountedTotal.toLocaleString()}`;
-      } else {
-        alert('Please enter a promo code');
-      }
-    }
-
-    // Checkout
-    function checkout() {
-      alert('Proceeding to secure checkout... (Demo)');
-    }
-
-    // Toggle FAQ
-    function toggleFaq(element) {
-      element.classList.toggle('active');
-    }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-      updateOrderSummary();
-    });
-  </script>
-</body>
-</html>
+</div>

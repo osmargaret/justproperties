@@ -1,300 +1,303 @@
-<div class="role-welcome-card">
-    <div class="role-welcome-inner">
-        <div class="role-welcome-header">
-            <div class="logo-row">
-                <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png"
-                    alt="JustProperties" class="logo-img">
-                <span class="logo-text">JustProperties</span>
+<div class="role-welcome-wrap">
+    <div class="rw-inner">
+
+        {{-- Header --}}
+        <div class="rw-header">
+            <div class="rw-logo-row">
+                <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="JustProperties" class="rw-logo-img">
+                <span class="rw-logo-text">JustProperties</span>
             </div>
-            <h1>Welcome{{ auth()->check() && auth()->user()->name ? ', ' . explode(' ', trim(auth()->user()->name), 2)[0] : '' }}</h1>
-            <p class="lead">You are signed in. Choose how you want to use the platform first — you can switch between buyer and seller tools anytime by visiting each dashboard.</p>
+            <h1 class="rw-title">
+                Welcome{{ auth()->check() && auth()->user()->name ? ', ' . explode(' ', trim(auth()->user()->name), 2)[0] : '' }}!
+            </h1>
+            <p class="rw-subtitle">
+                What would you like to do today? Choose one of the options below to get started. You can always switch between modes later.
+            </p>
         </div>
 
-        <div class="role-columns">
-            <section class="role-panel buyer">
-                <div class="role-panel-icon"><i class="ri-home-heart-line"></i></div>
-                <h2>As a buyer</h2>
-                <p class="role-panel-intro">Search listings, save favourites, set property alerts, and manage notifications in one place.</p>
-                <ul class="role-features">
-                    <li><i class="ri-check-line"></i> Browse land, completed builds, rentals, and short lets</li>
-                    <li><i class="ri-check-line"></i> Save properties and get alerted when new matches appear</li>
-                    <li><i class="ri-check-line"></i> Track saved properties and listing activity</li>
-                </ul>
-                <a href="{{ route('buyer.dashboard') }}" class="role-cta buyer-cta" wire:navigate>
-                    <span>Go to buyer dashboard</span>
-                    <i class="ri-arrow-right-line"></i>
-                </a>
-            </section>
+        {{-- 6-Card Grid --}}
+        <div class="rw-grid">
 
-            <section class="role-panel seller">
-                <div class="role-panel-icon"><i class="ri-building-2-line"></i></div>
-                <h2>As a seller</h2>
-                <p class="role-panel-intro">List properties, manage subscriptions and documents, run promotions, and track leads from interested buyers.</p>
-                <ul class="role-features">
-                    <li><i class="ri-check-line"></i> Create and manage your property listings</li>
-                    <li><i class="ri-check-line"></i> Handle subscriptions, transactions, and uploads</li>
-                    <li><i class="ri-check-line"></i> Use promotions to reach more buyers</li>
-                </ul>
-                <a href="{{ route('seller.dashboard') }}" class="role-cta seller-cta" wire:navigate>
-                    <span>Go to seller dashboard</span>
-                    <i class="ri-arrow-right-line"></i>
-                </a>
-            </section>
+            {{-- 1: Rent --}}
+            <a href="{{ route('rent-lease') }}" class="rw-card rw-card--rent" wire:navigate>
+                <div class="rw-card-icon">
+                    <i class="ri-key-2-line"></i>
+                </div>
+                <div class="rw-card-body">
+                    <h2 class="rw-card-title">Rent a Property</h2>
+                    <p class="rw-card-desc">Browse homes, apartments, and commercial spaces available for rent or lease.</p>
+                </div>
+                <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
+            </a>
+
+            {{-- 2: Shortlet --}}
+            <a href="{{ route('short-lets') }}" class="rw-card rw-card--shortlet" wire:navigate>
+                <div class="rw-card-icon">
+                    <i class="ri-hotel-line"></i>
+                </div>
+                <div class="rw-card-body">
+                    <h2 class="rw-card-title">Book a Shortlet</h2>
+                    <p class="rw-card-desc">Find furnished apartments and holiday homes for short-term stays.</p>
+                </div>
+                <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
+            </a>
+
+            {{-- 3: Buy --}}
+            <a href="{{ route('completed-properties') }}" class="rw-card rw-card--buy" wire:navigate>
+                <div class="rw-card-icon">
+                    <i class="ri-home-heart-line"></i>
+                </div>
+                <div class="rw-card-body">
+                    <h2 class="rw-card-title">Buy a Property</h2>
+                    <p class="rw-card-desc">Discover land, completed homes, and uncompleted structures for sale across Nigeria.</p>
+                </div>
+                <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
+            </a>
+
+            {{-- 4: Sell --}}
+            <a href="{{ route('list-property') }}" class="rw-card rw-card--sell" wire:navigate>
+                <div class="rw-card-icon">
+                    <i class="ri-price-tag-3-line"></i>
+                </div>
+                <div class="rw-card-body">
+                    <h2 class="rw-card-title">Sell / List Property</h2>
+                    <p class="rw-card-desc">List your property directly and connect with verified buyers — no agent fees.</p>
+                </div>
+                <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
+            </a>
+
+            {{-- 5: Seller Dashboard --}}
+            <button type="button" wire:click="chooseRole('seller')" class="rw-card rw-card--seller-dash">
+                <div class="rw-card-icon">
+                    <i class="ri-building-2-line"></i>
+                </div>
+                <div class="rw-card-body">
+                    <h2 class="rw-card-title">Seller Dashboard</h2>
+                    <p class="rw-card-desc">Manage your listings, subscriptions, documents, and track leads from buyers.</p>
+                </div>
+                <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
+            </button>
+
+            {{-- 6: Buyer Dashboard --}}
+            <button type="button" wire:click="chooseRole('buyer')" class="rw-card rw-card--buyer-dash">
+                <div class="rw-card-icon">
+                    <i class="ri-heart-3-line"></i>
+                </div>
+                <div class="rw-card-body">
+                    <h2 class="rw-card-title">Buyer Dashboard</h2>
+                    <p class="rw-card-desc">View saved properties, set alerts, manage subscriptions and stay updated on new listings.</p>
+                </div>
+                <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
+            </button>
+
         </div>
 
-        <p class="role-footer-note">
-            <a href="{{ route('welcome') }}" class="text-link">Back to site</a>
-            <span class="dot">·</span>
-            <form method="POST" action="{{ route('logout') }}" class="inline-form">@csrf<button type="submit" class="text-link-btn">Sign out</button></form>
+        {{-- Footer Note --}}
+        <p class="rw-footer-note">
+            <a href="{{ route('welcome') }}" class="rw-text-link" wire:navigate>Back to site</a>
+            <span class="rw-dot">·</span>
+            <form method="POST" action="{{ route('logout') }}" class="rw-inline-form">
+                @csrf
+                <button type="submit" class="rw-text-btn">Sign out</button>
+            </form>
         </p>
+
     </div>
 </div>
 
 @push('styles')
-    <style>
-        .role-welcome-card {
-            background: #fff;
-            border-radius: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 100%;
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 2.5rem 2rem;
-            animation: slideUp 0.5s ease-out;
-        }
+<style>
+    /* ===== Wrap ===== */
+    .role-welcome-wrap {
+        background: #fff;
+        border-radius: 2rem;
+        box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.22);
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem;
+        animation: rwSlideUp 0.45s ease-out both;
+    }
 
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
+    @keyframes rwSlideUp {
+        from { transform: translateY(24px); opacity: 0; }
+        to   { transform: translateY(0);   opacity: 1; }
+    }
 
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
+    .rw-inner { max-width: 960px; margin: 0 auto; }
 
-        .role-welcome-inner {
-            max-width: 880px;
-            margin: 0 auto;
-        }
+    /* ===== Header ===== */
+    .rw-header {
+        text-align: center;
+        margin-bottom: 2.25rem;
+    }
 
-        .role-welcome-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
+    .rw-logo-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
 
-        .logo-row {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
-        }
+    .rw-logo-img {
+        width: 36px;
+        height: 36px;
+        border-radius: 0.5rem;
+    }
 
-        .logo-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 0.5rem;
-        }
+    .rw-logo-text {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #111827;
+    }
 
-        .logo-text {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: #111827;
-        }
+    .rw-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.65rem, 4vw, 2.1rem);
+        color: #111827;
+        margin-bottom: 0.6rem;
+    }
 
-        .role-welcome-header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.75rem, 4vw, 2.25rem);
-            color: #111827;
-            margin-bottom: 0.75rem;
-        }
+    .rw-subtitle {
+        color: #4b5563;
+        font-size: 0.9375rem;
+        line-height: 1.65;
+        max-width: 44rem;
+        margin: 0 auto;
+    }
 
-        .lead {
-            color: #4b5563;
-            font-size: 1rem;
-            line-height: 1.65;
-            max-width: 42rem;
-            margin: 0 auto;
-        }
+    /* ===== Grid ===== */
+    .rw-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
 
-        .role-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
+    /* ===== Card base ===== */
+    .rw-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.2rem 1.1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 1.1rem;
+        text-decoration: none;
+        color: inherit;
+        background: #fff;
+        cursor: pointer;
+        font-family: inherit;
+        text-align: left;
+        width: 100%;
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
 
-        .role-panel {
-            border: 2px solid #e5e7eb;
-            border-radius: 1.25rem;
-            padding: 1.75rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
+    .rw-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);
+    }
 
-        .role-panel:hover {
-            box-shadow: 0 10px 30px -10px rgba(5, 150, 105, 0.2);
-        }
+    /* Per-card accent colours */
+    .rw-card--rent:hover          { border-color: #0ea5e9; }
+    .rw-card--shortlet:hover      { border-color: #a855f7; }
+    .rw-card--buy:hover           { border-color: #f59e0b; }
+    .rw-card--sell:hover          { border-color: #ef4444; }
+    .rw-card--seller-dash:hover   { border-color: #0d9488; }
+    .rw-card--buyer-dash:hover    { border-color: #059669; }
 
-        .role-panel.buyer:hover {
-            border-color: #059669;
-        }
+    .rw-card-icon {
+        width: 2.8rem;
+        height: 2.8rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+    }
 
-        .role-panel.seller:hover {
-            border-color: #0d9488;
-        }
+    .rw-card--rent        .rw-card-icon { background: #e0f2fe; color: #0ea5e9; }
+    .rw-card--shortlet    .rw-card-icon { background: #f3e8ff; color: #a855f7; }
+    .rw-card--buy         .rw-card-icon { background: #fef3c7; color: #f59e0b; }
+    .rw-card--sell        .rw-card-icon { background: #fee2e2; color: #ef4444; }
+    .rw-card--seller-dash .rw-card-icon { background: #f0fdfa; color: #0d9488; }
+    .rw-card--buyer-dash  .rw-card-icon { background: #ecfdf5; color: #059669; }
 
-        .role-panel-icon {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
+    .rw-card-body { flex: 1; min-width: 0; }
 
-        .buyer .role-panel-icon {
-            background: #ecfdf5;
-            color: #059669;
-        }
+    .rw-card-title {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-        .seller .role-panel-icon {
-            background: #f0fdfa;
-            color: #0d9488;
-        }
+    .rw-card-desc {
+        font-size: 0.78125rem;
+        color: #6b7280;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 
-        .role-panel h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 0.5rem;
-        }
+    .rw-card-arrow {
+        color: #d1d5db;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        transition: color 0.2s, transform 0.2s;
+    }
 
-        .role-panel-intro {
-            font-size: 0.875rem;
-            color: #6b7280;
-            line-height: 1.55;
-            margin-bottom: 1rem;
-        }
+    .rw-card:hover .rw-card-arrow {
+        color: #059669;
+        transform: translateX(4px);
+    }
 
-        .role-features {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 1.5rem;
-            flex: 1;
-        }
+    /* ===== Footer ===== */
+    .rw-footer-note {
+        text-align: center;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
 
-        .role-features li {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            font-size: 0.8125rem;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
+    .rw-text-link {
+        color: #059669;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .rw-text-link:hover { text-decoration: underline; }
 
-        .role-features i {
-            color: #059669;
-            margin-top: 0.125rem;
-            flex-shrink: 0;
-        }
+    .rw-dot { margin: 0 0.35rem; }
 
-        .seller .role-features i {
-            color: #0d9488;
-        }
+    .rw-inline-form { display: inline; }
 
-        .role-cta {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            font-size: 0.9375rem;
-            text-decoration: none;
-            transition: background 0.2s, transform 0.15s;
-        }
+    .rw-text-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        color: #059669;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: inherit;
+        font-family: inherit;
+    }
+    .rw-text-btn:hover { text-decoration: underline; }
 
-        .role-cta:hover {
-            transform: translateY(-1px);
-        }
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+        .rw-grid { grid-template-columns: 1fr 1fr; }
+        .role-welcome-wrap { padding: 1.75rem 1.25rem; border-radius: 1.25rem; }
+        .rw-card-desc { display: none; }
+    }
 
-        .buyer-cta {
-            background: #059669;
-            color: #fff;
-        }
-
-        .buyer-cta:hover {
-            background: #047857;
-            color: #fff;
-        }
-
-        .seller-cta {
-            background: #0f766e;
-            color: #fff;
-        }
-
-        .seller-cta:hover {
-            background: #115e59;
-            color: #fff;
-        }
-
-        .role-footer-note {
-            text-align: center;
-            margin-top: 2rem;
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
-
-        .text-link {
-            color: #059669;
-            font-weight: 500;
-            text-decoration: none;
-        }
-
-        .text-link:hover {
-            text-decoration: underline;
-        }
-
-        .inline-form {
-            display: inline;
-        }
-
-        .text-link-btn {
-            background: none;
-            border: none;
-            padding: 0;
-            color: #059669;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: inherit;
-            font-family: inherit;
-        }
-
-        .text-link-btn:hover {
-            text-decoration: underline;
-        }
-
-        .dot {
-            margin: 0 0.35rem;
-        }
-
-        @media (max-width: 768px) {
-            .role-columns {
-                grid-template-columns: 1fr;
-            }
-
-            .role-welcome-card {
-                padding: 1.75rem 1.25rem;
-                border-radius: 1.25rem;
-            }
-        }
-    </style>
+    @media (max-width: 480px) {
+        .rw-grid { grid-template-columns: 1fr; }
+        .rw-card-desc { display: block; }
+    }
+</style>
 @endpush

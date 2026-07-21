@@ -114,6 +114,47 @@
                         @error('payment_gateway') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                         <p class="mt-1 text-xs text-gray-500">Checkout uses this gateway for payments in this currency. API keys stay in <code>.env</code>.</p>
                     </div>
+
+                    {{-- Manual Payment Section --}}
+                    <div class="border-t border-gray-100 pt-3 mt-1">
+                        <label class="inline-flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+                            <input type="checkbox" wire:model.live="show_manual_payment" class="rounded border-gray-300 text-emerald-600" />
+                            Enable Manual Payment Option
+                        </label>
+                        <p class="text-xs text-gray-400 mt-1">Show bank transfer instructions to users at checkout.</p>
+                    </div>
+
+                    @if($show_manual_payment)
+                    <div class="space-y-2 border border-amber-100 bg-amber-50 rounded-lg p-3">
+                        <p class="text-xs font-semibold text-amber-700 mb-2">Bank Details for {{ $code ?: 'Currency' }}</p>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Bank Name</label>
+                            <input type="text" wire:model="bank_name" placeholder="e.g. First Bank Nigeria" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
+                            @error('bank_name') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Account Number</label>
+                            <input type="text" wire:model="bank_account_number" placeholder="e.g. 0123456789" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
+                            @error('bank_account_number') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Account Name</label>
+                            <input type="text" wire:model="account_name" placeholder="e.g. JustProperties Ltd" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
+                            @error('account_name') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Swift / Sort Code (optional)</label>
+                            <input type="text" wire:model="swift_code" placeholder="e.g. FBNBNL1X" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
+                            @error('swift_code') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Payment Instructions (optional)</label>
+                            <textarea wire:model="bank_instructions" rows="2" placeholder="e.g. Use your reference as payment description" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm resize-none"></textarea>
+                            @error('bank_instructions') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="flex gap-2 pt-2">
                         <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white">Save</button>
                         <button type="button" wire:click="closeModal" class="rounded-lg border border-gray-200 px-4 py-2 text-sm">Cancel</button>

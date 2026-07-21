@@ -28,6 +28,32 @@
             @endforeach
         </div>
 
+        {{-- Active Filters Indicator --}}
+        @if($tag || $category || $search)
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 24px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px;">
+                <span style="font-size: 14px; color: #6b7280; font-weight: 500;">Active filters:</span>
+                @if($search)
+                    <span style="display: inline-flex; align-items: center; gap: 4px; bg-color: #ecfdf5; color: #065f46; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 9999px; background-color: #d1fae5;">
+                        Search: "{{ $search }}"
+                        <button type="button" wire:click="$set('search', '')" style="color: #047857; font-weight: bold; margin-left: 4px; border: none; background: none; cursor: pointer;">&times;</button>
+                    </span>
+                @endif
+                @if($category)
+                    <span style="display: inline-flex; align-items: center; gap: 4px; bg-color: #ecfdf5; color: #065f46; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 9999px; background-color: #d1fae5;">
+                        Category: {{ $category }}
+                        <button type="button" wire:click="$set('category', '')" style="color: #047857; font-weight: bold; margin-left: 4px; border: none; background: none; cursor: pointer;">&times;</button>
+                    </span>
+                @endif
+                @if($tag)
+                    <span style="display: inline-flex; align-items: center; gap: 4px; bg-color: #ecfdf5; color: #065f46; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 9999px; background-color: #d1fae5;">
+                        Tag: #{{ $tag }}
+                        <button type="button" wire:click="$set('tag', '')" style="color: #047857; font-weight: bold; margin-left: 4px; border: none; background: none; cursor: pointer;">&times;</button>
+                    </span>
+                @endif
+                <button type="button" wire:click="resetFilters" style="font-size: 12px; color: #6b7280; font-weight: 600; text-decoration: underline; margin-left: auto; border: none; background: none; cursor: pointer;">Clear all</button>
+            </div>
+        @endif
+
         <!-- Featured Post -->
         @if($featuredPost)
         <div class="featured-post">
@@ -47,6 +73,16 @@
                     <p class="featured-excerpt">
                         {{ $featuredPost->excerpt ?? str($featuredPost->content)->limit(150) }}
                     </p>
+                    @php $featuredTags = $featuredPost->tags ? array_filter(array_map('trim', explode(',', $featuredPost->tags))) : []; @endphp
+                    @if(count($featuredTags) > 0)
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 16px 0;">
+                            @foreach($featuredTags as $t)
+                                <a href="{{ route('blog', ['tag' => $t]) }}" style="font-size: 12px; color: #047857; text-decoration: none; background-color: #ecfdf5; padding: 4px 10px; border-radius: 9999px; font-weight: 500;">
+                                    #{{ $t }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                     <a href="{{ route('post',$featuredPost) }}" class="read-more-btn">
                         Read Full Article <i class="ri-arrow-right-line"></i>
                     </a>
@@ -73,6 +109,16 @@
                     <p class="card-excerpt">
                         {{ $post->excerpt ?? str($post->content)->limit(100) }}
                     </p>
+                    @php $postTags = $post->tags ? array_filter(array_map('trim', explode(',', $post->tags))) : []; @endphp
+                    @if(count($postTags) > 0)
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px 0;">
+                            @foreach($postTags as $t)
+                                <a href="{{ route('blog', ['tag' => $t]) }}" style="font-size: 11px; color: #047857; text-decoration: none; background-color: #ecfdf5; padding: 2px 8px; border-radius: 4px;">
+                                    #{{ $t }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                     <a href="{{ route('post',$post) }}" class="card-link">
                         Read Article <i class="ri-arrow-right-line"></i>
                     </a>

@@ -57,7 +57,11 @@ class Transactions extends Component
 
         // Filter by status
         if ($this->status !== 'all') {
-            $query->where('status', $this->status);
+            if ($this->status === 'completed') {
+                $query->whereIn('status', ['completed', 'success']);
+            } else {
+                $query->where('status', $this->status);
+            }
         }
 
         return $query->paginate(10);

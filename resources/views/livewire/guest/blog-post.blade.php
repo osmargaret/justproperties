@@ -44,9 +44,10 @@
             {!! $post->content !!}
           </div>
 
+          @php $postTagsList = $post->tags ? array_filter(array_map('trim', explode(',', $post->tags))) : []; @endphp
           <div class="flex flex-wrap gap-2 py-6 border-t border-b border-gray-200 mb-6">
-            @foreach($post->tags ?? [] as $tag)
-              <span class="bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-xs font-medium hover:bg-emerald-600 hover:text-white transition">{{ $tag }}</span>
+            @foreach($postTagsList as $tag)
+              <a href="{{ route('blog', ['tag' => $tag]) }}" class="bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-xs font-medium hover:bg-emerald-600 hover:text-white transition">#{{ $tag }}</a>
             @endforeach
           </div>
 
@@ -155,7 +156,7 @@
           <div class="bg-white rounded-xl p-6 shadow">
             <h3 class="font-bold text-gray-900 mb-4 pb-3 border-b-2 border-gray-100 text-lg">Popular Tags</h3>
             <div class="flex flex-wrap gap-2">
-              @foreach($post->tags ?? [] as $tag)
+              @foreach($postTagsList ?? [] as $tag)
                 <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium hover:bg-emerald-600 hover:text-white transition">{{ $tag }}</span>
               @endforeach
             </div>

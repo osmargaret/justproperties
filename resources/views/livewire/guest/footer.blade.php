@@ -1,5 +1,5 @@
 <footer class="text-white mt-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900">
-    <div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="max-w-7xl mx-auto px-4 pt-12">
         <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
             <div>
                 <div class="flex items-center gap-2 mb-4">
@@ -37,7 +37,7 @@
                         <div class="">
                             <select wire:model="categoryId" required class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-emerald-800 hover:bg-emerald-700 disabled:bg-emerald-700 rounded-lg transition-colors cursor-pointer whitespace-nowrap text-white placeholder-emerald-200 outline-none transition-colors text-xs sm:text-sm">
                                 <option value="">Select Property Type</option>
-                                @foreach($categories as $category)
+                                @foreach($propertyCategories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                                 @endforeach
                             </select>
@@ -63,16 +63,17 @@
                     <a href="{{ route('pricing') }}" class="text-emerald-200 hover:text-white text-sm transition">Pricing</a>
                     <a href="{{ route('blog') }}" class="text-emerald-200 hover:text-white text-sm transition">Blog</a>
                     <a href="{{ route('contact') }}" class="text-emerald-200 hover:text-white text-sm transition">Contact</a>
+                    <a href="{{ route('advertise') }}" class="text-emerald-200 hover:text-white text-sm transition">Advertize</a>
                 </nav>
             </div>
             <div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-4">Resources</h3>
                 <nav class="flex flex-col gap-3">
-                    <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Buying Guide</a>
-                    <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Legal Tips</a>
-                    <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Investment Guide</a>
-                    <a href="#" class="text-emerald-200 hover:text-white text-sm transition">Market Report</a>
-                    <a href="#" class="text-emerald-200 hover:text-white text-sm transition">FAQ</a>
+                    @foreach($nonPropertyCategories as $category)
+                        <a href="{{ route('blog', ['category' => $category->slug]) }}" class="text-emerald-200 hover:text-white text-sm transition">
+                            {{ $category->name }}
+                        </a>
+                    @endforeach
                 </nav>
             </div>
             <div>

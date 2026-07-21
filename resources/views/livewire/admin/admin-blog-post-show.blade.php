@@ -53,7 +53,7 @@
                 <dl class="mt-2 space-y-1 text-gray-700">
                     <div><dt class="text-gray-500">Status</dt><dd>{{ $post->status }}</dd></div>
                     <div><dt class="text-gray-500">Source</dt><dd>{{ $post->content_source }}{{ $post->ai_generated_at ? ' · '.$post->ai_generated_at->format('Y-m-d H:i') : '' }}</dd></div>
-                    <div><dt class="text-gray-500">Tags</dt><dd>{{ is_array($post->tags) ? implode(', ', $post->tags) : '—' }}</dd></div>
+                    <div><dt class="text-gray-500">Tags</dt><dd>{{ $post->tags ?: '—' }}</dd></div>
                 </dl>
             </section>
 

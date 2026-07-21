@@ -1,8 +1,9 @@
 <div class="profile-header bg-gradient-to-r from-emerald-900 to-emerald-600 rounded-xl p-8 mb-8 text-white flex items-center gap-8 flex-wrap">
     <div class="relative">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile"
+        <img id="profile_image" src="{{ auth()->user()->profile_photo_url }}" alt="Profile"
             class="w-24 h-24 rounded-full object-cover border-4 border-white/30" />
         <div
+            onclick="document.getElementById('profile_photo_input').click()"
             class="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center text-emerald-600 cursor-pointer border-2 border-emerald-600">
             <i class="ri-camera-line text-sm"></i>
         </div>

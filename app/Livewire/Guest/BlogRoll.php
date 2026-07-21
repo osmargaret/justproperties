@@ -8,13 +8,21 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+use Livewire\Attributes\Url;
+
 #[Layout('layouts.app')]
 class BlogRoll extends Component
 {
     use WithPagination;
 
+    #[Url]
     public $search = '';
+
+    #[Url]
     public $category = '';
+
+    #[Url]
+    public $tag = '';
 
     public function updatingSearch()
     {
@@ -23,6 +31,17 @@ class BlogRoll extends Component
 
     public function updatingCategory()
     {
+        $this->resetPage();
+    }
+
+    public function updatingTag()
+    {
+        $this->resetPage();
+    }
+
+    public function resetFilters()
+    {
+        $this->reset(['search', 'category', 'tag']);
         $this->resetPage();
     }
 
@@ -42,6 +61,16 @@ class BlogRoll extends Component
         if ($this->category) {
             $query->whereHas('category', function ($q) {
                 $q->where('slug', $this->category);
+            });
+        }
+
+        if ($this->tag) {
+            $tag = $this->tag;
+            $query->where(function ($q) use ($tag) {
+                $q->where('tags', 'like', $tag)
+                  ->orWhere('tags', 'like', $tag.',%')
+                  ->orWhere('tags', 'like', '%, '.$tag)
+                  ->orWhere('tags', 'like', '%, '.$tag.',%');
             });
         }
 
