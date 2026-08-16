@@ -1,6 +1,7 @@
 <?php
 
 use App\Exports\PropertyBulkTemplateExport;
+use App\Livewire\Admin\AdminAdvertisements;
 use App\Livewire\Admin\AdminBlog;
 use App\Livewire\Admin\AdminBlogPostCreate;
 use App\Livewire\Admin\AdminBlogPostEdit;
@@ -10,7 +11,6 @@ use App\Livewire\Admin\AdminCouponEdit;
 use App\Livewire\Admin\AdminCoupons;
 use App\Livewire\Admin\AdminDashboard;
 use App\Livewire\Admin\AdminFaqs;
-use App\Livewire\Admin\AdminAdvertisements;
 use App\Livewire\Admin\AdminModerations;
 use App\Livewire\Admin\AdminPayments;
 use App\Livewire\Admin\AdminPromotions;
@@ -43,11 +43,12 @@ use App\Livewire\Guest\BlogPost;
 use App\Livewire\Guest\BlogRoll;
 use App\Livewire\Guest\CompletedProperty;
 use App\Livewire\Guest\Contact;
+use App\Livewire\Guest\Facilities;
 use App\Livewire\Guest\LandedProperty;
+use App\Livewire\Guest\Pricing;
 use App\Livewire\Guest\PrivacyPolicy;
 use App\Livewire\Guest\RentLease;
 use App\Livewire\Guest\ShortLet;
-use App\Livewire\Guest\Pricing;
 use App\Livewire\Guest\TermsOfService;
 use App\Livewire\Guest\UncompletedProperty;
 use App\Livewire\Guest\Welcome;
@@ -88,6 +89,7 @@ Route::get('blog/post/{post}', BlogPost::class)->name('post');
 Route::get('landed-properties', LandedProperty::class)->name('landed-properties');
 Route::get('uncompleted-properties', UncompletedProperty::class)->name('uncompleted-properties');
 Route::get('completed-properties', CompletedProperty::class)->name('completed-properties');
+Route::get('facilities', Facilities::class)->name('facilities');
 Route::get('rent-lease', RentLease::class)->name('rent-lease');
 Route::get('short-lets', ShortLet::class)->name('short-lets');
 

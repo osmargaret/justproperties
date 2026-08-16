@@ -45,7 +45,7 @@ class ListProperty extends Component
 
     public ?int $state_id = null;
 
-    public ?int $city_id = null;
+    public ?string $city = null;
 
     public string $address = '';
 
@@ -139,7 +139,7 @@ class ListProperty extends Component
 
     public function updatedStateId(): void
     {
-        $this->city_id = null;
+        $this->city = null;
     }
 
     public function updatedSubscriptionSource(string $value): void
@@ -249,7 +249,7 @@ class ListProperty extends Component
                     'location' => null,
                     'country_id' => $user->country_id,
                     'state_id' => $this->lookupStateId($row['state_code'] ?? null, $row['state_name'] ?? null),
-                    'city_id' => $this->lookupCityId($row['city_code'] ?? null, $row['city_name'] ?? null),
+                    'city' => $row['city'] ?? null,
                     'neighborhood' => (string) ($row['neighborhood'] ?? ''),
                     'address' => (string) ($row['address'] ?? ''),
                     'show_address' => filter_var($row['show_address'] ?? true, FILTER_VALIDATE_BOOLEAN),
@@ -400,7 +400,7 @@ class ListProperty extends Component
             'cost' => ['required', 'numeric', 'min:0'],
             'description' => ['required', 'string', 'min:20'],
             'state_id' => ['required', 'exists:states,id'],
-            'city_id' => ['required', 'exists:cities,id'],
+            'city' => ['nullable', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'neighborhood' => ['nullable', 'string', 'max:255'],
             'show_address' => ['boolean'],
@@ -451,7 +451,7 @@ class ListProperty extends Component
             'listing_category_id' => 'listing category',
             'cost' => 'cost',
             'state_id' => 'state',
-            'city_id' => 'city/LGA',
+            'city' => 'city/LGA',
             'uploadedImages' => 'property images',
             'selected_subscription_id' => 'existing subscription',
             'selected_subscription_plan_id' => 'subscription plan',
@@ -546,33 +546,25 @@ class ListProperty extends Component
         ]);
     }
 
-    private function resolveCountryId(): ?int
-    {
-        return Auth::user()?->country_id;
-    }
 
     private function lookupStateId(?string $code, ?string $name): ?int
     {
+        /** @var User $user */
+        $user = Auth::user();
         if ($code) {
-            $id = State::query()->whereRaw('LOWER(code) = ?', [Str::lower($code)])->value('id');
-            if ($id) {
-                return (int) $id;
-            }
+            /** @disregard */
+            $id = State::where('country_id',$user->country_id)->query()->whereRaw('LOWER(code) = ?', [Str::lower($code)])->value('id');
         }
-
-        return $name ? State::query()->whereRaw('LOWER(name) = ?', [Str::lower($name)])->value('id') : null;
-    }
-
-    private function lookupCityId(?string $code, ?string $name): ?int
-    {
-        if ($code) {
-            $id = City::query()->whereRaw('LOWER(code) = ?', [Str::lower($code)])->value('id');
-            if ($id) {
-                return (int) $id;
-            }
+        if(!$id && $name){
+            /** @disregard */
+            $state = State::where('name','LIKE',"%$name%")->first();
+            $id = $state ? $state->id : null;
         }
-
-        return $name ? City::query()->whereRaw('LOWER(name) = ?', [Str::lower($name)])->value('id') : null;
+        if(!$id){
+            /** @disregard */
+            $id = State::where('country_id',$user->country_id)->first();
+        }
+        return $id;
     }
 
     /**
@@ -641,9 +633,9 @@ class ListProperty extends Component
                 'cost' => (float) ($this->cost ?? 0),
                 'category_id' => $this->listing_category_id,
                 'location' => trim($this->address.' '.$this->neighborhood),
-                'country_id' => $this->resolveCountryId(),
+                'country_id' => $user->country_id,
                 'state_id' => $this->state_id,
-                'city_id' => $this->city_id,
+                'city' => $this->city,
                 'neighborhood' => $this->neighborhood !== '' ? $this->neighborhood : null,
                 'address' => $this->address,
                 'show_address' => $this->show_address,
@@ -706,7 +698,7 @@ class ListProperty extends Component
             ->get();
 
         return view('livewire.seller.list-property', [
-            'categories' => Category::query()->with('settings')->orderBy('name', 'asc')->get(),
+            'categories' => Category::query()->where('is_property', 1)->with('settings')->orderBy('name', 'asc')->get(),
             'states' => $states,
             'cities' => $cities,
             'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name', 'asc')->get(),

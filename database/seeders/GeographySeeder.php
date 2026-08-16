@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\City;
+
 use App\Models\Country;
 use App\Models\CountryCurrency;
 use App\Models\Currency;
 use App\Models\Price;
-use App\Models\State;
+use App\Services\GeographyService;
 use Illuminate\Database\Seeder;
 
 class GeographySeeder extends Seeder
@@ -17,6 +17,7 @@ class GeographySeeder extends Seeder
      */
     public function run(): void
     {
+        // Create only Nigeria here. States and cities will be fetched via GeographyService.
         $nigeria = Country::query()->updateOrCreate(
             ['code' => 'NG'],
             [
@@ -28,38 +29,6 @@ class GeographySeeder extends Seeder
                 'is_active' => true,
             ]
         );
-
-        $usa = Country::query()->updateOrCreate(
-            ['code' => 'US'],
-            [
-                'name' => 'United States',
-                'slug' => 'united-states',
-                'flag' => '🇺🇸',
-                'phone_code' => '+1',
-                'language_code' => 'en',
-                'is_active' => true,
-            ]
-        );
-
-        foreach (
-            [
-                ['code' => 'GH', 'name' => 'Ghana', 'slug' => 'ghana', 'flag' => '🇬🇭', 'phone_code' => '+233'],
-                ['code' => 'KE', 'name' => 'Kenya', 'slug' => 'kenya', 'flag' => '🇰🇪', 'phone_code' => '+254'],
-                ['code' => 'ZA', 'name' => 'South Africa', 'slug' => 'south-africa', 'flag' => '🇿🇦', 'phone_code' => '+27'],
-            ] as $row
-        ) {
-            Country::query()->updateOrCreate(
-                ['code' => $row['code']],
-                [
-                    'name' => $row['name'],
-                    'slug' => $row['slug'],
-                    'flag' => $row['flag'],
-                    'phone_code' => $row['phone_code'],
-                    'language_code' => 'en',
-                    'is_active' => true,
-                ]
-            );
-        }
 
         $ngn = Currency::query()->updateOrCreate(
             ['code' => 'NGN'],
@@ -79,66 +48,11 @@ class GeographySeeder extends Seeder
 
         Currency::query()->where('id', '!=', $ngn->id)->update(['is_default' => false]);
 
-        $usd = Currency::query()->updateOrCreate(
-            ['code' => 'USD'],
-            [
-                'name' => 'US Dollar',
-                'slug' => 'usd',
-                'symbol' => '$',
-                'symbol_position' => 'before',
-                'thousands_separator' => ',',
-                'decimal_separator' => '.',
-                'decimal_multiplier' => '100',
-                'is_default' => false,
-                'is_active' => true,
-                'payment_gateway' => 'flutterwave',
-            ]
-        );
-
-        $lagosState = State::query()->updateOrCreate(
-            ['country_id' => $nigeria->id, 'slug' => 'lagos'],
-            [
-                'name' => 'Lagos',
-                'code' => 'LA',
-                'is_active' => true,
-            ]
-        );
-
-        State::query()->updateOrCreate(
-            ['country_id' => $usa->id, 'slug' => 'california'],
-            [
-                'name' => 'California',
-                'code' => 'CA',
-                'is_active' => true,
-            ]
-        );
-
-        $ikeja = City::query()->updateOrCreate(
-            ['state_id' => $lagosState->id, 'slug' => 'ikeja'],
-            [
-                'name' => 'Ikeja',
-                'code' => 'IKE',
-                'country_id' => $nigeria->id,
-                'is_active' => true,
-            ]
-        );
-
-        City::query()->updateOrCreate(
-            ['state_id' => $lagosState->id, 'slug' => 'lekki'],
-            [
-                'name' => 'Lekki',
-                'code' => 'LEK',
-                'country_id' => $nigeria->id,
-                'is_active' => true,
-            ]
-        );
-
-        foreach ([[$nigeria->id, $ngn->id], [$nigeria->id, $usd->id], [$usa->id, $usd->id]] as [$countryId, $currencyId]) {
-            CountryCurrency::query()->firstOrCreate(
-                ['country_id' => $countryId, 'currency_id' => $currencyId],
-                []
-            );
-        }
+        // Link Nigeria to NGN
+        CountryCurrency::query()->firstOrCreate([
+            'country_id' => $nigeria->id,
+            'currency_id' => $ngn->id,
+        ], []);
 
         Price::query()->firstOrCreate(
             [
@@ -148,5 +62,15 @@ class GeographySeeder extends Seeder
             ],
             ['amount' => 5000000.00]
         );
+
+        // Fetch states and cities for Nigeria using GeographyService (uses updateOrCreate internally)
+        try {
+            app(GeographyService::class)->fetchAndSave($nigeria);
+        } catch (\Throwable $e) {
+            // Swallow errors in seeder but log if available
+            if (function_exists('logger')) {
+                logger()->warning('GeographySeeder: failed to fetch states/cities for Nigeria: '.$e->getMessage());
+            }
+        }
     }
 }

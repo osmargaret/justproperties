@@ -3,7 +3,6 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Country;
 use App\Models\PromotionPlan;
 use App\Models\Property;
@@ -53,14 +52,7 @@ class ContentGenerationServiceTest extends TestCase
             'country_id' => $country->id,
             'is_active' => true,
         ]);
-        $city = City::query()->create([
-            'name' => 'Ikeja',
-            'slug' => 'ikeja',
-            'code' => 'IKJ',
-            'state_id' => $state->id,
-            'country_id' => $country->id,
-            'is_active' => true,
-        ]);
+        
         $category = Category::query()->create([
             'name' => 'Landed Properties',
             'slug' => 'landed-properties',
@@ -79,7 +71,7 @@ class ContentGenerationServiceTest extends TestCase
             'category_id' => $category->id,
             'country_id' => $country->id,
             'state_id' => $state->id,
-            'city_id' => $city->id,
+            'city' => 'Ikeja',
             'address' => '1 Test Road',
             'neighborhood' => 'Ikeja GRA',
             'show_address' => true,

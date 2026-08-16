@@ -5,12 +5,12 @@
         <div class="relative text-center max-w-3xl mx-auto px-4 text-white">
             <span class="inline-block bg-white/20 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">Advertising Opportunities</span>
             <h1 class="font-bold font-serif mb-6 text-5xl leading-tight">Reach Nigeria's Property Audience</h1>
-            <p class="text-xl opacity-90 leading-relaxed max-w-2xl mx-auto">Put your brand in front of thousands of active buyers, sellers, landlords, and real estate professionals every day. JustProperties is Nigeria's growing hub for property discovery.</p>
+            <p class="text-xl opacity-90 leading-relaxed max-w-2xl mx-auto">Put your brand in front of thousands of active buyers, sellers, landlords, and real estate professionals every day. Propatis is Nigeria's growing hub for property discovery.</p>
             <div class="mt-10 flex flex-wrap justify-center gap-4">
                 <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold px-8 py-3.5 rounded-xl shadow-lg hover:bg-emerald-50 transition">
                     <i class="ri-mail-line"></i> Get in Touch
                 </a>
-                <a href="mailto:ads@justproperties.ng" class="inline-flex items-center gap-2 bg-emerald-800/60 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-emerald-800 transition border border-white/20">
+                <a href="mailto:ads@propatis.com" class="inline-flex items-center gap-2 bg-emerald-800/60 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-emerald-800 transition border border-white/20">
                     <i class="ri-send-plane-line"></i> Email Us Directly
                 </a>
             </div>
@@ -146,17 +146,17 @@
             </div>
             <div class="grid md:grid-cols-4 gap-6 text-center">
                 @foreach([
-                    ['icon' => 'ri-bank-line', 'label' => 'Mortgage & Finance Companies'],
-                    ['icon' => 'ri-tools-line', 'label' => 'Construction & Building Materials'],
-                    ['icon' => 'ri-paint-brush-line', 'label' => 'Interior Design & Furnishing'],
-                    ['icon' => 'ri-shield-check-line', 'label' => 'Insurance & Property Law Firms'],
-                ] as $partner)
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mx-auto mb-4">
-                        <i class="{{ $partner['icon'] }} text-2xl"></i>
-                    </div>
-                    <p class="text-sm font-semibold text-gray-800">{{ $partner['label'] }}</p>
-                </div>
+                        ['icon' => 'ri-bank-line', 'label' => 'Mortgage & Finance Companies'],
+                        ['icon' => 'ri-tools-line', 'label' => 'Construction & Building Materials'],
+                        ['icon' => 'ri-paint-brush-line', 'label' => 'Interior Design & Furnishing'],
+                        ['icon' => 'ri-shield-check-line', 'label' => 'Insurance & Property Law Firms'],
+                    ] as $partner)
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                            <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mx-auto mb-4">
+                                <i class="{{ $partner['icon'] }} text-2xl"></i>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-800">{{ $partner['label'] }}</p>
+                        </div>
                 @endforeach
             </div>
         </div>
@@ -172,8 +172,8 @@
                     <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold px-8 py-3.5 rounded-xl shadow-lg hover:bg-emerald-50 transition">
                         <i class="ri-chat-1-line"></i> Contact Our Team
                     </a>
-                    <a href="mailto:ads@justproperties.ng" class="inline-flex items-center gap-2 border-2 border-white/40 text-white font-semibold px-8 py-3.5 rounded-xl hover:border-white hover:bg-white/10 transition">
-                        <i class="ri-mail-send-line"></i> ads@justproperties.ng
+                    <a href="mailto:ads@propatis.com" class="inline-flex items-center gap-2 border-2 border-white/40 text-white font-semibold px-8 py-3.5 rounded-xl hover:border-white hover:bg-white/10 transition">
+                        <i class="ri-mail-send-line"></i> ads@propatis.com
                     </a>
                 </div>
             </div>

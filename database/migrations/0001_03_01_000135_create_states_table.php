@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->nullable();
             $table->string('code')->nullable();
+            $table->double('latitude', 10, 7)->nullable();
+            $table->double('longitude', 10, 7)->nullable();
+            $table->string('timezone', 64)->nullable();
             $table->unsignedBigInteger('country_id');
             $table->foreign('country_id')->references('id')->on('countries');
             $table->boolean('is_active')->default(true);

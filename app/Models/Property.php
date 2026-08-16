@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
     'location',
     'country_id',
     'state_id',
-    'city_id',
+    'city',
     'neighborhood',
     'address',
     'show_address',
@@ -69,7 +69,8 @@ class Property extends Model
 
     public function city(): BelongsTo
     {
-        return $this->belongsTo(City::class);
+        // Cities are stored as freeform strings on the property now.
+        throw new \BadMethodCallException('Property::city relation removed; use the `city` attribute instead.');
     }
 
     public function features(): HasMany
@@ -184,7 +185,7 @@ class Property extends Model
             if (! $this->show_address) {
                 return collect([
                     $this->neighborhood,
-                    $this->city?->name,
+                    $this->city,
                     $this->state?->name,
                     $this->country?->name,
                 ])->filter()->implode(', ');
@@ -200,7 +201,7 @@ class Property extends Model
             return collect([
                 $this->address,
                 $this->neighborhood,
-                $this->city?->name,
+                    $this->city,
                 $this->state?->name,
                 $this->country?->name,
             ])->filter()->implode(', ');

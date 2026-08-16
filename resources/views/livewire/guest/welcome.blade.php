@@ -3,7 +3,7 @@
         <section class="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0">
                 <img alt="Luxury Properties" class="w-full h-full object-cover object-top"
-                    src="https://readdy.ai/api/search-image?query=stunning%20aerial%20view%20of%20modern%20luxury%20residential%20estate%20in%20Lagos%20Nigeria%20with%20contemporary%20houses%2C%20swimming%20pools%2C%20manicured%20gardens%2C%20wide%20streets%2C%20upscale%20neighborhood%2C%20golden%20hour%20lighting%2C%20professional%20real%20estate%20photography%20with%20warm%20tones%20and%20clear%20sky%20background&amp;width=1920&amp;height=1080&amp;seq=hero1&amp;orientation=landscape" />
+                    src="{{ asset('frontend/images/properties.jpg') }}" />
                 <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60"></div>
             </div>
             <div class="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 w-full">
@@ -11,7 +11,7 @@
                     <div class="space-y-3 sm:space-y-4">
                         <h2
                             class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-serif text-white leading-tight">
-                            JustProperties
+                            Propatis
                         </h2>
                         <p class="text-lg sm:text-xl md:text-2xl text-emerald-100 font-light px-4">
                             Connect Directly with Property Owners
@@ -949,7 +949,7 @@
                                 List Your Property in Minutes
                             </h2>
                             <p class="text-base sm:text-lg text-gray-600 leading-relaxed">
-                                Join hundreds of property owners who trust JustProperties
+                                Join hundreds of property owners who trust Propatis
                                 to connect with serious buyers and renters
                             </p>
                         </div>
@@ -1043,7 +1043,7 @@
                     <div class="lg:col-span-2 space-y-4 sm:space-y-6 text-center lg:text-left">
                         <h2
                             class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-serif text-gray-900 leading-tight">
-                            Why Choose JustProperties
+                            Why Choose Propatis
                         </h2>
                         <p class="text-base sm:text-lg text-gray-600 leading-relaxed">
                             Nigeria's most trusted platform for direct property
@@ -1264,7 +1264,7 @@
                     </article>
                 </div>
                 <div class="text-center mt-8 sm:mt-12">
-                    <a href="https://wa.me/2348067042140?text=Hello%2C%20I%20want%20to%20read%20more%20real%20estate%20articles%20on%20JustProperties."
+                    <a href="https://wa.me/2348067042140?text=Hello%2C%20I%20want%20to%20read%20more%20real%20estate%20articles%20on%20Propatis."
                         target="_blank" rel="noopener noreferrer"
                         class="inline-block px-6 sm:px-8 py-3 sm:py-4 border-2 border-gray-900 hover:bg-gray-900 text-gray-900 hover:text-white font-semibold rounded-xl transition-all duration-300 whitespace-nowrap text-sm sm:text-base cursor-pointer">View
                         All Articles</a>

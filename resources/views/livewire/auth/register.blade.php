@@ -3,8 +3,8 @@
         <div class="brand-content">
             <div class="logo">
                 <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png"
-                    alt="JustProperties">
-                <span>JustProperties</span>
+                    alt="Propatis">
+                <span>Propatis</span>
             </div>
 
             <div class="brand-text">

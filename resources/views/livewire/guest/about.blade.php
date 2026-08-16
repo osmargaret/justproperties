@@ -1,7 +1,7 @@
 <div>
   <section class="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-400 pt-32 pb-16">
     <div class="text-center max-w-3xl mx-auto px-4 text-white">
-      <h1 class="text-4xl md:text-5xl font-bold font-serif mb-6 leading-tight">About JustProperties</h1>
+      <h1 class="text-4xl md:text-5xl font-bold font-serif mb-6 leading-tight">About Propatis</h1>
       <p class="text-lg sm:text-xl text-lg md:text-xl opacity-95 leading-loose">Nigeria's premier direct property marketplace connecting verified owners with serious buyers and renters. We're revolutionizing real estate transactions by eliminating middlemen and empowering direct connections.</p>
     </div>
   </section>
@@ -14,13 +14,13 @@
         <div>
           <h2 class="font-bold font-serif text-gray-900 mb-6 text-4xl leading-tight">Our Story</h2>
           <div class="space-y-4 text-gray-500">
-            <p class="leading-loose">JustProperties was founded in 2024 with a simple mission: to make property transactions in Nigeria transparent, affordable, and direct. We noticed that property buyers and renters were often frustrated by high agent fees, lack of transparency, and difficulty connecting directly with property owners.</p>
+            <p class="leading-loose">Propatis was founded in 2024 with a simple mission: to make property transactions in Nigeria transparent, affordable, and direct. We noticed that property buyers and renters were often frustrated by high agent fees, lack of transparency, and difficulty connecting directly with property owners.</p>
             <p class="leading-loose">Our platform bridges this gap by providing a trusted marketplace where verified property owners can list their properties and connect directly with serious buyers and renters. No middlemen, no hidden fees, just direct connections.</p>
             <p class="leading-loose">Based in Ikorodu, Lagos, we've grown to become one of Nigeria's most trusted property marketplaces, serving thousands of property owners and seekers across Lagos and beyond.</p>
           </div>
         </div>
         <div class="rounded-2xl overflow-hidden shadow-2xl">
-          <img src="https://readdy.ai/api/search-image?query=modern%20office%20space%20with%20team%20collaboration%2C%20Nigerian%20professionals%20working%20together%2C%20bright%20and%20airy%20workspace%2C%20professional%20photography%20with%20clean%20background&width=800&height=600&seq=about1&orientation=landscape" alt="JustProperties Team" class="w-full h-full object-cover" />
+          <img src="https://readdy.ai/api/search-image?query=modern%20office%20space%20with%20team%20collaboration%2C%20Nigerian%20professionals%20working%20together%2C%20bright%20and%20airy%20workspace%2C%20professional%20photography%20with%20clean%20background&width=800&height=600&seq=about1&orientation=landscape" alt="Propatis Team" class="w-full h-full object-cover" />
         </div>
       </div>
     </section>
@@ -28,7 +28,7 @@
     <!-- Our Values -->
     <section class="mb-16">
       <h2 class="font-bold font-serif text-gray-900 text-center mb-4 text-4xl leading-tight">Our Values</h2>
-      <p class="text-gray-500 text-center max-w-2xl mx-auto mb-12 text-lg">The principles that guide everything we do at JustProperties</p>
+      <p class="text-gray-500 text-center max-w-2xl mx-auto mb-12 text-lg">The principles that guide everything we do at Propatis</p>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         <!-- Trust & Transparency -->
         <div class="bg-white p-8 rounded-2xl border border-gray-200 hover:border-emerald-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -108,7 +108,7 @@
     <!-- Team Section -->
     <section class="mb-16">
       <h2 class="font-bold font-serif text-gray-900 text-center mb-4 text-4xl leading-tight">Meet Our Team</h2>
-      <p class="text-gray-500 text-center max-w-2xl mx-auto mb-12 text-lg">The dedicated professionals behind JustProperties</p>
+      <p class="text-gray-500 text-center max-w-2xl mx-auto mb-12 text-lg">The dedicated professionals behind Propatis</p>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         <!-- Louis Adeyemi -->
         <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
@@ -118,7 +118,7 @@
           <div class="p-6 text-center">
             <h3 class="font-bold text-gray-900 mb-1 text-xl leading-snug">Louis Adeyemi</h3>
             <p class="font-medium mb-3 text-emerald-500 text-base">Founder & CEO</p>
-            <p class="text-gray-500 text-sm leading-relaxed">With over 10 years in real estate, Louis founded JustProperties to revolutionize property transactions in Nigeria.</p>
+            <p class="text-gray-500 text-sm leading-relaxed">With over 10 years in real estate, Louis founded Propatis to revolutionize property transactions in Nigeria.</p>
           </div>
         </div>
         <!-- Chioma Okafor -->
@@ -149,7 +149,7 @@
     <!-- CTA Section -->
     <section class="bg-gray-50 rounded-2xl p-8 md:p-12 text-center">
       <h2 class="font-bold font-serif text-gray-900 mb-4 text-4xl leading-tight">Ready to Find Your Dream Property?</h2>
-      <p class="text-gray-500 mb-8 max-w-xl mx-auto text-base leading-relaxed">Join thousands of satisfied property owners and seekers who trust JustProperties for their real estate needs.</p>
+      <p class="text-gray-500 mb-8 max-w-xl mx-auto text-base leading-relaxed">Join thousands of satisfied property owners and seekers who trust Propatis for their real estate needs.</p>
       <div class="flex flex-wrap justify-center gap-4">
         <a href="browse_all.html" class="inline-flex items-center gap-2 text-white px-6 py-3 rounded-lg font-semibold transition-all hover:-translate-y-1 bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-700 hover:via-emerald-600 hover:to-emerald-500 shadow-md hover:shadow-lg">
           <i class="ri-search-line text-lg"></i>

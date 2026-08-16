@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             BlogPostsSeeder::class,
             PropertiesSeeder::class,
-            PropertiesMediaSeeder::class,
             SubscriptionsAndPaymentsSeeder::class,
             UserEngagementSeeder::class,
             ContentAndNotificationsSeeder::class,

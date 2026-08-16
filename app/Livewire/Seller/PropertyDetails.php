@@ -4,7 +4,6 @@ namespace App\Livewire\Seller;
 
 use App\Livewire\Seller\Concerns\ManagesPropertyListingFields;
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Currency;
 use App\Models\Media;
 use App\Models\Newsletter;
@@ -50,7 +49,7 @@ class PropertyDetails extends Component
 
     public ?int $editStateId = null;
 
-    public ?int $editCityId = null;
+    public ?string $editCity = null;
 
     public string $editAddress = '';
 
@@ -99,7 +98,6 @@ class PropertyDetails extends Component
             'category.settings',
             'country',
             'state',
-            'city',
             'media',
             'features',
             'subscribedPropertyLinks.subscription.plan',
@@ -491,7 +489,7 @@ class PropertyDetails extends Component
 
     public function updatedEditStateId(): void
     {
-        $this->editCityId = null;
+        $this->editCity = null;
     }
 
     protected function syncEditFieldsFromProperty(): void
@@ -501,7 +499,7 @@ class PropertyDetails extends Component
         $this->editCost = (float) $this->property->cost;
         $this->editCategoryId = $this->property->category_id;
         $this->editStateId = $this->property->state_id;
-        $this->editCityId = $this->property->city_id;
+        $this->editCity = $this->property->city ?? null;
         $this->editAddress = (string) $this->property->address;
         $this->editNeighborhood = (string) ($this->property->neighborhood ?? '');
         $this->editShowAddress = (bool) $this->property->show_address;
@@ -560,7 +558,7 @@ class PropertyDetails extends Component
             'editCost' => ['required', 'numeric', 'min:0'],
             'editCategoryId' => ['required', 'exists:categories,id'],
             'editStateId' => ['required', 'exists:states,id'],
-            'editCityId' => ['required', 'exists:cities,id'],
+            'editCity' => ['nullable', 'string', 'max:255'],
             'editAddress' => ['required', 'string', 'max:255'],
             'editNeighborhood' => ['nullable', 'string', 'max:255'],
             'editShowAddress' => ['boolean'],
@@ -576,7 +574,7 @@ class PropertyDetails extends Component
             'editCategoryId' => 'listing category',
             'editCost' => 'cost',
             'editStateId' => 'state',
-            'editCityId' => 'city/LGA',
+            'editCity' => 'city/LGA',
         ]);
 
         if ($existingMediaCount + $newCount < 1) {
@@ -597,7 +595,7 @@ class PropertyDetails extends Component
             'cost' => $this->editCost,
             'category_id' => $this->editCategoryId,
             'state_id' => $this->editStateId,
-            'city_id' => $this->editCityId,
+            'city' => $this->editCity,
             'address' => $this->editAddress,
             'neighborhood' => $this->editNeighborhood !== '' ? $this->editNeighborhood : null,
             'show_address' => $this->editShowAddress,
@@ -911,11 +909,7 @@ class PropertyDetails extends Component
         return view('livewire.seller.property-details', [
             'categories' => Category::query()->with('settings')->orderBy('name', 'asc')->get(),
             'states' => State::query()->where('is_active', true)->orderBy('name', 'asc')->get(),
-            'cities' => City::query()
-                ->where('is_active', true)
-                ->when($this->editStateId, fn ($q) => $q->where('state_id', $this->editStateId))
-                ->orderBy('name', 'asc')
-                ->get(),
+            'cities' => collect(),
         ]);
     }
 }

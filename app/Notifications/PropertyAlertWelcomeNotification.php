@@ -39,9 +39,9 @@ class PropertyAlertWelcomeNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('Welcome to JustProperties Alerts!')
+                    ->subject('Welcome to Propatis Alerts!')
                     ->greeting('Hello ' . $this->user->name . ',')
-                    ->line('You have successfully subscribed to property alerts on JustProperties.')
+                    ->line('You have successfully subscribed to property alerts on Propatis.')
                     ->line('An account has been created for you so you can manage your preferences.')
                     ->line('Your temporary password is: ' . $this->password)
                     ->action('Login to your account', url('/login'))

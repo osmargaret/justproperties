@@ -4,7 +4,6 @@ namespace App\Livewire\Auth;
 
 use App\Models\Country;
 use App\Models\User;
-use App\Services\GeographyService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
@@ -63,14 +62,7 @@ class Register extends Component
 
         Auth::login($user);
 
-        // Populate states & cities for the user's country in the background
-        // after the response is sent, so registration is not blocked.
-        $countryModel = Country::query()->find($this->country_id);
-        if ($countryModel && ! $countryModel->states()->exists()) {
-            dispatch(function () use ($countryModel) {
-                app(GeographyService::class)->fetchAndSave($countryModel);
-            })->afterResponse();
-        }
+        // States & cities will be populated when admin adds countries.
 
         return redirect()->route('verification.notice');
     }

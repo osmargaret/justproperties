@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Settings;
 use App\Models\Country;
 use App\Models\CountrySetting;
 use App\Models\Currency;
+use App\Services\GeographyService;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -102,7 +103,14 @@ class AdminCountries extends Component
         if ($this->editingId) {
             Country::query()->whereKey($this->editingId)->update($payload);
         } else {
-            Country::query()->create($payload);
+            $country = Country::query()->create($payload);
+
+            // Fetch states & cities for the newly created country in background
+            if ($country && ! $country->states()->exists()) {
+                dispatch(function () use ($country) {
+                    app(GeographyService::class)->fetchAndSave($country);
+                })->afterResponse();
+            }
         }
 
         session()->flash('status', __('Country saved.'));

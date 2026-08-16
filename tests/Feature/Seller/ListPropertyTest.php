@@ -4,7 +4,6 @@ namespace Tests\Feature\Seller;
 
 use App\Livewire\Seller\ListProperty;
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Payment;
@@ -26,7 +25,7 @@ class ListPropertyTest extends TestCase
 
     public function test_can_save_listing_as_draft_and_redirect_to_property_details(): void
     {
-        [$seller, $category, $state, $city] = $this->seedBaseData();
+        [$seller, $category, $state] = $this->seedBaseData();
 
         Livewire::actingAs($seller)
             ->test(ListProperty::class)
@@ -44,7 +43,7 @@ class ListPropertyTest extends TestCase
 
     public function test_submit_with_pending_payment_redirects_to_checkout(): void
     {
-        [$seller, $category, $state, $city, $currency] = $this->seedBaseData();
+        [$seller, $category, $state, $currency] = $this->seedBaseData();
         $subscriptionPlan = SubscriptionPlan::query()->create([
             'name' => 'Starter',
             'slug' => 'starter',
@@ -67,7 +66,7 @@ class ListPropertyTest extends TestCase
             ->set('description', str_repeat('Description ', 4))
             ->set('cost', 70000000)
             ->set('state_id', $state->id)
-            ->set('city_id', $city->id)
+            ->set('city', 'Ikeja')
             ->set('address', '20 Broad Street')
             ->set('neighborhood', 'Ikeja')
             ->set('show_address', true)
@@ -94,7 +93,7 @@ class ListPropertyTest extends TestCase
 
     public function test_submit_without_payable_charge_marks_property_active(): void
     {
-        [$seller, $category, $state, $city] = $this->seedBaseData();
+        [$seller, $category, $state] = $this->seedBaseData();
         $subscriptionPlan = SubscriptionPlan::query()->create([
             'name' => 'Professional',
             'slug' => 'professional',
@@ -121,7 +120,7 @@ class ListPropertyTest extends TestCase
             ->set('description', str_repeat('Description ', 4))
             ->set('cost', 72000000)
             ->set('state_id', $state->id)
-            ->set('city_id', $city->id)
+            ->set('city', 'Ikeja')
             ->set('address', '3 Admiralty Way')
             ->set('neighborhood', 'Lekki')
             ->set('contact_name', 'Seller One')
@@ -140,7 +139,7 @@ class ListPropertyTest extends TestCase
 
     public function test_submit_with_unused_slots_but_purchase_choice_redirects_to_checkout(): void
     {
-        [$seller, $category, $state, $city, $currency] = $this->seedBaseData();
+        [$seller, $category, $state, $currency] = $this->seedBaseData();
         $heldPlan = SubscriptionPlan::query()->create([
             'name' => 'Held Pack',
             'slug' => 'held-pack',
@@ -180,7 +179,7 @@ class ListPropertyTest extends TestCase
             ->set('description', str_repeat('Description ', 4))
             ->set('cost', 61000000)
             ->set('state_id', $state->id)
-            ->set('city_id', $city->id)
+            ->set('city', 'Ikeja')
             ->set('address', '5 Sample Close')
             ->set('neighborhood', 'Gbagada')
             ->set('show_address', true)
@@ -208,7 +207,7 @@ class ListPropertyTest extends TestCase
     public function test_bulk_upload_creates_draft_rows_and_redirects_to_listed_properties(): void
     {
         [$seller, $category] = $this->seedBaseData();
-        $csv = "title,description,category_slug,cost,state_name,city_name,address,neighborhood,show_address,contact_name,contact_phone,contact_email,contact_whatsapp\n";
+        $csv = "title,description,category_slug,cost,state,city,address,neighborhood,show_address,contact_name,contact_phone,contact_email,contact_whatsapp\n";
         $csv .= "Bulk Listing One,Description one,{$category->slug},12000000,Lagos,Ikeja,10 Street,Alausa,true,Seller One,+2348000000000,seller@example.com,+2348000000000\n";
         $csv .= "Bulk Listing Two,Description two,{$category->slug},22000000,Lagos,Ikeja,22 Street,Magodo,true,Seller One,+2348000000000,seller@example.com,+2348000000000\n";
         $file = UploadedFile::fake()->createWithContent('bulk-properties.csv', $csv);
@@ -285,14 +284,7 @@ class ListPropertyTest extends TestCase
             'country_id' => $country->id,
             'is_active' => true,
         ]);
-        $city = City::query()->create([
-            'name' => 'Ikeja',
-            'slug' => 'ikeja',
-            'code' => 'IKJ',
-            'state_id' => $state->id,
-            'country_id' => $country->id,
-            'is_active' => true,
-        ]);
+        
         $currency = Currency::query()->create([
             'name' => 'Naira',
             'slug' => 'naira',
@@ -311,6 +303,6 @@ class ListPropertyTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        return [$seller, $category, $state, $city, $currency];
+        return [$seller, $category, $state, $currency];
     }
 }

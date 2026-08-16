@@ -22,7 +22,8 @@ class GeographyService
     {
         try {
             $this->fetchStates($country);
-            $this->fetchCities($country);
+            // Cities are no longer stored in a separate table; skip city persistence.
+            // $this->fetchCities($country);
         } catch (\Throwable $e) {
             Log::warning('GeographyService: failed to fetch geography for country '.$country->code, [
                 'error' => $e->getMessage(),
@@ -92,58 +93,7 @@ class GeographyService
      */
     protected function fetchCities(Country $country): void
     {
-        $response = Http::withHeaders([
-            'X-CSCAPI-KEY' => $this->apiKey(),
-        ])->timeout(30)->get(self::BASE_URL."/{$country->code}/cities");
-
-        if (! $response->successful()) {
-            Log::warning('GeographyService: HTTP error fetching cities', [
-                'country' => $country->code,
-                'status'  => $response->status(),
-            ]);
-
-            return;
-        }
-
-        $cities = $response->json();
-
-        if (! is_array($cities)) {
-            return;
-        }
-
-        // Cache states by their ISO2 code for lookup
-        $statesByIso2 = State::query()
-            ->where('country_id', $country->id)
-            ->get()
-            ->keyBy('code');
-
-        foreach ($cities as $cityData) {
-            $cityName  = $cityData['name'] ?? null;
-            $stateCode = $cityData['state_code'] ?? null;
-
-            if (! $cityName) {
-                continue;
-            }
-
-            $citySlug = Str::slug($cityName);
-            $state    = $stateCode ? ($statesByIso2[$stateCode] ?? null) : null;
-
-            if (! $state) {
-                continue; // skip cities whose state we couldn't resolve
-            }
-
-            City::query()->updateOrCreate(
-                ['state_id' => $state->id, 'slug' => $citySlug],
-                [
-                    'name'       => $cityName,
-                    'country_id' => $country->id,
-                    'latitude'   => $cityData['latitude'] ?? null,
-                    'longitude'  => $cityData['longitude'] ?? null,
-                    'timezone'   => $cityData['timezone'] ?? null,
-                    'population' => isset($cityData['population']) ? (int) $cityData['population'] : null,
-                    'is_active'  => true,
-                ]
-            );
-        }
+        // Cities are now captured as freeform input on properties; we no longer persist city rows.
+        return;
     }
 }

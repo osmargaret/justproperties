@@ -29,11 +29,7 @@ class PlansCouponsSeeder extends Seeder
                 'priceable_type' => SubscriptionPlan::class, 'currency_id' => 1],
             ['amount' => 500.00]
         );
-        Price::query()->updateOrCreate(
-            ['priceable_id' => $plan->id,
-                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 2],
-            ['amount' => 1.00]
-        );
+        
 
         $plan = SubscriptionPlan::query()->updateOrCreate(
             ['slug' => 'professional'],
@@ -49,11 +45,7 @@ class PlansCouponsSeeder extends Seeder
                 'priceable_type' => SubscriptionPlan::class, 'currency_id' => 1],
             ['amount' => 1500.00]
         );
-        Price::query()->updateOrCreate(
-            ['priceable_id' => $plan->id,
-                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 2],
-            ['amount' => 5.00]
-        );
+        
 
         $plan = PromotionPlan::query()->updateOrCreate(
             ['slug' => 'featured-listing'],
@@ -68,11 +60,7 @@ class PlansCouponsSeeder extends Seeder
                 'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
             ['amount' => 500.00]
         );
-        Price::query()->updateOrCreate(
-            ['priceable_id' => $plan->id,
-                'priceable_type' => PromotionPlan::class, 'currency_id' => 2],
-            ['amount' => 1.00]
-        );
+        
 
         $plan = PromotionPlan::query()->updateOrCreate(
             ['slug' => 'blog-post-starter'],
@@ -87,12 +75,7 @@ class PlansCouponsSeeder extends Seeder
                 'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
             ['amount' => 1500.00]
         );
-        Price::query()->updateOrCreate(
-            ['priceable_id' => $plan->id,
-                'priceable_type' => PromotionPlan::class, 'currency_id' => 2],
-            ['amount' => 5.00]
-        );
-
+        
         $plan = PromotionPlan::query()->updateOrCreate(
             ['slug' => 'newsletter-starter'],
             [
@@ -105,11 +88,6 @@ class PlansCouponsSeeder extends Seeder
             ['priceable_id' => $plan->id,
                 'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
             ['amount' => 2500.00]
-        );
-        Price::query()->updateOrCreate(
-            ['priceable_id' => $plan->id,
-                'priceable_type' => PromotionPlan::class, 'currency_id' => 2],
-            ['amount' => 7.00]
         );
 
         Coupon::query()->updateOrCreate(

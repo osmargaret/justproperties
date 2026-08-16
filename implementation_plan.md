@@ -1,6 +1,6 @@
 # Implementation Plan — todo2.txt Full Requirements
 
-This plan covers all 10 feature epics from [todo2.txt](file:///c:/laragon/www/justproperties/todo2.txt) in the recommended execution order (database-first, then backend, then views).
+This plan covers all 10 feature epics from [todo2.txt](file:///c:/laragon/www/propatis/todo2.txt) in the recommended execution order (database-first, then backend, then views).
 
 ---
 
@@ -22,11 +22,11 @@ This plan covers all 10 feature epics from [todo2.txt](file:///c:/laragon/www/ju
 ### Models
 #### ~~[MODIFY] Country.php~~ *(not needed for bank_details)*
 
-#### [MODIFY] [Currency.php](file:///c:/laragon/www/justproperties/app/Models/Currency.php)
+#### [MODIFY] [Currency.php](file:///c:/laragon/www/propatis/app/Models/Currency.php)
 - Add `bank_details` to `#[Fillable]`
 - Add `'bank_details' => 'array'` cast
 
-#### [MODIFY] [Payment.php](file:///c:/laragon/www/justproperties/app/Models/Payment.php)
+#### [MODIFY] [Payment.php](file:///c:/laragon/www/propatis/app/Models/Payment.php)
 - Add `receipt` to `#[Fillable]`
 
 ### Admin — AdminCurrencies Settings
@@ -38,7 +38,7 @@ This plan covers all 10 feature epics from [todo2.txt](file:///c:/laragon/www/ju
 - Add bank details fields (toggle + inputs) in the create/edit modal
 
 ### Checkout — Manual Payment Option
-#### [MODIFY] [Checkout.php](file:///c:/laragon/www/justproperties/app/Livewire/Seller/Checkout.php)
+#### [MODIFY] [Checkout.php](file:///c:/laragon/www/propatis/app/Livewire/Seller/Checkout.php)
 - Add `WithFileUploads` trait
 - Add `$paymentMethod = 'gateway'`, `$receiptFile` properties
 - Add `submitManualPayment()` method: validate + store receipt + set payment `status = 'pending'`, `method = 'manual'`
@@ -48,7 +48,7 @@ This plan covers all 10 feature epics from [todo2.txt](file:///c:/laragon/www/ju
 - Show file upload for receipt; hide on gateway selection
 
 ### Admin — AdminPayments Receipt Review
-#### [MODIFY] [AdminPayments.php](file:///c:/laragon/www/justproperties/app/Livewire/Admin/AdminPayments.php)
+#### [MODIFY] [AdminPayments.php](file:///c:/laragon/www/propatis/app/Livewire/Admin/AdminPayments.php)
 - Add `confirmPayment(int $id)` method: set payment status to `'success'`, set `paid_at = now()`
 
 #### [MODIFY] `resources/views/livewire/admin/admin-payments.blade.php`
@@ -61,7 +61,7 @@ This plan covers all 10 feature epics from [todo2.txt](file:///c:/laragon/www/ju
 
 **Goal**: Expand the 2-panel welcome screen to 6 intent-based tiles.
 
-#### [MODIFY] [role-welcome.blade.php](file:///c:/laragon/www/justproperties/resources/views/livewire/auth/role-welcome.blade.php)
+#### [MODIFY] [role-welcome.blade.php](file:///c:/laragon/www/propatis/resources/views/livewire/auth/role-welcome.blade.php)
 Replace the 2-column buyer/seller panels with 6 cards:
 1. **Rent** → buyer dashboard
 2. **Shortlet** → buyer dashboard
@@ -70,7 +70,7 @@ Replace the 2-column buyer/seller panels with 6 cards:
 5. **Seller Dashboard** → seller dashboard
 6. **Buyer Dashboard** → buyer dashboard
 
-#### [MODIFY] [RoleWelcome.php](file:///c:/laragon/www/justproperties/app/Livewire/Auth/RoleWelcome.php)
+#### [MODIFY] [RoleWelcome.php](file:///c:/laragon/www/propatis/app/Livewire/Auth/RoleWelcome.php)
 - Add `chooseRole(string $role)` method to set `active_role` then redirect
 
 ---
@@ -93,21 +93,21 @@ Replace the 2-column buyer/seller panels with 6 cards:
 
 #### [NEW] `resources/views/livewire/admin/admin-faqs.blade.php`
 
-#### [MODIFY] [web.php](file:///c:/laragon/www/justproperties/routes/web.php)
+#### [MODIFY] [web.php](file:///c:/laragon/www/propatis/routes/web.php)
 - Add admin route: `admin/faqs`
 
 #### [MODIFY] Admin sidebar nav
 - Add FAQ menu item
 
 ### Contact Page (dynamic FAQs)
-#### [MODIFY] [Contact.php](file:///c:/laragon/www/justproperties/app/Livewire/Guest/Contact.php)
+#### [MODIFY] [Contact.php](file:///c:/laragon/www/propatis/app/Livewire/Guest/Contact.php)
 - Pass `Faq::where('show_on_contact_page', true)->where('is_active', true)->get()` to view
 
-#### [MODIFY] [contact.blade.php](file:///c:/laragon/www/justproperties/resources/views/livewire/guest/contact.blade.php)
+#### [MODIFY] [contact.blade.php](file:///c:/laragon/www/propatis/resources/views/livewire/guest/contact.blade.php)
 - Replace hardcoded FAQ cards with dynamic loop
 
 ### App Layout Chat Widget
-#### [MODIFY] [app.blade.php](file:///c:/laragon/www/justproperties/resources/views/layouts/app.blade.php)
+#### [MODIFY] [app.blade.php](file:///c:/laragon/www/propatis/resources/views/layouts/app.blade.php)
 - Convert bottom-right button into a FAQ chat popover panel
 - Load active FAQs as clickable questions; clicking a question shows the answer
 - Add "Back" button to return to question list
@@ -121,11 +121,11 @@ Replace the 2-column buyer/seller panels with 6 cards:
 #### [NEW] `app/Mail/ContactMessage.php`
 - Mailable for contact form submissions
 
-#### [MODIFY] [Contact.php](file:///c:/laragon/www/justproperties/app/Livewire/Guest/Contact.php)
+#### [MODIFY] [Contact.php](file:///c:/laragon/www/propatis/app/Livewire/Guest/Contact.php)
 - Add public props: `$name`, `$email`, `$phone`, `$subject`, `$message`
 - Add `send()` method: validate → send mail to `env('MAIL_FROM_ADDRESS')` → flash success/error
 
-#### [MODIFY] [contact.blade.php](file:///c:/laragon/www/justproperties/resources/views/livewire/guest/contact.blade.php)
+#### [MODIFY] [contact.blade.php](file:///c:/laragon/www/propatis/resources/views/livewire/guest/contact.blade.php)
 - Convert plain HTML `<form>` to `wire:submit.prevent="send"`, `wire:model` bindings
 - Add subject options: **Feedback** and **Adverts**
 - Display flash session success/error message
@@ -141,10 +141,10 @@ Replace the 2-column buyer/seller panels with 6 cards:
 - `updatedSelectedCountryId()` to reload plans
 - Pass `SubscriptionPlan` data to view
 
-#### [MODIFY] [web.php](file:///c:/laragon/www/justproperties/routes/web.php)
+#### [MODIFY] [web.php](file:///c:/laragon/www/propatis/routes/web.php)
 - Replace `Route::view(...)` → `Route::get('pricing', Pricing::class)->name('pricing')`
 
-#### [MODIFY] [pricing.blade.php](file:///c:/laragon/www/justproperties/resources/views/livewire/guest/pricing.blade.php)
+#### [MODIFY] [pricing.blade.php](file:///c:/laragon/www/propatis/resources/views/livewire/guest/pricing.blade.php)
 - Remove standalone HTML shell
 - Wrap in Livewire component with `layouts.app`
 - Add country switcher dropdown (wire:model)
@@ -165,10 +165,10 @@ Replace the 2-column buyer/seller panels with 6 cards:
 #### [NEW] `database/seeders/PropertiesSeeder.php`
 - 50 properties across all category types
 
-#### [MODIFY] [PropertyObserver.php](file:///c:/laragon/www/justproperties/app/Observers/PropertyObserver.php)
+#### [MODIFY] [PropertyObserver.php](file:///c:/laragon/www/propatis/app/Observers/PropertyObserver.php)
 - Add seeder-aware check: when seeding, create moderation record with `status = 'approved'` instead of `'pending'`
 
-#### [MODIFY] [DatabaseSeeder.php](file:///c:/laragon/www/justproperties/database/seeders/DatabaseSeeder.php)
+#### [MODIFY] [DatabaseSeeder.php](file:///c:/laragon/www/propatis/database/seeders/DatabaseSeeder.php)
 - Add new seeders to call chain
 
 ---
@@ -177,17 +177,17 @@ Replace the 2-column buyer/seller panels with 6 cards:
 
 **Goal**: Display tags as comma-separated clickable strings in post list and blog views.
 
-#### [MODIFY] [AdminBlogPostEdit.php](file:///c:/laragon/www/justproperties/app/Livewire/Admin/AdminBlogPostEdit.php)
+#### [MODIFY] [AdminBlogPostEdit.php](file:///c:/laragon/www/propatis/app/Livewire/Admin/AdminBlogPostEdit.php)
 - On `mount()`, convert stored tags array → comma-separated string for `$tagsInput`
 
 #### [MODIFY] Admin blog post list blade
 - Display tags as comma-separated linked strings
 
-#### [MODIFY] [BlogRoll.php](file:///c:/laragon/www/justproperties/app/Livewire/Guest/BlogRoll.php)
+#### [MODIFY] [BlogRoll.php](file:///c:/laragon/www/propatis/app/Livewire/Guest/BlogRoll.php)
 - Add `$tag = ''` URL parameter with `#[Url]`
 - Filter posts by tag: `whereJsonContains('tags', $this->tag)`
 
-#### [MODIFY] [BlogPost.php](file:///c:/laragon/www/justproperties/app/Livewire/Guest/BlogPost.php)
+#### [MODIFY] [BlogPost.php](file:///c:/laragon/www/propatis/app/Livewire/Guest/BlogPost.php)
 - Pass post tags to view as linked chips
 
 #### [MODIFY] blog-roll + blog-post blades
@@ -204,33 +204,33 @@ Replace the 2-column buyer/seller panels with 6 cards:
 - Add `is_property` boolean (default `true`) to `categories` table
 
 ### Model
-#### [MODIFY] [Category.php](file:///c:/laragon/www/justproperties/app/Models/Category.php)
+#### [MODIFY] [Category.php](file:///c:/laragon/www/propatis/app/Models/Category.php)
 - Add `is_property` to `#[Fillable]` and cast
 
 ### Seeder
-#### [MODIFY] [CategoriesSeeder.php](file:///c:/laragon/www/justproperties/database/seeders/CategoriesSeeder.php)
+#### [MODIFY] [CategoriesSeeder.php](file:///c:/laragon/www/propatis/database/seeders/CategoriesSeeder.php)
 - Mark all existing property categories with `is_property = true`
 - Add **Facilities** category with types (factory, warehouse, industrial, hotel, hospital, school, etc.)
 - Add non-property blog categories with `is_property = false` via `updateOrCreate`
 
 ### Admin
-#### [MODIFY] [AdminCategories.php](file:///c:/laragon/www/justproperties/app/Livewire/Admin/Settings/AdminCategories.php)
+#### [MODIFY] [AdminCategories.php](file:///c:/laragon/www/propatis/app/Livewire/Admin/Settings/AdminCategories.php)
 - Filter to `where('is_property', true)` in `mount()` and `render()`
 - Remove category creation UI
 
 ### Blog Post Create/Edit
-#### [MODIFY] [AdminBlogPostCreate.php](file:///c:/laragon/www/justproperties/app/Livewire/Admin/AdminBlogPostCreate.php) + Edit
+#### [MODIFY] [AdminBlogPostCreate.php](file:///c:/laragon/www/propatis/app/Livewire/Admin/AdminBlogPostCreate.php) + Edit
 - Load **all** categories (no `is_property` filter)
 
 ### Welcome Page
-#### [MODIFY] [Welcome.php](file:///c:/laragon/www/justproperties/app/Livewire/Guest/Welcome.php)
+#### [MODIFY] [Welcome.php](file:///c:/laragon/www/propatis/app/Livewire/Guest/Welcome.php)
 - Add `Category::where('is_property', true)->get()` to render data
 
 ### Footer
-#### [MODIFY] [Footer.php](file:///c:/laragon/www/justproperties/app/Livewire/Guest/Footer.php)
+#### [MODIFY] [Footer.php](file:///c:/laragon/www/propatis/app/Livewire/Guest/Footer.php)
 - Load `Category::where('is_property', false)->get()` → pass to view
 
-#### [MODIFY] [footer.blade.php](file:///c:/laragon/www/justproperties/resources/views/livewire/guest/footer.blade.php)
+#### [MODIFY] [footer.blade.php](file:///c:/laragon/www/propatis/resources/views/livewire/guest/footer.blade.php)
 - Under Resources, list non-property categories as blog links
 
 ---
@@ -251,10 +251,10 @@ Replace the 2-column buyer/seller panels with 6 cards:
 #### [NEW] `resources/views/livewire/guest/advertise.blade.php`
 - Marketing page: benefits, who can benefit list, ad placements/types, CTA button to Contact
 
-#### [MODIFY] [web.php](file:///c:/laragon/www/justproperties/routes/web.php)
+#### [MODIFY] [web.php](file:///c:/laragon/www/propatis/routes/web.php)
 - Add: `Route::get('advertise', Advertise::class)->name('advertise')`
 
-#### [MODIFY] [footer.blade.php](file:///c:/laragon/www/justproperties/resources/views/livewire/guest/footer.blade.php)
+#### [MODIFY] [footer.blade.php](file:///c:/laragon/www/propatis/resources/views/livewire/guest/footer.blade.php)
 - Update "Advertize" link to `route('advertise')`
 
 ### Admin
@@ -263,7 +263,7 @@ Replace the 2-column buyer/seller panels with 6 cards:
 
 #### [NEW] `resources/views/livewire/admin/admin-advertisements.blade.php`
 
-#### [MODIFY] [web.php](file:///c:/laragon/www/justproperties/routes/web.php)
+#### [MODIFY] [web.php](file:///c:/laragon/www/propatis/routes/web.php)
 - Add admin route: `admin/advertisements`
 
 #### [MODIFY] Admin sidebar
@@ -289,7 +289,7 @@ Replace the 2-column buyer/seller panels with 6 cards:
 #### [MODIFY] `app/Providers/EventServiceProvider.php`
 - Register listener: `Registered` → `PopulateGeographyForNewUser`
 
-#### [MODIFY] [State.php](file:///c:/laragon/www/justproperties/app/Models/State.php) + [City.php](file:///c:/laragon/www/justproperties/app/Models/City.php)
+#### [MODIFY] [State.php](file:///c:/laragon/www/propatis/app/Models/State.php) + [City.php](file:///c:/laragon/www/propatis/app/Models/City.php)
 - Add `latitude`, `longitude`, `timezone` to fillable (and `population` for cities)
 
 ---

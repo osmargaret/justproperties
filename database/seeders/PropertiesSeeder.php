@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Country;
 use App\Models\Media;
 use App\Models\Property;
@@ -28,10 +27,9 @@ class PropertiesSeeder extends Seeder
 
         $categories = Category::query()->where('is_property', true)->get();
         $country = Country::query()->where('code', 'NG')->firstOrFail();
-        $state = State::query()->where('slug', 'lagos')->firstOrFail();
-        $cities = City::query()->where('state_id', $state->id)->get();
-
+        $state = State::query()->where('slug', 'lagos')->where('country_id', $country->id)->firstOrFail();
         $neighborhoods = ['Lekki Phase 1', 'Ikoyi', 'Victoria Island', 'Ikeja GRA', 'Ajah', 'Surulere', 'Yaba', 'Gbagada'];
+        $citiesList = ['Ikeja', 'Lekki', 'Ikoyi', 'Victoria Island', 'Ajah', 'Surulere', 'Yaba', 'Gbagada'];
         $propertyTypes = [
             'Luxury 4 Bedroom Terrace Duplex',
             'Modern 3 Bedroom Apartment',
@@ -48,7 +46,7 @@ class PropertiesSeeder extends Seeder
         for ($i = 1; $i <= 50; $i++) {
             $seller = $sellers->random();
             $category = $categories->random();
-            $city = $cities->random();
+            $cityName = $citiesList[array_rand($citiesList)];
             $neighborhood = $neighborhoods[array_rand($neighborhoods)];
             $type = $propertyTypes[array_rand($propertyTypes)];
             
@@ -67,7 +65,7 @@ class PropertiesSeeder extends Seeder
                     'location' => $neighborhood . ', Lagos',
                     'country_id' => $country->id,
                     'state_id' => $state->id,
-                    'city_id' => $city->id,
+                    'city' => $cityName,
                     'neighborhood' => $neighborhood,
                     'address' => 'Plot ' . rand(1, 100) . ' Road ' . rand(1, 10) . ', ' . $neighborhood,
                     'show_address' => rand(0, 1) === 1,

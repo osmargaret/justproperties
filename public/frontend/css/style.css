@@ -38,6 +38,10 @@
     color: #6b7280 !important;
   }
 
+  .navbar.scrolled #mobileMenuToggle{
+    color: #111827 !important;
+  }
+
   .nav-container {
     max-width: 1280px;
     margin: 0 auto;

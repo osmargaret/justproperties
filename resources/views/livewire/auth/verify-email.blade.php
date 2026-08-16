@@ -1,7 +1,7 @@
 <div class="auth-card">
     @include('livewire.auth.partials.auth-brand', [
         'title' => 'Verify your email',
-        'description' => 'We sent a secure link to your inbox. One click confirms your account so you can use JustProperties.',
+        'description' => 'We sent a secure link to your inbox. One click confirms your account so you can use Propatis.',
     ])
 
     <div class="form-panel">

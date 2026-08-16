@@ -3,8 +3,8 @@
         <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
             <div>
                 <div class="flex items-center gap-2 mb-4">
-                    <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="JustProperties" class="h-10 w-auto" />
-                    <span class="text-xl font-bold font-serif">JustProperties</span>
+                    <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="Propatis" class="h-10 w-auto" />
+                    <span class="text-xl font-bold font-serif">Propatis</span>
                 </div>
                 <p class="text-emerald-200 text-sm mb-6 leading-normal">Nigeria's premier direct property marketplace connecting verified owners with serious buyers and renters.</p>
                 <div class="flex gap-3">
@@ -101,7 +101,7 @@
     </div>
     <div class="border-t border-emerald-700/50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p class="text-emerald-200 text-sm">© 2026 JustProperties. All rights reserved.</p>
+            <p class="text-emerald-200 text-sm">© 2026 Propatis. All rights reserved.</p>
             <div class="flex gap-6">
                 <a href="{{ route('terms-of-service') }}" class="text-emerald-200 hover:text-white text-sm transition">Terms of Service</a>
                 <a href="{{ route('privacy-policy') }}" class="text-emerald-200 hover:text-white text-sm transition">Privacy Policy</a>
@@ -111,19 +111,19 @@
 
     <!-- Success Modal -->
     @if($statusMessage)
-    <div class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
-            <div class="p-8 text-center text-gray-900">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="ri-check-line text-3xl font-bold"></i>
+        <div class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
+                <div class="p-8 text-center text-gray-900">
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-check-line text-3xl font-bold"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Subscribed!</h3>
+                    <p class="text-gray-600 mb-6">{{ $statusMessage }}</p>
+                    <button wire:click="$set('statusMessage', null)" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition">
+                        Done
+                    </button>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">Subscribed!</h3>
-                <p class="text-gray-600 mb-6">{{ $statusMessage }}</p>
-                <button wire:click="$set('statusMessage', null)" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition">
-                    Done
-                </button>
             </div>
         </div>
-    </div>
     @endif
 </footer>

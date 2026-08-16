@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('location')->nullable();
             $table->foreignId('country_id')->nullable()->constrained('countries');
             $table->foreignId('state_id')->nullable()->constrained('states');
-            $table->foreignId('city_id')->nullable()->constrained('cities');
+            $table->string('city')->nullable();
             $table->string('neighborhood')->nullable();
             $table->string('address')->nullable();
             $table->boolean('show_address')->default(true);

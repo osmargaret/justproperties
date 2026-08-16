@@ -68,111 +68,111 @@
                 <p class="text-lg">No plans available yet. Please check back soon.</p>
             </div>
         @else
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ min(4, $plans->count()) }} gap-6 mb-14">
-            @foreach($plans as $plan)
-                @php
-                    $price = $plan->prices->first();
-                    $currency = $price?->currency;
-                    $monthlyAmount = $price ? (float) $price->amount : null;
-                    $yearlyAmount = $monthlyAmount ? round($monthlyAmount * 12 * 0.70) : null; // 30% off
-                    $displayAmount = $billingCycle === 'yearly' ? $yearlyAmount : $monthlyAmount;
-                    $isPopular = $loop->iteration === 3;
-                    $currencySymbol = $currency?->symbol ?? '$';
-                @endphp
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ min(4, $plans->count()) }} gap-6 mb-14">
+                @foreach($plans as $plan)
+                    @php
+                        $price = $plan->prices->first();
+                        $currency = $price?->currency;
+                        $monthlyAmount = $price ? (float) $price->amount : null;
+                        $yearlyAmount = $monthlyAmount ? round($monthlyAmount * 12 * 0.70) : null; // 30% off
+                        $displayAmount = $billingCycle === 'yearly' ? $yearlyAmount : $monthlyAmount;
+                        $isPopular = $loop->iteration === 3;
+                        $currencySymbol = $currency?->symbol ?? '$';
+                    @endphp
 
-                <div class="relative bg-white rounded-2xl p-6 shadow-md border-2 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
-                    {{ $isPopular ? 'border-emerald-500 scale-105 z-10' : 'border-transparent' }}"
-                >
-                    @if($isPopular)
-                        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold tracking-wider uppercase px-5 py-1 rounded-full whitespace-nowrap">
-                            Most Popular
-                        </div>
-                    @endif
-
-                    {{-- Plan Header --}}
-                    <div class="text-center mb-6">
-                        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-3
-                            {{ $isPopular ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-600' }}">
-                            <i class="ri-vip-crown-line text-2xl"></i>
-                        </div>
-                        <h2 class="font-serif text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
-
-                        @if($displayAmount !== null)
-                            <div class="mt-3">
-                                <span class="text-4xl font-bold text-emerald-600">
-                                    {{ $currencySymbol }}{{ number_format($displayAmount) }}
-                                </span>
-                                <span class="text-gray-400 text-sm">
-                                    /{{ $billingCycle === 'yearly' ? 'year' : 'month' }}
-                                </span>
+                    <div class="relative bg-white rounded-2xl p-6 shadow-md border-2 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
+                        {{ $isPopular ? 'border-emerald-500 scale-105 z-10' : 'border-transparent' }}"
+                    >
+                        @if($isPopular)
+                            <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold tracking-wider uppercase px-5 py-1 rounded-full whitespace-nowrap">
+                                Most Popular
                             </div>
-                            @if($billingCycle === 'yearly' && $monthlyAmount)
-                                <p class="text-xs text-emerald-600 font-semibold mt-1">
-                                    Save {{ $currencySymbol }}{{ number_format($monthlyAmount * 12 - $yearlyAmount) }}/year
-                                </p>
+                        @endif
+
+                        {{-- Plan Header --}}
+                        <div class="text-center mb-6">
+                            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-3
+                                {{ $isPopular ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-600' }}">
+                                <i class="ri-vip-crown-line text-2xl"></i>
+                            </div>
+                            <h2 class="font-serif text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
+
+                            @if($displayAmount !== null)
+                                <div class="mt-3">
+                                    <span class="text-4xl font-bold text-emerald-600">
+                                        {{ $currencySymbol }}{{ number_format($displayAmount) }}
+                                    </span>
+                                    <span class="text-gray-400 text-sm">
+                                        /{{ $billingCycle === 'yearly' ? 'year' : 'month' }}
+                                    </span>
+                                </div>
+                                @if($billingCycle === 'yearly' && $monthlyAmount)
+                                    <p class="text-xs text-emerald-600 font-semibold mt-1">
+                                        Save {{ $currencySymbol }}{{ number_format($monthlyAmount * 12 - $yearlyAmount) }}/year
+                                    </p>
+                                @endif
+                            @else
+                                <div class="mt-3">
+                                    <span class="text-3xl font-bold text-gray-400">No price set</span>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">Contact us for pricing in your region</p>
                             @endif
-                        @else
-                            <div class="mt-3">
-                                <span class="text-3xl font-bold text-gray-400">No price set</span>
-                            </div>
-                            <p class="text-xs text-gray-400 mt-1">Contact us for pricing in your region</p>
-                        @endif
-                    </div>
+                        </div>
 
-                    {{-- Features --}}
-                    <ul class="space-y-3 mb-6">
-                        @if($plan->features && count($plan->features) > 0)
-                            @foreach($plan->features as $feature)
-                                <li class="flex items-start gap-2.5 text-sm text-gray-600">
-                                    <i class="ri-check-line text-emerald-500 mt-0.5 shrink-0 text-base"></i>
-                                    <span>{{ $feature }}</span>
+                        {{-- Features --}}
+                        <ul class="space-y-3 mb-6">
+                            @if($plan->features && count($plan->features) > 0)
+                                @foreach($plan->features as $feature)
+                                    <li class="flex items-start gap-2.5 text-sm text-gray-600">
+                                        <i class="ri-check-line text-emerald-500 mt-0.5 shrink-0 text-base"></i>
+                                        <span>{{ $feature }}</span>
+                                    </li>
+                                @endforeach
+                            @else
+                                <li class="flex items-center gap-2.5 text-sm text-gray-400">
+                                    <i class="ri-information-line shrink-0"></i>
+                                    <span>Features coming soon</span>
                                 </li>
-                            @endforeach
+                            @endif
+
+                            @if($plan->seats)
+                                <li class="flex items-center gap-2.5 text-sm text-gray-600">
+                                    <i class="ri-home-4-line text-emerald-500 shrink-0"></i>
+                                    <span><strong>{{ $plan->seats }}</strong> property listing{{ $plan->seats > 1 ? 's' : '' }}</span>
+                                </li>
+                            @endif
+
+                            @if($plan->days)
+                                <li class="flex items-center gap-2.5 text-sm text-gray-600">
+                                    <i class="ri-calendar-check-line text-emerald-500 shrink-0"></i>
+                                    <span>Listings active for <strong>{{ $plan->days }} days</strong></span>
+                                </li>
+                            @endif
+                        </ul>
+
+                        {{-- CTA Button --}}
+                        @auth
+                                    <button wire:click="selectPlan({{ $plan->id }})"
+                                       class="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200
+                                           {{ $isPopular
+                            ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-200'
+                            : 'border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white' }}"
+                                    >
+                                        Get {{ $plan->name }}
+                                    </button>
                         @else
-                            <li class="flex items-center gap-2.5 text-sm text-gray-400">
-                                <i class="ri-information-line shrink-0"></i>
-                                <span>Features coming soon</span>
-                            </li>
-                        @endif
-
-                        @if($plan->seats)
-                            <li class="flex items-center gap-2.5 text-sm text-gray-600">
-                                <i class="ri-home-4-line text-emerald-500 shrink-0"></i>
-                                <span><strong>{{ $plan->seats }}</strong> property listing{{ $plan->seats > 1 ? 's' : '' }}</span>
-                            </li>
-                        @endif
-
-                        @if($plan->days)
-                            <li class="flex items-center gap-2.5 text-sm text-gray-600">
-                                <i class="ri-calendar-check-line text-emerald-500 shrink-0"></i>
-                                <span>Listings active for <strong>{{ $plan->days }} days</strong></span>
-                            </li>
-                        @endif
-                    </ul>
-
-                    {{-- CTA Button --}}
-                    @auth
-                        <button wire:click="selectPlan({{ $plan->id }})"
-                           class="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200
-                               {{ $isPopular
-                                   ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-200'
-                                   : 'border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white' }}"
-                        >
-                            Get {{ $plan->name }}
-                        </button>
-                    @else
-                        <a href="{{ route('login') }}"
-                           class="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200
-                               {{ $isPopular
-                                   ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-200'
-                                   : 'border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white' }}"
-                        >
-                            Get Started
-                        </a>
-                    @endauth
-                </div>
-            @endforeach
-        </div>
+                                    <a href="{{ route('login') }}"
+                                       class="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-200
+                                           {{ $isPopular
+                            ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-200'
+                            : 'border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white' }}"
+                                    >
+                                        Get Started
+                                    </a>
+                        @endauth
+                    </div>
+                @endforeach
+            </div>
         @endif
 
         {{-- Feature Comparison Table --}}
@@ -201,7 +201,7 @@
                             <td class="py-3 pr-4 text-gray-600 font-medium">Listing Duration</td>
                             @foreach($plans as $plan)
                                 <td class="py-3 px-2 text-center text-gray-700">
-                                    {{ $plan->days ? $plan->days.' days' : '—' }}
+                                    {{ $plan->days ? $plan->days . ' days' : '—' }}
                                 </td>
                             @endforeach
                         </tr>
@@ -216,7 +216,7 @@
                         <tr>
                             <td class="py-3 pr-4 text-gray-600 font-medium">WhatsApp Support</td>
                             @foreach($plans as $planItem)
-                                @php $isPaid = $planItem->prices->isNotEmpty() && (float)$planItem->prices->first()?->amount > 0; @endphp
+                                @php $isPaid = $planItem->prices->isNotEmpty() && (float) $planItem->prices->first()?->amount > 0; @endphp
                                 <td class="py-3 px-2 text-center">
                                     @if($isPaid)
                                         <i class="ri-check-line text-emerald-500 text-lg"></i>
@@ -278,7 +278,7 @@
         <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl p-8 text-center text-white shadow-xl">
             <h2 class="font-serif text-2xl sm:text-3xl font-bold mb-2">Ready to get started?</h2>
             <p class="text-emerald-100 mb-6 max-w-md mx-auto">
-                Join thousands of property owners already listing on JustProperties.
+                Join thousands of property owners already listing on Propatis.
             </p>
             @guest
                 <a href="{{ route('register') }}" class="inline-block bg-white text-emerald-700 font-semibold px-8 py-3 rounded-xl hover:bg-emerald-50 transition shadow-md">

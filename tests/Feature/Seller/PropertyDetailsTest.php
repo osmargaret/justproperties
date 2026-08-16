@@ -4,7 +4,6 @@ namespace Tests\Feature\Seller;
 
 use App\Livewire\Seller\PropertyDetails;
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Country;
 use App\Models\Currency;
 use App\Models\FeaturedProperty;
@@ -265,7 +264,7 @@ class PropertyDetailsTest extends TestCase
     }
 
     /**
-     * @return array{User, Property, Category, State, City}
+     * @return array{User, Property, Category, State}
      */
     private function seedProperty(): array
     {
@@ -282,14 +281,7 @@ class PropertyDetailsTest extends TestCase
             'country_id' => $country->id,
             'is_active' => true,
         ]);
-        $city = City::query()->create([
-            'name' => 'Ikeja',
-            'slug' => 'ikeja',
-            'code' => 'IKJ',
-            'state_id' => $state->id,
-            'country_id' => $country->id,
-            'is_active' => true,
-        ]);
+        
         Currency::query()->create([
             'name' => 'Naira',
             'slug' => 'naira',
@@ -316,7 +308,7 @@ class PropertyDetailsTest extends TestCase
             'category_id' => $category->id,
             'country_id' => $country->id,
             'state_id' => $state->id,
-            'city_id' => $city->id,
+            'city' => 'Ikeja',
             'address' => '1 Test Road',
             'neighborhood' => 'Ikeja GRA',
             'show_address' => true,
@@ -327,6 +319,6 @@ class PropertyDetailsTest extends TestCase
             'user_id' => $seller->id,
         ]);
 
-        return [$seller, $property, $category, $state, $city];
+        return [$seller, $property, $category, $state];
     }
 }

@@ -7,7 +7,7 @@
     <div class="prose max-w-none">
       <section class="mb-8">
         <h2 class="font-bold text-gray-900 mb-4 text-2xl">1. Acceptance of Terms</h2>
-        <p class="text-gray-500 mb-4">By accessing and using JustProperties, you accept and agree to be bound by the terms and provisions of this agreement.</p>
+        <p class="text-gray-500 mb-4">By accessing and using Propatis, you accept and agree to be bound by the terms and provisions of this agreement.</p>
       </section>
       <section class="mb-8">
         <h2 class="font-bold text-gray-900 mb-4 text-2xl">2. Property Listings</h2>
@@ -19,7 +19,7 @@
       </section>
       <section class="mb-8">
         <h2 class="font-bold text-gray-900 mb-4 text-2xl">4. Limitation of Liability</h2>
-        <p class="text-gray-500">JustProperties is not responsible for any transactions or communications between users. Users should exercise caution and verify information independently.</p>
+        <p class="text-gray-500">Propatis is not responsible for any transactions or communications between users. Users should exercise caution and verify information independently.</p>
       </section>
     </div>
   </main>

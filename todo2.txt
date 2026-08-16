@@ -82,7 +82,7 @@ Categories {
 Advertisement{
     Create a new page for advertize.. and link to footer.blade.php
     On the page{
-        Show users  that justproperties  can help them advertize their properties to millions of visitors worldwide
+        Show users  that propatis  can help them advertize their properties to millions of visitors worldwide
         Show people who can benefit{
             Legal Practitioners
             Real Estate Agents

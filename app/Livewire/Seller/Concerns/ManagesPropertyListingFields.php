@@ -120,7 +120,7 @@ trait ManagesPropertyListingFields
             'property.category_id' => 'listing category',
             'property.cost' => 'cost',
             'property.state_id' => 'state',
-            'property.city_id' => 'city/LGA',
+            'property.city' => 'city/LGA',
             'uploadedImages' => 'property images',
         ];
     }

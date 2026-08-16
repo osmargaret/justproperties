@@ -5,24 +5,24 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-        JustProperties Ikorodu Lagos - Buy, Rent &amp; Lease Properties Direct
+        Propatis Ikorodu Lagos - Buy, Rent &amp; Lease Properties Direct
         from Owners | Real Estate Marketplace Nigeria
     </title>
     <meta name="description"
-        content="JustProperties connects property buyers and renters directly with verified owners in Ikorodu, Lagos, Nigeria. Browse landed properties, uncompleted structures, completed properties, short-let apartments. No agent fees. Direct WhatsApp contact. List your property today." />
+        content="Propatis connects property buyers and renters directly with verified owners in Ikorodu, Lagos, Nigeria. Browse landed properties, uncompleted structures, completed properties, short-let apartments. No agent fees. Direct WhatsApp contact. List your property today." />
     <meta name="keywords"
         content="real estate Ikorodu Lagos, properties for sale Nigeria, buy property direct from owner, rent apartment Lagos, short let Ikorodu, landed property Nigeria" />
-    <link rel="canonical" href="https://justproperties.com/" />
+    <link rel="canonical" href="https://propatis.com/" />
     <meta name="last-modified" content="2025-01-01" />
-    <meta property="og:title" content="JustProperties - Direct Property Marketplace in Ikorodu Lagos Nigeria" />
+    <meta property="og:title" content="Propatis - Direct Property Marketplace in Ikorodu Lagos Nigeria" />
     <meta property="og:description"
         content="Connect directly with property owners. Buy, rent, or lease properties without agent fees." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://justproperties.com/" />
-    <meta property="og:image" content="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" />
+    <meta property="og:url" content="https://propatis.com/" />
+    <meta property="og:image" content="{{ asset('frontend/images/logoo.png') }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="JustProperties - Direct Property Marketplace" />
-    <meta name="twitter:description" content="Connect directly with property owners in Lagos Nigeria" />
+    <meta name="twitter:title" content="Propatis - Direct Property Marketplace" />
+    <meta name="twitter:description" content="Connect directly with property owners Globally" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@600&amp;display=swap" />
@@ -70,13 +70,14 @@
             <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between h-16 sm:h-20">
                 <a class="nav-brand flex items-center space-x-2" href="{{ route('welcome') }}">
-                    <img alt="JustProperties Logo" class="h-9 sm:h-12 w-auto" src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" />
-                    <h1 class="text-lg sm:text-2xl font-bold font-serif text-white">JustProperties</h1>
+                    <img alt="Propatis Logo" class="h-9 sm:h-12 w-auto" src="{{ asset('frontend/images/logoo.png') }}" />
+                    
                 </a>
                 <div class="hidden lg:flex items-center space-x-5">
                     <a href="{{ route('landed-properties') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Landed Properties</a>
                     <a href="{{ route('uncompleted-properties') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Uncompleted</a>
                     <a href="{{ route('completed-properties') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Completed</a>
+                    <a href="{{ route('facilities') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Facilities</a>
                     <a href="{{ route('rent-lease') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Rent/Lease</a>
                     <a href="{{ route('short-lets') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Short-Let</a>
                     <!-- <a href="{{ route('blog') }}" class="text-base font-medium transition-colors whitespace-nowrap cursor-pointer text-white hover:text-emerald-300">Blog</a> -->
@@ -86,23 +87,23 @@
                     <i class="ri-add-circle-line text-lg"></i>List Property
                 </a>
                 @guest
-                <a href="{{ route('login') }}" class="text-base flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap text-white hover:bg-white/10">
-                    <i class="ri-user-line text-xl w-5 h-5 flex items-center justify-center"></i>
-                    <span class="text-sm">Sign In</span>
-                </a>
+                    <a href="{{ route('login') }}" class="text-base flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap text-white hover:bg-white/10">
+                        <i class="ri-user-line text-xl w-5 h-5 flex items-center justify-center"></i>
+                        <span class="text-sm">Sign In</span>
+                    </a>
                 @else
-                <a href="{{ auth()->user()->dashboard_url }}" class="nav-auth-pill flex items-center gap-3 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full cursor-pointer transition-colors">
-                    <span class="w-8 h-8 shrink-0 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-semibold">{{ strtoupper(auth()->user()->initials()) }}</span>
-                    <span class="hidden sm:block text-left">
-                        <span class="nav-auth-name block text-sm font-semibold text-white">{{ auth()->user()->name }}</span>
-                        <span class="nav-auth-sub block text-xs text-emerald-300">{{ auth()->user()->position }}</span>
-                    </span>
-                    <i class="nav-auth-chevron ri-arrow-down-s-line text-white/70"></i>
-                </a>
+                    <a href="{{ auth()->user()->dashboard_url }}" class="nav-auth-pill flex items-center gap-3 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full cursor-pointer transition-colors">
+                        <span class="w-8 h-8 shrink-0 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-semibold">{{ strtoupper(auth()->user()->initials()) }}</span>
+                        <span class="hidden sm:block text-left">
+                            <span class="nav-auth-name block text-sm font-semibold text-white">{{ auth()->user()->name }}</span>
+                            <span class="nav-auth-sub block text-xs text-emerald-300">{{ auth()->user()->position }}</span>
+                        </span>
+                        <i class="nav-auth-chevron ri-arrow-down-s-line text-white/70"></i>
+                    </a>
                 @endguest
                 </div>
                 <div class="flex items-center space-x-3 lg:hidden">
-                <a href="{{ route('list-property') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition text-gray-700">
+                <a href="{{ route('list-property') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition whitespace-nowrap text-white bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-700 hover:via-emerald-600 hover:to-emerald-500 shadow-md hover:shadow-lg">
                     <i class="ri-add-circle-line text-xl"></i>
                     <span class="font-medium">List Property</span>
                 </a>
@@ -126,6 +127,10 @@
                         <i class="ri-home-4-line text-lg"></i>
                         <span class="font-medium">Completed</span>
                     </a>
+                    <a href="{{ route('facilities') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                        <i class="ri-home-4-line text-lg"></i>
+                        <span class="font-medium">Facilities</span>
+                    </a>
                     <a href="{{ route('rent-lease') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
                         <i class="ri-key-line text-lg"></i>
                         <span class="font-medium">Rent/Lease</span>
@@ -139,25 +144,25 @@
                         <span class="font-medium">Blog</span>
                     </a>
                     @guest
-                    <a href="{{ route('login') }}" class="mt-2 flex items-center gap-3 px-4 py-3 rounded-lg transition bg-emerald-600 text-white hover:bg-emerald-700">
-                        <i class="ri-user-line text-lg"></i>
-                        <span class="font-medium">Sign In / Sign Up</span>
-                    </a>
+                        <a href="{{ route('login') }}" class="mt-2 flex items-center gap-3 px-4 py-3 rounded-lg transition bg-emerald-600 text-white hover:bg-emerald-700">
+                            <i class="ri-user-line text-lg"></i>
+                            <span class="font-medium">Sign In / Sign Up</span>
+                        </a>
                     @else
-                    <a href="{{ auth()->user()->dashboard_url }}" class="mt-2 flex items-center gap-3 px-4 py-3 rounded-lg transition bg-gray-100 text-gray-900 hover:bg-gray-200">
-                        <span class="w-10 h-10 shrink-0 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-semibold">{{ strtoupper(auth()->user()->initials()) }}</span>
-                        <div class="min-w-0 flex-1">
-                            <div class="font-medium truncate">{{ auth()->user()->name }}</div>
-                            <div class="text-xs text-emerald-600">{{ auth()->user()->position }}</div>
-                        </div>
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}" class="mt-1 px-1">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 text-left font-medium">
-                            <i class="ri-logout-box-r-line text-lg"></i>
-                            <span>Log out</span>
-                        </button>
-                    </form>
+                        <a href="{{ auth()->user()->dashboard_url }}" class="mt-2 flex items-center gap-3 px-4 py-3 rounded-lg transition bg-gray-100 text-gray-900 hover:bg-gray-200">
+                            <span class="w-10 h-10 shrink-0 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-semibold">{{ strtoupper(auth()->user()->initials()) }}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-medium truncate">{{ auth()->user()->name }}</div>
+                                <div class="text-xs text-emerald-600">{{ auth()->user()->position }}</div>
+                            </div>
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="mt-1 px-1">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 text-left font-medium">
+                                <i class="ri-logout-box-r-line text-lg"></i>
+                                <span>Log out</span>
+                            </button>
+                        </form>
                     @endguest
                 </div>
             </div>

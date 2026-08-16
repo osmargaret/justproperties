@@ -71,13 +71,8 @@
                 </div>
                 <div>
                     <label class="block font-medium text-sm text-gray-700 mb-2">City / LGA *</label>
-                    <select wire:model="editCityId" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-                        <option value="">Select city / LGA</option>
-                        @foreach ($cities as $city)
-                            <option value="{{ $city->id }}">{{ $city->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('editCityId') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                    <input wire:model="editCity" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                    @error('editCity') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="sm:col-span-2">
                     <label class="block font-medium text-sm text-gray-700 mb-2">Street address *</label>

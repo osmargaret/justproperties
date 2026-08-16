@@ -7,7 +7,7 @@
     <div class="prose max-w-none">
       <section class="mb-8">
         <h2 class="font-bold text-gray-900 mb-4 text-2xl">1. Introduction</h2>
-        <p class="text-gray-500 mb-4">At JustProperties, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.</p>
+        <p class="text-gray-500 mb-4">At Propatis, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.</p>
       </section>
       <section class="mb-8">
         <h2 class="font-bold text-gray-900 mb-4 text-2xl">2. Information We Collect</h2>
