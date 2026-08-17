@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone')->nullable();
             $table->string('whatsapp')->nullable();
+            $table->string('photo')->nullable();
             $table->boolean('two_factor_enable')->default(false);
 
             $table->string('password');

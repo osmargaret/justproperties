@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'phone_code',
     'currency_id',
     'language_code',
+    'is_default',
     'is_active',
 ])]
 class Country extends Model
@@ -24,6 +25,7 @@ class Country extends Model
     protected function casts(): array
     {
         return [
+            'is_default' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
@@ -31,11 +33,6 @@ class Country extends Model
     public function states(): HasMany
     {
         return $this->hasMany(State::class);
-    }
-
-    public function cities(): HasMany
-    {
-        return $this->hasMany(City::class);
     }
 
     public function properties(): HasMany

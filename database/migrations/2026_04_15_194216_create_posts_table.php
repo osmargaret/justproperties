@@ -22,7 +22,7 @@ return new class extends Migration
             $table->longText('content');
             $table->string('content_source')->default('manual');
             $table->timestamp('ai_generated_at')->nullable();
-            $table->json('tags')->nullable();
+            $table->text('tags')->nullable();
             $table->string('status')->default('draft'); // draft, published, archived
             $table->unsignedBigInteger('views_count')->default(0);
             $table->unsignedBigInteger('click_count')->default(0);

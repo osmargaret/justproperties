@@ -95,7 +95,7 @@ class PropertyDetails extends Component
         abort_unless($property->user_id === Auth::id(), 403);
 
         $this->property = $property->load([
-            'category.settings',
+            'category.fields',
             'country',
             'state',
             'media',
@@ -583,8 +583,8 @@ class PropertyDetails extends Component
             return;
         }
 
-        $category = Category::query()->with('settings')->find($this->editCategoryId);
-        $dynamicRules = $this->buildDynamicRules($category?->settings ?? collect());
+        $category = Category::query()->with('fields')->find($this->editCategoryId);
+        $dynamicRules = $this->buildDynamicRules($category?->fields ?? collect());
         if ($dynamicRules !== []) {
             $this->validate($dynamicRules, [], $this->propertyListingValidationAttributes());
         }
@@ -611,7 +611,7 @@ class PropertyDetails extends Component
 
         $this->uploadedImages = [];
         $this->property->refresh();
-        $this->property->load(['media', 'features', 'category.settings']);
+        $this->property->load(['media', 'features', 'category.fields']);
         $this->hydrateDynamicAttributesFromProperty($this->property);
         $this->syncEditFieldsFromProperty();
 
@@ -784,8 +784,8 @@ class PropertyDetails extends Component
     public function featureLabels(): array
     {
         $labels = [];
-        foreach ($this->property->category?->settings ?? [] as $setting) {
-            $labels[$setting->key] = $setting->label;
+        foreach ($this->property->category?->fields ?? [] as $field) {
+            $labels[$field->key] = $field->label;
         }
 
         return $labels;
@@ -799,9 +799,9 @@ class PropertyDetails extends Component
         }
 
         return Category::query()
-            ->with('settings')
+            ->with('fields')
             ->find($this->editCategoryId)
-            ?->settings ?? collect();
+            ?->fields ?? collect();
     }
 
     #[Computed]
@@ -907,7 +907,7 @@ class PropertyDetails extends Component
     public function render()
     {
         return view('livewire.seller.property-details', [
-            'categories' => Category::query()->with('settings')->orderBy('name', 'asc')->get(),
+            'categories' => Category::query()->with('fields')->orderBy('name', 'asc')->get(),
             'states' => State::query()->where('is_active', true)->orderBy('name', 'asc')->get(),
             'cities' => collect(),
         ]);

@@ -2,7 +2,9 @@
 
 namespace App\Exports;
 
-use App\Models\CategorySetting;
+use App\Models\Category;
+use App\Models\CategoryField;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
@@ -11,29 +13,42 @@ class PropertyBulkTemplateOptionsSheet implements FromArray, WithTitle
     public function array(): array
     {
         $rows = [[
-            'category_slug',
             'field_key',
             'label',
             'data_type',
             'allowed_values',
         ]];
 
-        $settings = CategorySetting::query()
-            ->with('category')
-            ->whereIn('data_type', [CategorySetting::TYPE_ENUM, CategorySetting::TYPE_MULTI_ENUM])
-            ->orderBy('category_id')
-            ->orderBy('sort_order')
+        $fields = CategoryField::query()
+            ->whereIn('data_type', [
+                CategoryField::TYPE_SINGLE_SELECT,
+                CategoryField::TYPE_MULTI_SELECT,
+                CategoryField::TYPE_ENUM,
+                CategoryField::TYPE_MULTI_ENUM,
+            ])
+            ->orderBy('key')
             ->get();
 
-        foreach ($settings as $setting) {
-            $options = $setting->options;
+        foreach ($fields as $field) {
+            $options = $field->options;
             $allowed = is_array($options) ? implode(' | ', $options) : '';
 
+            $label = $field->label;
+            if (Str::lower($field->label) === 'type' || str_ends_with($field->key, '-type')) {
+                $categoryName = Category::query()
+                    ->where('is_property', true)
+                    ->whereHas('fields', fn ($q) => $q->where('category_fields.id', $field->id))
+                    ->value('name');
+
+                if ($categoryName) {
+                    $label .= " (For {$categoryName})";
+                }
+            }
+
             $rows[] = [
-                $setting->category?->slug ?? '',
-                $setting->key,
-                $setting->label,
-                $setting->data_type,
+                $field->key,
+                $label,
+                $field->data_type,
                 $allowed,
             ];
         }

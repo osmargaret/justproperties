@@ -3,9 +3,9 @@
 namespace App\Livewire\Admin\Settings;
 
 use App\Models\Category;
-use App\Models\CategorySetting;
+use App\Models\CategoryField;
 use Illuminate\Contracts\View\View;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class AdminCategories extends Component
@@ -16,48 +16,21 @@ class AdminCategories extends Component
 
     public string $categorySlug = '';
 
-    public bool $showEditModal = false;
+    public bool $showAttachModal = false;
 
-    public ?int $editingSettingId = null;
+    public ?int $selectedFieldToAttach = null;
 
-    public string $editKey = '';
-
-    public string $editLabel = '';
-
-    public string $editDataType = CategorySetting::TYPE_TEXT;
-
-    public bool $editRequired = false;
-
-    public string $editOptionsLines = '';
-
-    public int $editSort = 0;
-
-    public string $editValidationJson = '';
-
-    public bool $showAddModal = false;
-
-    public string $newKey = '';
-
-    public string $newLabel = '';
-
-    public string $newDataType = CategorySetting::TYPE_TEXT;
-
-    public bool $newRequired = false;
-
-    public string $newOptionsLines = '';
-
-    public int $newSortOrder = 0;
+    public int $attachSortOrder = 0;
 
     public function mount(): void
     {
-        $this->selectedCategoryId = Category::query()->where('is_property', true)->orderBy('name','asc')->value('id');
+        $this->selectedCategoryId = Category::query()->where('is_property', true)->orderBy('name', 'asc')->value('id');
         $this->loadCategoryMeta();
     }
 
     public function updatedSelectedCategoryId(): void
     {
-        $this->closeEditModal();
-        $this->closeAddModal();
+        $this->closeAttachModal();
         $this->loadCategoryMeta();
     }
 
@@ -92,199 +65,72 @@ class AdminCategories extends Component
         session()->flash('status', 'Category name saved.');
     }
 
-    public function openEditModal(int $settingId): void
+    public function openAttachModal(): void
     {
-        $setting = CategorySetting::query()
-            ->where('category_id', $this->selectedCategoryId)
-            ->whereKey($settingId)
-            ->firstOrFail();
-
-        $this->editingSettingId = $setting->id;
-        $this->editKey = $setting->key;
-        $this->editLabel = $setting->label;
-        $this->editDataType = $setting->data_type;
-        $this->editRequired = $setting->is_required;
-        $this->editOptionsLines = implode("\n", $setting->options ?? []);
-        $this->editSort = (int) $setting->sort_order;
-        $this->editValidationJson = $setting->validation !== null
-            ? json_encode($setting->validation, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-            : '';
+        $this->reset(['selectedFieldToAttach', 'attachSortOrder']);
         $this->resetErrorBag();
-        $this->showEditModal = true;
+        $this->showAttachModal = true;
     }
 
-    public function closeEditModal(): void
+    public function closeAttachModal(): void
     {
-        $this->showEditModal = false;
-        $this->editingSettingId = null;
-        $this->reset([
-            'editKey',
-            'editLabel',
-            'editDataType',
-            'editRequired',
-            'editOptionsLines',
-            'editSort',
-            'editValidationJson',
-        ]);
-        $this->editDataType = CategorySetting::TYPE_TEXT;
+        $this->showAttachModal = false;
+        $this->reset(['selectedFieldToAttach', 'attachSortOrder']);
     }
 
-    public function saveEditModal(): void
-    {
-        $this->validate([
-            'editingSettingId' => ['required', 'integer'],
-            'editLabel' => ['required', 'string', 'max:255'],
-            'editDataType' => ['required', Rule::in($this->dataTypeOptions())],
-            'editSort' => ['required', 'integer', 'min:0', 'max:999999'],
-            'editValidationJson' => ['nullable', 'string'],
-        ]);
-
-        $setting = CategorySetting::query()
-            ->where('category_id', $this->selectedCategoryId)
-            ->whereKey($this->editingSettingId)
-            ->firstOrFail();
-
-        $options = $this->parseOptionsLines($this->editOptionsLines);
-
-        $validationRaw = trim($this->editValidationJson);
-        $validation = null;
-        if ($validationRaw !== '') {
-            $decoded = json_decode($validationRaw, true);
-            if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
-                $this->addError('editValidationJson', 'Must be valid JSON (object or array).');
-
-                return;
-            }
-            $validation = $decoded;
-        }
-
-        $setting->update([
-            'label' => $this->editLabel,
-            'data_type' => $this->editDataType,
-            'is_required' => $this->editRequired,
-            'options' => $options,
-            'validation' => $validation,
-            'sort_order' => $this->editSort,
-        ]);
-
-        $key = $setting->key;
-        $this->closeEditModal();
-
-        session()->flash('status', "Setting “{$key}” saved.");
-    }
-
-    public function openAddModal(): void
-    {
-        $this->reset(['newKey', 'newLabel', 'newOptionsLines']);
-        $this->newDataType = CategorySetting::TYPE_TEXT;
-        $this->newRequired = false;
-        $this->newSortOrder = 0;
-        $this->resetErrorBag();
-        $this->showAddModal = true;
-    }
-
-    public function closeAddModal(): void
-    {
-        $this->showAddModal = false;
-        $this->reset(['newKey', 'newLabel', 'newOptionsLines']);
-        $this->newDataType = CategorySetting::TYPE_TEXT;
-        $this->newRequired = false;
-        $this->newSortOrder = 0;
-    }
-
-    public function addSetting(): void
+    public function attachField(): void
     {
         $this->validate([
             'selectedCategoryId' => ['required', 'integer', 'exists:categories,id'],
-            'newKey' => [
-                'required',
-                'string',
-                'max:120',
-                'regex:/^[a-z][a-z0-9_]*$/',
-                Rule::unique('category_settings', 'key')->where(
-                    fn ($query) => $query->where('category_id', $this->selectedCategoryId)
-                ),
-            ],
-            'newLabel' => ['required', 'string', 'max:255'],
-            'newDataType' => ['required', Rule::in($this->dataTypeOptions())],
-            'newSortOrder' => ['required', 'integer', 'min:0', 'max:999999'],
+            'selectedFieldToAttach' => ['required', 'integer', 'exists:category_fields,id'],
+            'attachSortOrder' => ['required', 'integer', 'min:0', 'max:999999'],
         ]);
 
-        $options = $this->parseOptionsLines($this->newOptionsLines);
+        $category = Category::query()->findOrFail($this->selectedCategoryId);
+        $field = CategoryField::query()->findOrFail($this->selectedFieldToAttach);
 
-        CategorySetting::query()->create([
-            'category_id' => $this->selectedCategoryId,
-            'key' => $this->newKey,
-            'label' => $this->newLabel,
-            'data_type' => $this->newDataType,
-            'is_required' => $this->newRequired,
-            'options' => $options,
-            'default_value' => null,
-            'validation' => null,
-            'sort_order' => $this->newSortOrder,
-        ]);
+        DB::table('category_settings')->updateOrInsert(
+            ['category_id' => $category->id, 'category_field_id' => $field->id],
+            ['sort_order' => $this->attachSortOrder]
+        );
 
-        $this->closeAddModal();
-
-        session()->flash('status', 'New field added.');
+        session()->flash('status', "Field “{$field->label}” attached to category.");
+        $this->closeAttachModal();
     }
 
-    public function deleteSetting(int $settingId): void
+    public function detachField(int $fieldId): void
     {
-        $setting = CategorySetting::query()
+        DB::table('category_settings')
             ->where('category_id', $this->selectedCategoryId)
-            ->whereKey($settingId)
-            ->firstOrFail();
+            ->where('category_field_id', $fieldId)
+            ->delete();
 
-        $key = $setting->key;
-        $setting->delete();
-
-        if ($this->editingSettingId === $settingId) {
-            $this->closeEditModal();
-        }
-
-        session()->flash('status', "Field “{$key}” removed.");
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function dataTypeOptions(): array
-    {
-        return [
-            CategorySetting::TYPE_ENUM,
-            CategorySetting::TYPE_MULTI_ENUM,
-            CategorySetting::TYPE_NUMBER,
-            CategorySetting::TYPE_TEXT,
-            CategorySetting::TYPE_TEXTAREA,
-            CategorySetting::TYPE_BOOLEAN,
-            CategorySetting::TYPE_DATE,
-        ];
-    }
-
-    protected function parseOptionsLines(string $raw): ?array
-    {
-        $lines = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $raw) ?: [])));
-
-        return $lines === [] ? null : $lines;
+        session()->flash('status', 'Field detached from category.');
     }
 
     public function render(): View
     {
         $categories = Category::query()
             ->where('is_property', true)
-            ->withCount('settings')
-            ->orderBy('name','asc')
+            ->withCount('fields')
+            ->orderBy('name', 'asc')
             ->get();
 
         $selectedCategory = $this->selectedCategoryId
-            ? Category::query()->with(['settings' => fn ($q) => $q->orderBy('sort_order')])->find($this->selectedCategoryId)
+            ? Category::query()->with(['fields' => fn ($q) => $q->orderBy('category_settings.sort_order')])->find($this->selectedCategoryId)
             : null;
+
+        $attachedFieldIds = $selectedCategory ? $selectedCategory->fields->pluck('id')->all() : [];
+
+        $availableFields = CategoryField::query()
+            ->whereNotIn('id', $attachedFieldIds)
+            ->orderBy('label')
+            ->get();
 
         return view('livewire.admin.settings.admin-categories', [
             'categories' => $categories,
             'selectedCategory' => $selectedCategory,
-            'dataTypeOptions' => $this->dataTypeOptions(),
+            'availableFields' => $availableFields,
         ]);
     }
 }

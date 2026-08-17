@@ -1,5 +1,18 @@
 @props(['property'])
 
+@php
+    $rentFreq = $property->featureValue('rent_amount_frequency');
+    $freqSuffix = match (strtolower(trim($rentFreq ?? ''))) {
+        'per annum', 'per year', 'yearly', 'annually', 'year' => '/year',
+        'per month', 'monthly', 'month' => '/month',
+        'per week', 'weekly', 'week' => '/week',
+        'per day', 'daily', 'day' => '/day',
+        'per night', 'nightly', 'night' => '/night',
+        'per quarter', 'quarterly', 'quarter' => '/quarter',
+        default => $rentFreq ? '/' . strtolower(trim(str_ireplace(['per ', 'Per '], '', $rentFreq))) : '',
+    };
+@endphp
+
 <div class="bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100 hover:border-emerald-200 cursor-pointer">
     <div class="relative h-48 md:h-64 overflow-hidden">
         <a href="{{ route('property.show', $property) }}">
@@ -28,7 +41,12 @@
             <span><i class="ri-briefcase-line"></i> {{ $property->featureValue('bathrooms') ?? 'N/A' }} Baths</span>
         </div>
         <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span class="font-bold text-emerald-600 text-xl">{{ $property->currency()?->symbol ?? '₦' }}{{ number_format($property->cost) }}</span>
+            <span class="font-bold text-emerald-600 text-xl flex items-baseline gap-0.5">
+                <span>{{ $property->currency()?->symbol ?? '₦' }}{{ number_format($property->cost) }}</span>
+                @if($freqSuffix)
+                    <span class="text-xs font-normal text-gray-500">{{ $freqSuffix }}</span>
+                @endif
+            </span>
             <a href="{{ route('property.show', $property) }}" class="text-emerald-600 font-medium text-sm hover:underline">View Details</a>
         </div>
     </div>

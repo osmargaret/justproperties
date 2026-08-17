@@ -5,16 +5,16 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-        Propatis Ikorodu Lagos - Buy, Rent &amp; Lease Properties Direct
+        Propatis - Buy, Rent &amp; Lease Properties Direct
         from Owners | Real Estate Marketplace Nigeria
     </title>
     <meta name="description"
-        content="Propatis connects property buyers and renters directly with verified owners in Ikorodu, Lagos, Nigeria. Browse landed properties, uncompleted structures, completed properties, short-let apartments. No agent fees. Direct WhatsApp contact. List your property today." />
+        content="Propatis connects property buyers and renters directly with verified owners globally. Browse landed properties, uncompleted structures, completed properties, short-let apartments. No agent fees. Direct WhatsApp contact. List your property today." />
     <meta name="keywords"
-        content="real estate Ikorodu Lagos, properties for sale Nigeria, buy property direct from owner, rent apartment Lagos, short let Ikorodu, landed property Nigeria" />
+        content="real estate, properties for sale, buy property direct from owner, rent apartments, short let, landed property" />
     <link rel="canonical" href="https://propatis.com/" />
     <meta name="last-modified" content="2025-01-01" />
-    <meta property="og:title" content="Propatis - Direct Property Marketplace in Ikorodu Lagos Nigeria" />
+    <meta property="og:title" content="Propatis - Direct Property Marketplace globally" />
     <meta property="og:description"
         content="Connect directly with property owners. Buy, rent, or lease properties without agent fees." />
     <meta property="og:type" content="website" />
@@ -23,6 +23,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Propatis - Direct Property Marketplace" />
     <meta name="twitter:description" content="Connect directly with property owners Globally" />
+    <link rel="icon" href="{{ asset('frontend/images/logo.png') }}" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@600&amp;display=swap" />

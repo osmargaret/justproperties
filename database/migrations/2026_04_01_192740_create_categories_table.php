@@ -15,8 +15,29 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->nullable();
-            $table->json('requirements')->nullable(); // {type:options,area:input,area_unit:options,bedroom:input,bathroom:input,features:multiple_options}
+            $table->boolean('is_property')->default(true);
             $table->timestamps();
+        });
+
+        Schema::create('category_fields', function (Blueprint $table) {
+            $table->id();
+            $table->string('key')->unique();
+            $table->string('label');
+            $table->enum('data_type', ['number', 'text', 'textarea', 'boolean', 'date', 'single_select', 'multi_select']);
+            $table->boolean('is_required')->default(false);
+            $table->json('options')->nullable();
+            $table->json('default_value')->nullable();
+            $table->json('validation')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('category_settings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+            $table->foreignId('category_field_id')->constrained('category_fields')->cascadeOnDelete();
+            $table->unsignedInteger('sort_order')->default(0);
+            $table->timestamps();
+            $table->unique(['category_id', 'category_field_id']);
         });
     }
 
@@ -25,6 +46,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('category_settings');
+        Schema::dropIfExists('category_fields');
         Schema::dropIfExists('categories');
     }
 };

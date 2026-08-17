@@ -4,12 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\CategorySetting;
-use App\Models\CategoryField;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 
-class CategoriesSeeder extends Seeder
+class CategoSeeder extends Seeder
 {
     /** @var list<string> */
     private array $multiEnumKeys = [
@@ -40,6 +38,7 @@ class CategoriesSeeder extends Seeder
                 ['slug' => $row['slug']],
                 [
                     'name'        => $row['name'],
+                    'requirements' => null,
                     'is_property' => true,
                 ]
             );
@@ -60,6 +59,7 @@ class CategoriesSeeder extends Seeder
                 ['slug' => $row['slug']],
                 [
                     'name'        => $row['name'],
+                    'requirements' => null,
                     'is_property' => false,
                 ]
             );
@@ -68,41 +68,24 @@ class CategoriesSeeder extends Seeder
 
     private function syncCategorySettings(Category $category, array $requirements): void
     {
-        // remove existing pivot rows for this category
-        DB::table('category_settings')->where('category_id', $category->id)->delete();
+        $category->settings()->delete();
 
         $sort = 0;
         foreach ($requirements as $key => $value) {
             $sort += 10;
             [$dataType, $isRequired, $options, $defaultValue] = $this->mapRequirementValue($key, $value);
 
-            // Shared fields use the raw key; only `type` is namespaced per category.
-            $fieldKey = $key === 'type' ? ($category->slug . '-type') : $key;
-
-            // Translate in-memory data types to DB enum values where necessary
-            $dbDataType = $dataType;
-            if ($dataType === 'enum') {
-                $dbDataType = 'single_select';
-            } elseif ($dataType === 'multi_enum') {
-                $dbDataType = 'multi_select';
-            }
-
-            $field = CategoryField::query()->updateOrCreate(
-                ['key' => $fieldKey],
-                [
-                    'label' => Str::headline(str_replace('_', ' ', $key)),
-                    'data_type' => $dbDataType,
-                    'is_required' => $isRequired,
-                    'options' => $options,
-                    'default_value' => $defaultValue,
-                    'validation' => null,
-                ]
-            );
-
-            DB::table('category_settings')->updateOrInsert(
-                ['category_id' => $category->id, 'category_field_id' => $field->id],
-                ['sort_order' => $sort]
-            );
+            CategorySetting::query()->create([
+                'category_id' => $category->id,
+                'key' => $key,
+                'label' => Str::headline(str_replace('_', ' ', $key)),
+                'data_type' => $dataType,
+                'is_required' => $isRequired,
+                'options' => $options,
+                'default_value' => $defaultValue,
+                'validation' => null,
+                'sort_order' => $sort,
+            ]);
         }
     }
 
@@ -352,7 +335,6 @@ class CategoriesSeeder extends Seeder
                     'Warehouse',
                     'Short office suite',
                 ],
-                'rent_amount_frequency' => ['Per annum', 'Per month', 'Per quarter', 'Per week', 'Per day'],
                 'area' => 'required',
                 'area_unit' => ['square_meters', 'square_feet'],
                 'bedrooms' => 'required',
@@ -379,6 +361,7 @@ class CategoriesSeeder extends Seeder
                     'Serviced (cleaning + linen)',
                 ],
                 'tenure_type' => ['Annual lease', 'Two-year lease', 'Monthly (corporate)', 'Short-term rolling'],
+                'rent_amount_frequency' => ['Per annum', 'Per month', 'Per quarter'],
                 'lease_duration_months' => 'input',
                 'renewal_clause' => ['Automatic renewal', 'Fresh negotiation', 'Fixed term only'],
                 'agency_legal_fees_policy' => ['Standard 10% agency + legal', 'Negotiable', 'Owner pays agency', 'All-inclusive rent'],
@@ -410,7 +393,6 @@ class CategoriesSeeder extends Seeder
                     'Luxe villa',
                     'Corporate apartment',
                 ],
-                'rent_amount_frequency' => ['Per day', 'Per night', 'Per week', 'Per month'],
                 'area' => 'required',
                 'area_unit' => ['square_meters', 'square_feet'],
                 'bedrooms' => 'required',

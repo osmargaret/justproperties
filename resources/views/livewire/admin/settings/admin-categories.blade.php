@@ -1,6 +1,6 @@
 <x-admin.page
     title="Categories &amp; field definitions"
-    description="Edit listing/blog categories and the dynamic fields (category_settings) used on seller listing forms."
+    description="Manage property categories and attach/detach dynamic fields used on seller listing forms."
 >
     @if (session('status'))
         <div class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
@@ -20,7 +20,7 @@
                             {{ (int) $selectedCategoryId === (int) $cat->id ? 'bg-emerald-50 text-emerald-900 font-medium' : 'text-gray-700 hover:bg-gray-50' }}"
                     >
                         <span class="block truncate">{{ $cat->name }}</span>
-                        <span class="block text-xs text-gray-400 mt-0.5 truncate">{{ $cat->settings_count }} fields · {{ $cat->slug }}</span>
+                        <span class="block text-xs text-gray-400 mt-0.5 truncate">{{ $cat->fields_count }} fields · {{ $cat->slug }}</span>
                     </button>
                 @empty
                     <p class="px-4 py-6 text-sm text-gray-500">No categories found. Run <code class="text-xs bg-gray-100 px-1 rounded">php artisan db:seed --class=CategoriesSeeder</code>.</p>
@@ -66,52 +66,45 @@
                 <div class="min-w-0 rounded-xl border border-gray-200 overflow-hidden">
                     <div class="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-wrap items-center justify-between gap-3">
                         <div class="min-w-0">
-                            <h3 class="text-lg font-semibold text-gray-900">Fields</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">Edit in a modal · options = one label per line</p>
+                            <h3 class="text-lg font-semibold text-gray-900">Attached Fields</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Attach or remove fields for this category. Field definitions are edited under <a href="{{ route('admin.settings.general') }}" class="text-emerald-600 hover:underline">General Settings > Property Fields</a>.</p>
                         </div>
                         <button
                             type="button"
-                            wire:click="openAddModal"
+                            wire:click="openAttachModal"
                             class="shrink-0 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
                         >
-                            Add field
+                            Attach field
                         </button>
                     </div>
 
                     <ul class="divide-y divide-gray-100">
-                        @if ($selectedCategory->settings->isEmpty())
+                        @if ($selectedCategory->fields->isEmpty())
                             <li class="px-4 sm:px-6 py-8 text-center text-sm text-gray-500">
-                                No field definitions yet. Use “Add field” or run the categories seeder.
+                                No field definitions attached yet. Click “Attach field” to add one.
                             </li>
                         @endif
-                        @foreach ($selectedCategory->settings as $setting)
-                            <li class="px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 min-w-0" wire:key="setting-row-{{ $setting->id }}">
+                        @foreach ($selectedCategory->fields as $field)
+                            <li class="px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 min-w-0" wire:key="field-row-{{ $field->id }}">
                                 <div class="min-w-0 flex-1">
-                                    <p class="font-mono text-xs text-gray-500 truncate">{{ $setting->key }}</p>
-                                    <p class="font-medium text-gray-900 truncate">{{ $setting->label }}</p>
+                                    <p class="font-medium text-gray-900 truncate">{{ $field->label }}</p>
+                                    <p class="font-mono text-xs text-gray-500 truncate">{{ $field->key }}</p>
                                     <p class="text-xs text-gray-500 mt-1">
-                                        <span class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5">{{ $setting->data_type }}</span>
-                                        @if ($setting->is_required)
+                                        <span class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5">{{ $field->data_type }}</span>
+                                        @if ($field->is_required)
                                             <span class="text-red-600">· required</span>
                                         @endif
-                                        <span class="text-gray-400">· sort {{ $setting->sort_order }}</span>
+                                        <span class="text-gray-400">· sort {{ $field->pivot->sort_order }}</span>
                                     </p>
                                 </div>
                                 <div class="flex shrink-0 gap-2">
                                     <button
                                         type="button"
-                                        wire:click="openEditModal({{ $setting->id }})"
-                                        class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        type="button"
-                                        wire:click="deleteSetting({{ $setting->id }})"
-                                        wire:confirm="Delete this field definition?"
+                                        wire:click="detachField({{ $field->id }})"
+                                        wire:confirm="Remove {{ $field->label }} from {{ $categoryName }}?"
                                         class="px-3 py-1.5 rounded-lg border border-red-200 text-sm font-medium text-red-700 hover:bg-red-50"
                                     >
-                                        Delete
+                                        Remove
                                     </button>
                                 </div>
                             </li>
@@ -119,151 +112,64 @@
                     </ul>
                 </div>
             @else
-                <p class="text-sm text-gray-500">Select a category to edit its fields.</p>
+                <p class="text-sm text-gray-500">Select a category to manage its fields.</p>
             @endif
         </div>
     </div>
 
-    {{-- Edit field modal --}}
-    @if ($showEditModal)
+    {{-- Attach field modal --}}
+    @if ($showAttachModal)
         <div
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overscroll-contain"
-            wire:click.self="closeEditModal"
-            wire:key="edit-modal-backdrop"
+            wire:click.self="closeAttachModal"
+            wire:key="attach-modal-backdrop"
         >
             <div
-                class="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+                class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby="edit-field-title"
+                aria-labelledby="attach-field-title"
                 @click.stop
             >
                 <button
                     type="button"
-                    wire:click="closeEditModal"
+                    wire:click="closeAttachModal"
                     class="absolute right-4 top-4 rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                     aria-label="Close"
                 >
                     <i class="ri-close-line text-xl"></i>
                 </button>
-                <h3 id="edit-field-title" class="text-lg font-semibold text-gray-900 pr-10 mb-1">Edit field</h3>
-                <p class="text-xs font-mono text-gray-500 mb-6 break-all">{{ $editKey }}</p>
+                <h3 id="attach-field-title" class="text-lg font-semibold text-gray-900 pr-10 mb-1">Attach field to {{ $categoryName }}</h3>
+                <p class="text-xs text-gray-500 mb-4">Select an unattached field to add to this category.</p>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Label <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model.live="editLabel" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-                        @error('editLabel') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Data type</label>
-                        <select wire:model.live="editDataType" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
-                            @foreach ($dataTypeOptions as $dt)
-                                <option value="{{ $dt }}">{{ $dt }}</option>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Select Field <span class="text-red-500">*</span></label>
+                        <select wire:model.live="selectedFieldToAttach" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                            <option value="">-- Choose a field --</option>
+                            @foreach ($availableFields as $f)
+                                <option value="{{ $f->id }}">{{ $f->label }} ({{ $f->key }}) [{{ $f->data_type }}]</option>
                             @endforeach
                         </select>
-                        @error('editDataType') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                        @error('selectedFieldToAttach') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                        @if ($availableFields->isEmpty())
+                            <p class="text-xs text-amber-600 mt-1">All available fields are already attached to this category.</p>
+                        @endif
                     </div>
-                    <div>
-                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                            <input type="checkbox" wire:model.live="editRequired" class="rounded border-gray-300 text-emerald-600" />
-                            Required
-                        </label>
-                    </div>
+
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Sort order</label>
-                        <input type="number" wire:model.live="editSort" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" min="0" />
-                        @error('editSort') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Options (one per line)</label>
-                        <textarea wire:model.live="editOptionsLines" rows="5" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs font-mono" placeholder="For enum / multi_enum"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Validation JSON</label>
-                        <textarea wire:model.live="editValidationJson" rows="4" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs font-mono" placeholder="{ }"></textarea>
-                        @error('editValidationJson') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                        <input type="number" wire:model.live="attachSortOrder" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" min="0" />
+                        @error('attachSortOrder') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div class="mt-6 flex flex-wrap justify-end gap-2 border-t border-gray-100 pt-4">
-                    <button type="button" wire:click="closeEditModal" class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <button type="button" wire:click="closeAttachModal" class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
                         Cancel
                     </button>
-                    <button type="button" wire:click="saveEditModal" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700">
-                        Save changes
-                    </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- Add field modal --}}
-    @if ($showAddModal)
-        <div
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overscroll-contain"
-            wire:click.self="closeAddModal"
-            wire:key="add-modal-backdrop"
-        >
-            <div
-                class="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="add-field-title"
-                @click.stop
-            >
-                <button
-                    type="button"
-                    wire:click="closeAddModal"
-                    class="absolute right-4 top-4 rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                    aria-label="Close"
-                >
-                    <i class="ri-close-line text-xl"></i>
-                </button>
-                <h3 id="add-field-title" class="text-lg font-semibold text-gray-900 pr-10 mb-6">Add field</h3>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Key <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model.live="newKey" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono" placeholder="e.g. parking_spaces" />
-                        @error('newKey') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Label <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model.live="newLabel" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-                        @error('newLabel') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Data type</label>
-                        <select wire:model.live="newDataType" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
-                            @foreach ($dataTypeOptions as $dt)
-                                <option value="{{ $dt }}">{{ $dt }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Sort order</label>
-                        <input type="number" wire:model.live="newSortOrder" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" min="0" />
-                        @error('newSortOrder') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                            <input type="checkbox" wire:model.live="newRequired" class="rounded border-gray-300 text-emerald-600" />
-                            Required
-                        </label>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Options (one per line)</label>
-                        <textarea wire:model.live="newOptionsLines" rows="4" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs font-mono" placeholder="For enum / multi_enum"></textarea>
-                    </div>
-                </div>
-
-                <div class="mt-6 flex flex-wrap justify-end gap-2 border-t border-gray-100 pt-4">
-                    <button type="button" wire:click="closeAddModal" class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                        Cancel
-                    </button>
-                    <button type="button" wire:click="addSetting" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700">
-                        Create field
+                    <button type="button" wire:click="attachField" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700" @disabled(!$selectedFieldToAttach)>
+                        Attach field
                     </button>
                 </div>
             </div>

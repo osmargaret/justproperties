@@ -119,6 +119,10 @@
                         $decoded = json_decode($feature->value, true);
                         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                             $displayValue = implode(', ', $decoded);
+                        } elseif ($displayValue === '1') {
+                            $displayValue = 'Yes';
+                        } elseif ($displayValue === '0') {
+                            $displayValue = 'No';
                         }
                     @endphp
                     <span class="inline-flex items-center gap-1 text-sm px-3 py-1.5 rounded-full bg-gray-100 text-gray-800">

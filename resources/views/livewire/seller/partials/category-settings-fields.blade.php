@@ -6,14 +6,15 @@
             <i class="ri-list-settings-line text-emerald-600"></i>
             Category-specific fields
         </h4>
-        <p class="text-sm text-gray-500">Driven by <code class="text-xs bg-gray-100 px-1 rounded">category settings</code> for the selected listing category.</p>
+        <p class="text-sm text-gray-500">Driven by <code class="text-xs bg-gray-100 px-1 rounded">category fields</code> for the selected listing category.</p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         @foreach($settings as $field)
             @php
                 $isWideField = in_array($field->data_type, [
-                    \App\Models\CategorySetting::TYPE_TEXTAREA,
-                    \App\Models\CategorySetting::TYPE_MULTI_ENUM,
+                    \App\Models\CategoryField::TYPE_TEXTAREA,
+                    \App\Models\CategoryField::TYPE_MULTI_SELECT,
+                    \App\Models\CategoryField::TYPE_MULTI_ENUM,
                 ], true);
             @endphp
             <div wire:key="category-setting-{{ $field->id }}" class="{{ $isWideField ? 'sm:col-span-2 lg:col-span-3' : '' }}">
@@ -25,7 +26,8 @@
                 </label>
 
                 @switch($field->data_type)
-                    @case(\App\Models\CategorySetting::TYPE_ENUM)
+                    @case(\App\Models\CategoryField::TYPE_SINGLE_SELECT)
+                    @case(\App\Models\CategoryField::TYPE_ENUM)
                         <select
                             wire:model.live="dynamicAttributes.{{ $field->key }}"
                             class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white"
@@ -37,7 +39,8 @@
                         </select>
                         @break
 
-                    @case(\App\Models\CategorySetting::TYPE_MULTI_ENUM)
+                    @case(\App\Models\CategoryField::TYPE_MULTI_SELECT)
+                    @case(\App\Models\CategoryField::TYPE_MULTI_ENUM)
                         <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                             @foreach($field->options ?? [] as $opt)
@@ -56,7 +59,7 @@
                         </div>
                         @break
 
-                    @case(\App\Models\CategorySetting::TYPE_NUMBER)
+                    @case(\App\Models\CategoryField::TYPE_NUMBER)
                         <input
                             type="number"
                             wire:model.live="dynamicAttributes.{{ $field->key }}"
@@ -65,7 +68,7 @@
                         />
                         @break
 
-                    @case(\App\Models\CategorySetting::TYPE_DATE)
+                    @case(\App\Models\CategoryField::TYPE_DATE)
                         <input
                             type="date"
                             wire:model.live="dynamicAttributes.{{ $field->key }}"
@@ -74,7 +77,7 @@
                         />
                         @break
 
-                    @case(\App\Models\CategorySetting::TYPE_TEXTAREA)
+                    @case(\App\Models\CategoryField::TYPE_TEXTAREA)
                         <textarea
                             wire:model.live="dynamicAttributes.{{ $field->key }}"
                             rows="3"
@@ -83,7 +86,7 @@
                         ></textarea>
                         @break
 
-                    @case(\App\Models\CategorySetting::TYPE_BOOLEAN)
+                    @case(\App\Models\CategoryField::TYPE_BOOLEAN)
                         <label class="inline-flex items-center gap-2">
                             <input type="checkbox" wire:model.live="dynamicAttributes.{{ $field->key }}" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
                             <span class="text-sm text-gray-600">Yes</span>

@@ -5,6 +5,8 @@ namespace App\Livewire\Admin\Settings;
 use App\Models\Setting;
 use App\Services\Ai\AiProviderRegistry;
 use Illuminate\Support\Str;
+use App\Models\CategoryField;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -31,6 +33,22 @@ class AdminGeneral extends Component
 
     public int $ai_rate_limit_per_user_per_day = 20;
 
+    // Tab state for the admin page: 'content' or 'fields'
+    public string $activeTab = 'content';
+
+    // Category fields management (moved from AdminCategoryFields)
+    public bool $showAddModal = false;
+    public bool $showEditModal = false;
+
+    public ?int $editingFieldId = null;
+
+    public string $field_key = '';
+    public string $field_label = '';
+    public string $field_data_type = CategoryField::TYPE_TEXT;
+    public bool $field_is_required = false;
+    public string $field_optionsLines = '';
+    public string $field_validationJson = '';
+
     public function mount(AiProviderRegistry $registry): void
     {
         $this->generation_mode = (string) Setting::getValue('content.generation_mode', 'manual');
@@ -49,6 +67,110 @@ class AdminGeneral extends Component
         $this->ai_max_tokens = (int) Setting::getValue('ai.max_tokens', 1200);
         $this->ai_timeout_seconds = (int) Setting::getValue('ai.timeout_seconds', 30);
         $this->ai_rate_limit_per_user_per_day = (int) Setting::getValue('ai.rate_limit_per_user_per_day', 20);
+    }
+
+    public function openFieldsTab(): void
+    {
+        $this->activeTab = 'fields';
+    }
+
+    public function openAddField(): void
+    {
+        $this->reset(['field_key','field_label','field_data_type','field_is_required','field_optionsLines','field_validationJson','editingFieldId']);
+        $this->showAddModal = true;
+        $this->activeTab = 'fields';
+    }
+
+    public function saveNewField(): void
+    {
+        $this->validate([
+            'field_key' => ['required','string','max:120','regex:/^[a-z][a-z0-9_\-]*$/', Rule::unique('category_fields','key')],
+            'field_label' => ['required','string','max:255'],
+            'field_data_type' => ['required', Rule::in($this->dataTypeOptions())],
+        ]);
+
+        $options = $this->parseOptionsLines($this->field_optionsLines);
+
+        CategoryField::query()->create([
+            'key' => $this->field_key,
+            'label' => $this->field_label,
+            'data_type' => $this->field_data_type,
+            'is_required' => $this->field_is_required,
+            'options' => $options,
+            'validation' => null,
+        ]);
+
+        $this->showAddModal = false;
+        session()->flash('status', 'Field created.');
+    }
+
+    public function openEditField(int $fieldId): void
+    {
+        $field = CategoryField::query()->findOrFail($fieldId);
+        $this->editingFieldId = $field->id;
+        $this->field_key = $field->key;
+        $this->field_label = $field->label;
+        $this->field_data_type = $field->data_type;
+        $this->field_is_required = (bool) $field->is_required;
+        $this->field_optionsLines = $field->options ? implode("\n", $field->options) : '';
+        $this->field_validationJson = $field->validation ? json_encode($field->validation, JSON_PRETTY_PRINT) : '';
+        $this->showEditModal = true;
+        $this->activeTab = 'fields';
+    }
+
+    public function saveEditField(): void
+    {
+        $this->validate([
+            'editingFieldId' => ['required','integer'],
+            'field_label' => ['required','string','max:255'],
+            'field_data_type' => ['required', Rule::in($this->dataTypeOptions())],
+        ]);
+
+        $field = CategoryField::query()->findOrFail($this->editingFieldId);
+        $options = $this->parseOptionsLines($this->field_optionsLines);
+
+        $field->update([
+            'label' => $this->field_label,
+            'data_type' => $this->field_data_type,
+            'is_required' => $this->field_is_required,
+            'options' => $options,
+            'validation' => null,
+        ]);
+
+        $this->showEditModal = false;
+        session()->flash('status', 'Field updated.');
+    }
+
+    public function deleteField(int $fieldId): void
+    {
+        $field = CategoryField::query()->findOrFail($fieldId);
+        $field->delete();
+        session()->flash('status', 'Field deleted.');
+    }
+
+    protected function dataTypeOptions(): array
+    {
+        return [
+            CategoryField::TYPE_SINGLE_SELECT,
+            CategoryField::TYPE_MULTI_SELECT,
+            CategoryField::TYPE_NUMBER,
+            CategoryField::TYPE_TEXT,
+            CategoryField::TYPE_TEXTAREA,
+            CategoryField::TYPE_BOOLEAN,
+            CategoryField::TYPE_DATE,
+        ];
+    }
+
+    protected function parseOptionsLines(string $raw): ?array
+    {
+        $lines = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $raw) ?: [])));
+        return $lines === [] ? null : $lines;
+    }
+
+    #[Computed]
+    public function fields()
+    {
+        return CategoryField::query()->orderBy('key')->get();
     }
 
     #[Computed]

@@ -14,6 +14,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('placement')->nullable(); // e.g. homepage_banner, blog_sidebar, blog_post
             $table->string('company')->nullable();
+            $table->string('email')->nullable();
             $table->decimal('amount', 12, 2)->nullable();
             $table->string('payment_method')->nullable();
             $table->string('payment_status')->default('pending'); // pending, completed

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('is_default')->default(false);
             $table->boolean('is_active')->default(true);
             $table->string('payment_gateway')->nullable();
+            $table->json('bank_details')->nullable();
             $table->timestamps();
         });
     }

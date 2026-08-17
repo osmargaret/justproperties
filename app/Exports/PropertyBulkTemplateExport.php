@@ -71,14 +71,19 @@ class PropertyBulkTemplateExport implements FromArray, WithHeadings, WithMultipl
     {
         $reserved = self::reservedBaseColumnKeys();
 
-        return CategorySetting::query()
+        $rows = CategorySetting::query()
+            ->whereHas('category', fn ($q) => $q->where('is_property', true))
+            ->with('field')
             ->orderBy('category_id')
             ->orderBy('sort_order')
-            ->pluck('key')
-            ->filter(fn (string $key) => ! in_array($key, $reserved, true))
+            ->get()
+            ->map(fn ($row) => $row->field?->key)
+            ->filter()
             ->unique()
             ->values()
             ->all();
+
+        return array_values(array_filter($rows, fn ($key) => ! in_array($key, $reserved, true)));
     }
 
     /**

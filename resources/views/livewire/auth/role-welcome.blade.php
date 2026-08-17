@@ -4,7 +4,7 @@
         {{-- Header --}}
         <div class="rw-header">
             <div class="rw-logo-row">
-                <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="Propatis" class="rw-logo-img">
+                <img src="{{ asset('frontend/images/logo.png') }}" alt="Propatis" class="rw-logo-img">
                 <span class="rw-logo-text">Propatis</span>
             </div>
             <h1 class="rw-title">

@@ -28,6 +28,8 @@ class AdminCountries extends Component
 
     public string $language_code = '';
 
+    public bool $is_default = false;
+
     public bool $is_active = true;
 
     public ?int $currency_id = null;
@@ -41,6 +43,7 @@ class AdminCountries extends Component
         $this->flag = '';
         $this->phone_code = '';
         $this->language_code = '';
+        $this->is_default = false;
         $this->is_active = true;
         $this->currency_id = Currency::query()->where('is_active', true)->orderByDesc('is_default')->value('id');
         $this->resetErrorBag();
@@ -57,6 +60,7 @@ class AdminCountries extends Component
         $this->flag = (string) ($country->flag ?? '');
         $this->phone_code = (string) ($country->phone_code ?? '');
         $this->language_code = (string) ($country->language_code ?? '');
+        $this->is_default = (bool) $country->is_default;
         $this->is_active = (bool) $country->is_active;
         $this->currency_id = $country->currency_id;
         $this->resetErrorBag();
@@ -85,6 +89,7 @@ class AdminCountries extends Component
             'flag' => ['nullable', 'string', 'max:32'],
             'phone_code' => ['nullable', 'string', 'max:32'],
             'language_code' => ['nullable', 'string', 'max:16'],
+            'is_default' => ['boolean'],
             'is_active' => ['boolean'],
             'currency_id' => ['nullable', 'integer', 'exists:currencies,id'],
         ]);
@@ -99,6 +104,13 @@ class AdminCountries extends Component
             'is_active'     => $this->is_active,
             'currency_id'   => $this->currency_id,
         ];
+
+        if ($this->is_default) {
+            Country::query()->update(['is_default' => false]);
+            $payload['is_default'] = true;
+        } else {
+            $payload['is_default'] = false;
+        }
 
         if ($this->editingId) {
             Country::query()->whereKey($this->editingId)->update($payload);
@@ -117,11 +129,23 @@ class AdminCountries extends Component
         $this->closeModal();
     }
 
+    public function setDefault(int $id): void
+    {
+        Country::query()->update(['is_default' => false]);
+        Country::query()->whereKey($id)->update(['is_default' => true]);
+        session()->flash('status', __('Default country updated.'));
+    }
+
     public function deleteCountry(int $id): void
     {
         $country = Country::query()->findOrFail($id);
         if ($country->users()->exists() || $country->properties()->exists()) {
             session()->flash('error', __('Cannot delete a country that has users or properties.'));
+
+            return;
+        }
+        if ($country->is_default) {
+            session()->flash('error', __('Unset default before deleting.'));
 
             return;
         }
@@ -132,7 +156,7 @@ class AdminCountries extends Component
 
     public function render()
     {
-        $countries = Country::query()->with('currency')->orderBy('name','asc')->get();
+        $countries = Country::query()->with('currency')->orderByDesc('is_default')->orderBy('name', 'asc')->get();
         $currencies = Currency::query()->where('is_active', true)->orderBy('code')->get();
 
         return view('livewire.admin.settings.admin-countries', [

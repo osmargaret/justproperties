@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            @include('livewire.seller.partials.category-settings-fields', ['settings' => $activeCategory?->settings ?? collect()])
+            @include('livewire.seller.partials.category-settings-fields', ['settings' => $activeCategory?->fields ?? $activeCategory?->settings ?? collect()])
         </div>
 
         <div>

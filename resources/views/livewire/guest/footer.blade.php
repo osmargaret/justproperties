@@ -3,7 +3,7 @@
         <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
             <div>
                 <div class="flex items-center gap-2 mb-4">
-                    <img src="https://public.readdy.ai/ai/img_res/ad862f59-432f-4717-90b5-32d843f1d8ac.png" alt="Propatis" class="h-10 w-auto" />
+                    <img src="{{ asset('frontend/images/logo.png') }}" alt="Propatis" class="h-10 w-auto" />
                     <span class="text-xl font-bold font-serif">Propatis</span>
                 </div>
                 <p class="text-emerald-200 text-sm mb-6 leading-normal">Nigeria's premier direct property marketplace connecting verified owners with serious buyers and renters.</p>

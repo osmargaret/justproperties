@@ -4,8 +4,7 @@ namespace App\Livewire\Seller;
 
 use App\Exports\PropertyBulkTemplateExport;
 use App\Models\Category;
-use App\Models\CategorySetting;
-use App\Models\City;
+use App\Models\CategoryField;
 use App\Models\Currency;
 use App\Models\Media;
 use App\Models\Payment;
@@ -119,21 +118,21 @@ class ListProperty extends Component
         if (! $id) {
             return;
         }
-        $category = Category::query()->with('settings')->find($id);
-        foreach ($category?->settings ?? [] as $setting) {
-            $default = $setting->default_value;
-            if ($setting->data_type === CategorySetting::TYPE_MULTI_ENUM) {
-                $this->dynamicAttributes[$setting->key] = is_array($default) ? $default : [];
+        $category = Category::query()->with('fields')->find($id);
+        foreach ($category?->fields ?? [] as $field) {
+            $default = $field->default_value;
+            if ($field->data_type === CategoryField::TYPE_MULTI_SELECT) {
+                $this->dynamicAttributes[$field->key] = is_array($default) ? $default : [];
 
                 continue;
             }
-            if ($setting->data_type === CategorySetting::TYPE_BOOLEAN) {
-                $this->dynamicAttributes[$setting->key] = (bool) ($default ?? false);
+            if ($field->data_type === CategoryField::TYPE_BOOLEAN) {
+                $this->dynamicAttributes[$field->key] = (bool) ($default ?? false);
 
                 continue;
             }
 
-            $this->dynamicAttributes[$setting->key] = is_array($default) ? null : $default;
+            $this->dynamicAttributes[$field->key] = is_array($default) ? null : $default;
         }
     }
 
@@ -235,7 +234,7 @@ class ListProperty extends Component
             }
 
             try {
-                $category = Category::query()->where('slug', $row['category_slug'] ?? '')->with('settings')->first();
+                $category = Category::query()->where('slug', $row['category_slug'] ?? '')->with('fields')->first();
                 if (! $category || empty($row['title'])) {
                     throw new \RuntimeException(__('Missing required title/category_slug values.'));
                 }
@@ -261,19 +260,25 @@ class ListProperty extends Component
                     'user_id' => $user->id,
                 ]);
 
-                foreach ($category->settings as $setting) {
-                    if (in_array($setting->key, PropertyBulkTemplateExport::reservedBaseColumnKeys(), true)) {
+                foreach ($category->fields as $field) {
+                    if (in_array($field->key, PropertyBulkTemplateExport::reservedBaseColumnKeys(), true)) {
                         continue;
                     }
 
-                    if (! isset($row[$setting->key]) || $row[$setting->key] === '') {
+                    if (! isset($row[$field->key]) || $row[$field->key] === '') {
                         continue;
+                    }
+
+                    $val = $row[$field->key];
+                    if (in_array($field->data_type, [CategoryField::TYPE_MULTI_SELECT, CategoryField::TYPE_MULTI_ENUM], true)) {
+                        $items = array_values(array_filter(array_map('trim', explode(',', (string) $val))));
+                        $val = json_encode($items);
                     }
 
                     PropertyFeature::query()->create([
                         'property_id' => $property->id,
-                        'feature' => $setting->key,
-                        'value' => (string) $row[$setting->key],
+                        'feature' => $field->key,
+                        'value' => (string) $val,
                         'unit' => null,
                     ]);
                 }
@@ -306,7 +311,7 @@ class ListProperty extends Component
             return null;
         }
 
-        return Category::query()->with('settings')->find($this->listing_category_id);
+        return Category::query()->with('fields')->find($this->listing_category_id);
     }
 
     #[Computed]
@@ -419,21 +424,21 @@ class ListProperty extends Component
     protected function buildDynamicRules(Collection $settings): array
     {
         $rules = [];
-        foreach ($settings as $setting) {
-            $base = $setting->is_required ? ['required'] : ['nullable'];
-            $path = 'dynamicAttributes.'.$setting->key;
-            switch ($setting->data_type) {
-                case CategorySetting::TYPE_NUMBER:
+        foreach ($settings as $field) {
+            $base = $field->is_required ? ['required'] : ['nullable'];
+            $path = 'dynamicAttributes.'.$field->key;
+            switch ($field->data_type) {
+                case CategoryField::TYPE_NUMBER:
                     $rules[$path] = [...$base, 'numeric'];
                     break;
-                case CategorySetting::TYPE_MULTI_ENUM:
+                case CategoryField::TYPE_MULTI_SELECT:
                     $rules[$path] = [...$base, 'array'];
                     $rules[$path.'.*'] = ['string'];
                     break;
-                case CategorySetting::TYPE_BOOLEAN:
+                case CategoryField::TYPE_BOOLEAN:
                     $rules[$path] = [...$base, 'boolean'];
                     break;
-                case CategorySetting::TYPE_DATE:
+                case CategoryField::TYPE_DATE:
                     $rules[$path] = [...$base, 'date'];
                     break;
                 default:
@@ -482,10 +487,16 @@ class ListProperty extends Component
                 continue;
             }
 
+            $stringValue = match (true) {
+                is_bool($value) => $value ? '1' : '0',
+                is_array($value) => json_encode(array_values($value)),
+                default => (string) $value,
+            };
+
             PropertyFeature::query()->create([
                 'property_id' => $property->id,
                 'feature' => $feature,
-                'value' => is_array($value) ? json_encode(array_values($value)) : (string) $value,
+                'value' => $stringValue,
                 'unit' => null,
             ]);
         }
@@ -549,22 +560,42 @@ class ListProperty extends Component
 
     private function lookupStateId(?string $code, ?string $name): ?int
     {
-        /** @var User $user */
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
+
+        // 1) try exact code match
         if ($code) {
-            /** @disregard */
-            $id = State::where('country_id',$user->country_id)->query()->whereRaw('LOWER(code) = ?', [Str::lower($code)])->value('id');
+            $id = State::query()->whereRaw('LOWER(code) = ?', [Str::lower($code)])->value('id');
+            if ($id) {
+                return (int) $id;
+            }
         }
-        if(!$id && $name){
-            /** @disregard */
-            $state = State::where('name','LIKE',"%$name%")->first();
-            $id = $state ? $state->id : null;
+
+        // 2) try exact name match
+        if ($name) {
+            $id = State::query()->whereRaw('LOWER(name) = ?', [Str::lower($name)])->value('id');
+            if ($id) {
+                return (int) $id;
+            }
+
+            // 2b) fuzzy LIKE match
+            $state = State::query()->where('name', 'LIKE', "%{$name}%")->first();
+            if ($state) {
+                return (int) $state->id;
+            }
         }
-        if(!$id){
-            /** @disregard */
-            $id = State::where('country_id',$user->country_id)->first();
+
+        // 3) fallback to first state in the user's country (if available)
+        if ($user?->country_id) {
+            $first = State::query()->where('country_id', $user->country_id)->orderBy('id')->value('id');
+            if ($first) {
+                return (int) $first;
+            }
         }
-        return $id;
+
+        // 4) final fallback: any first state available
+        $any = State::query()->orderBy('id')->value('id');
+        return $any ? (int) $any : null;
     }
 
     /**
@@ -593,7 +624,7 @@ class ListProperty extends Component
     {
         if ($mode === 'submit') {
             $this->validate($this->rules(), [], $this->validationAttributes());
-            $activeSettings = $this->activeCategory?->settings ?? collect();
+            $activeSettings = $this->activeCategory?->fields ?? collect();
             $dynamicRules = $this->buildDynamicRules($activeSettings);
             if ($dynamicRules !== []) {
                 $this->validate($dynamicRules, [], $this->validationAttributes());
@@ -691,14 +722,9 @@ class ListProperty extends Component
             ->where('is_active', true)
             ->orderBy('name', 'asc')
             ->get();
-        $cities = City::query()
-            ->where('is_active', true)
-            ->when($this->state_id, fn ($query) => $query->where('state_id', $this->state_id))
-            ->orderBy('name', 'asc')
-            ->get();
-
+        $cities = Property::whereIn('state_id', $states->pluck('id'))->get()->pluck('city')->unique()->sort()->values();
         return view('livewire.seller.list-property', [
-            'categories' => Category::query()->where('is_property', 1)->with('settings')->orderBy('name', 'asc')->get(),
+            'categories' => Category::query()->where('is_property', 1)->with('fields')->orderBy('name', 'asc')->get(),
             'states' => $states,
             'cities' => $cities,
             'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name', 'asc')->get(),

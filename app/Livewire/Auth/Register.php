@@ -69,7 +69,7 @@ class Register extends Component
 
     public function socialSignup(string $provider): void
     {
-        session()->flash('status', "Social signup with {$provider} is not implemented yet.");
+        session()->flash('status', "Social signup with {$provider} is not available yet.");
     }
 
     public function render()

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('advertisements', function (Blueprint $table) {
-            $table->string('email')->nullable()->after('company');
+        Schema::table('countries', function (Blueprint $table) {
+            $table->boolean('is_default')->default(false)->after('is_active');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('advertisements', function (Blueprint $table) {
-            $table->dropColumn('email');
+        Schema::table('countries', function (Blueprint $table) {
+            $table->dropColumn('is_default');
         });
     }
 };

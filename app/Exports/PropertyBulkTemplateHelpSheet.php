@@ -3,7 +3,8 @@
 namespace App\Exports;
 
 use App\Models\Category;
-use App\Models\CategorySetting;
+use App\Models\CategoryField;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
@@ -12,7 +13,8 @@ class PropertyBulkTemplateHelpSheet implements FromArray, WithTitle
     public function array(): array
     {
         $slugExamples = Category::query()
-            ->orderBy('name','asc')
+            ->where('is_property', true)
+            ->orderBy('name', 'asc')
             ->pluck('slug')
             ->filter()
             ->implode(', ');
@@ -37,29 +39,36 @@ class PropertyBulkTemplateHelpSheet implements FromArray, WithTitle
         $rows[] = ['', '', ''];
         $rows[] = [
             'Dynamic category columns',
-            'Add one column per category_settings key (e.g. bedrooms). Only fill columns that apply to that row\'s category_slug. See the "Field options" sheet for enum/multi_enum choices.',
+            'Add one column per category field key (e.g. bedrooms). Only fill columns that apply to that row\'s category_slug. See the "Field options" sheet for enum/multi_enum choices.',
             'bedrooms = 4',
         ];
 
-        $settings = CategorySetting::query()
-            ->with('category')
-            ->orderBy('category_id')
-            ->orderBy('sort_order')
+        $fields = CategoryField::query()
+            ->orderBy('key')
             ->get();
 
-        foreach ($settings as $setting) {
+        foreach ($fields as $field) {
+            $label = $field->label;
+            if (Str::lower($field->label) === 'type' || str_ends_with($field->key, '-type')) {
+                $categoryName = Category::query()
+                    ->where('is_property', true)
+                    ->whereHas('fields', fn ($q) => $q->where('category_fields.id', $field->id))
+                    ->value('name');
+
+                if ($categoryName) {
+                    $label .= " (For {$categoryName})";
+                }
+            }
+
             $rows[] = [
-                $setting->key,
+                $field->key,
                 sprintf(
-                    '%s | category: %s | type: %s%s',
-                    $setting->label,
-                    $setting->category?->slug ?? 'unknown',
-                    $setting->data_type,
-                    $setting->is_required ? ' | required' : ''
+                    '%s | type: %s%s',
+                    $label,
+                    $field->data_type,
+                    $field->is_required ? ' | required' : ''
                 ),
-                in_array($setting->data_type, [CategorySetting::TYPE_ENUM, CategorySetting::TYPE_MULTI_ENUM], true) && is_array($setting->options)
-                    ? 'See Field options sheet'
-                    : (is_array($setting->options) ? implode(', ', $setting->options) : ''),
+                is_array($field->options) ? implode(', ', $field->options) : '',
             ];
         }
 

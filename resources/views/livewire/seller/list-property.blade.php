@@ -37,7 +37,7 @@
                         </div>
                         <div>
                             <label class="block font-medium text-sm text-gray-700 mb-2">Cost ({{ $activeCurrency?->symbol ?? '₦' }}) *</label>
-                            <input type="number" wire:model.blur="cost" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g., 85000000" />
+                            <input type="number" min="1" wire:model.blur="cost" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g., 85000000" />
                             @error('cost') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                         @php
                             $activeCategory = $listing_category_id ? $categories->firstWhere('id', (int) $listing_category_id) : null;
                         @endphp
-                        @include('livewire.seller.partials.category-settings-fields', ['settings' => $activeCategory?->settings ?? collect()])
+                        @include('livewire.seller.partials.category-settings-fields', ['settings' => $activeCategory?->fields ?? $activeCategory?->settings ?? collect()])
                     </div>
                 </div>
 

@@ -75,7 +75,7 @@ class Login extends Component
 
     public function socialLogin(string $provider): void
     {
-        session()->flash('status', "Social login with {$provider} is not implemented yet.");
+        session()->flash('status', "Social login with {$provider} is not available yet.");
     }
 
     public function render()

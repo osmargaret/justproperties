@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('gateway')->nullable()->after('method');
             $table->text('details')->nullable()->after('gateway');
             $table->json('gateway_payload')->nullable()->after('details');
-
+            $table->string('receipt')->nullable();
             $table->index('paid_at');
             $table->index('status');
             $table->index('reference');

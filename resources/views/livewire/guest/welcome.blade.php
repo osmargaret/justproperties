@@ -22,7 +22,7 @@
                             <div class="relative">
                                 <i
                                     class="ri-map-pin-line absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base sm:text-lg"></i><input
-                                    placeholder="Location (e.g., Lekki, Ikorodu)"
+                                    placeholder="Location (e.g., Lekki, Maitama)"
                                     class="w-full pl-10 sm:pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
                                     type="text" value="" />
                             </div>
