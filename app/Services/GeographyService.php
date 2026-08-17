@@ -54,6 +54,7 @@ class GeographyService
             Log::warning('GeographyService: HTTP error fetching states', [
                 'country' => $country->code,
                 'status'  => $response->status(),
+                'message' => $response->body(),
             ]);
 
             return;
