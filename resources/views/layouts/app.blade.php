@@ -169,7 +169,7 @@
             </div>
         </nav>
 
-        {{ $slot }}
+        @yield('content', $slot ?? '')
 
         {{-- FAQ Chat Widget --}}
         @php

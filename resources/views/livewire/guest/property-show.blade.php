@@ -1,110 +1,215 @@
+@php
+    $rentFreq = $property->featureValue('rent_amount_frequency');
+    $freqSuffix = match (strtolower(trim($rentFreq ?? ''))) {
+        'per annum', 'per year', 'yearly', 'annually', 'year' => '/year',
+        'per month', 'monthly', 'month' => '/month',
+        'per week', 'weekly', 'week' => '/week',
+        'per day', 'daily', 'day' => '/day',
+        'per night', 'nightly', 'night' => '/night',
+        'per quarter', 'quarterly', 'quarter' => '/quarter',
+        default => $rentFreq ? '/' . strtolower(trim(str_ireplace(['per ', 'Per '], '', $rentFreq))) : '',
+    };
+
+    $rawFeatures = $property->features;
+    $featuresList = [];
+    if ($rawFeatures) {
+        $decoded = json_decode($rawFeatures, true);
+        $featuresList = is_array($decoded) ? $decoded : array_map('trim', explode(',', (string) $rawFeatures));
+    }
+@endphp
+
 <div x-data="{ 
     galleryOpen: false, 
-    activeImage: 0,
+    activeSlide: 0,
     images: {{ Js::from($property->media->pluck('url')->count() > 0 ? $property->media->pluck('url') : ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80']) }},
-    next() { this.activeImage = this.activeImage === this.images.length - 1 ? 0 : this.activeImage + 1; },
-    prev() { this.activeImage = this.activeImage === 0 ? this.images.length - 1 : this.activeImage - 1; }
-}" @keydown.window.escape="galleryOpen = false" @keydown.window.right="if(galleryOpen) next()" @keydown.window.left="if(galleryOpen) prev()">
-    <main class="max-w-7xl mx-auto px-4 mt-[90px] mb-12">
-        <!-- Breadcrumbs & Header -->
-        <div class="mb-6">
-            <div class="text-sm text-gray-500 mb-2 flex items-center gap-2">
-                <a href="/" class="hover:text-emerald-600">Home</a>
-                <i class="ri-arrow-right-s-line"></i>
-                <a href="#" class="hover:text-emerald-600">{{ $property->category->name ?? 'Category' }}</a>
-                <i class="ri-arrow-right-s-line"></i>
-                <span class="text-gray-900">{{ $property->city->name ?? 'City' }}</span>
+    next() { this.activeSlide = (this.activeSlide + 1) % this.images.length; },
+    prev() { this.activeSlide = (this.activeSlide - 1 + this.images.length) % this.images.length; }
+}" @keydown.window.escape="galleryOpen = false" @keydown.window.right="if(galleryOpen) next()" @keydown.window.left="if(galleryOpen) prev()" class="bg-gray-50 min-h-screen">
+
+    <!-- HERO SLIDER SECTION (Starts from top behind navbar) -->
+    <section class="relative w-full h-[540px] sm:h-[620px] lg:h-[700px] bg-gray-950 overflow-hidden group">
+        
+        <!-- Background Slider Images -->
+        <template x-for="(img, idx) in images" :key="idx">
+            <div x-show="activeSlide === idx" 
+                 x-transition:enter="transition ease-out duration-700" 
+                 x-transition:enter-start="opacity-0 scale-105" 
+                 x-transition:enter-end="opacity-100 scale-100" 
+                 x-transition:leave="transition ease-in duration-500" 
+                 x-transition:leave-start="opacity-100 scale-100" 
+                 x-transition:leave-end="opacity-0 scale-95" 
+                 class="absolute inset-0 w-full h-full">
+                <img :src="img" alt="{{ $property->name }}" class="w-full h-full object-cover">
             </div>
-            <h1 class="text-3xl font-bold text-gray-900">{{ $property->name }}</h1>
-            <p class="text-gray-500 mt-2 text-lg"><i class="ri-map-pin-line mr-1 text-emerald-600"></i> {{ $property->display_location }}</p>
+        </template>
+
+        <!-- Dark Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-gray-950"></div>
+
+        <!-- Top Breadcrumbs & Floating Controls (Below Navbar) -->
+        <div class="absolute top-20 sm:top-24 left-0 right-0 z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-end md:justify-between items-center">
+            <!-- Breadcrumb Pill (Hidden on Mobile) -->
+            <div class="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full text-xs sm:text-sm text-gray-200 border border-white/10 shadow-lg">
+                <a href="/" class="hover:text-emerald-400 transition">Home</a>
+                <i class="ri-arrow-right-s-line text-gray-400"></i>
+                @if($property->category)
+                    <a href="{{ route($property->category->slug) }}" class="hover:text-emerald-400 transition cursor-pointer">{{ $property->category->name }}</a>
+                    <i class="ri-arrow-right-s-line text-gray-400"></i>
+                @endif
+                <span class="text-white font-medium truncate max-w-[200px]">{{ $property->city ?? $property->state?->name ?? 'Details' }}</span>
+            </div>
+
+            <!-- Action Tools (Share, Fullscreen) -->
+            <div class="flex items-center gap-2">
+                <button @click="galleryOpen = true" class="inline-flex items-center gap-2 px-3.5 py-2 bg-black/50 hover:bg-emerald-600 text-white rounded-full text-xs sm:text-sm font-semibold backdrop-blur-md border border-white/15 transition-all shadow-lg cursor-pointer">
+                    <i class="ri-fullscreen-line text-base"></i>
+                    <span class="hidden sm:inline">View Photos</span> (<span x-text="images.length"></span>)
+                </button>
+                <button onclick="navigator.clipboard.writeText(window.location.href); alert('Property link copied to clipboard!');" class="w-9 h-9 sm:w-10 sm:h-10 bg-black/50 hover:bg-white hover:text-gray-900 text-white rounded-full flex items-center justify-center backdrop-blur-md border border-white/15 transition shadow-lg cursor-pointer" title="Share Property">
+                    <i class="ri-share-line text-base sm:text-lg"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Gallery / Featured Image -->
-        <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px]">
-            <div @click="activeImage = 0; galleryOpen = true" class="md:col-span-3 rounded-2xl overflow-hidden relative group cursor-pointer bg-gray-100">
-                <img :src="images[0]" alt="{{ $property->name }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
-                <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition"></div>
+        <!-- Slider Navigation Arrows -->
+        <template x-if="images.length > 1">
+            <div>
+                <button @click="prev()" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-emerald-600 text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition-all duration-300 opacity-90 hover:opacity-100 hover:scale-110 cursor-pointer shadow-2xl">
+                    <i class="ri-arrow-left-s-line text-xl sm:text-2xl"></i>
+                </button>
+                <button @click="next()" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-emerald-600 text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition-all duration-300 opacity-90 hover:opacity-100 hover:scale-110 cursor-pointer shadow-2xl">
+                    <i class="ri-arrow-right-s-line text-xl sm:text-2xl"></i>
+                </button>
             </div>
-            <div class="hidden md:grid grid-rows-2 gap-4">
-                <div @click="activeImage = 1; galleryOpen = true" class="rounded-2xl overflow-hidden cursor-pointer relative group bg-gray-100" x-show="images.length > 1">
-                    <img :src="images[1]" alt="{{ $property->name }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+        </template>
+
+        <!-- FLOATING HERO INFO PANEL (ON TOP OF SLIDER) -->
+        <div class="absolute bottom-6 sm:bottom-12 left-0 right-0 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+                
+                <!-- Left Column: Title, Badges, Location & Short Description -->
+                <div class="lg:col-span-8 space-y-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        @if($property->category)
+                            <span class="px-3 py-1 bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md">
+                                {{ $property->category->name }}
+                            </span>
+                        @endif
+
+                        @if($property->promotions()->where('status', 'active')->exists())
+                            <span class="px-3 py-1 bg-yellow-500/90 text-black text-xs font-extrabold uppercase tracking-wider rounded-full backdrop-blur-md shadow-md flex items-center gap-1">
+                                ⭐ Boosted Listing
+                            </span>
+                        @endif
+
+                        <span class="px-3 py-1 bg-white/20 text-white text-xs font-medium rounded-full backdrop-blur-md border border-white/15">
+                            Available
+                        </span>
+                    </div>
+
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white font-serif leading-tight drop-shadow-lg">
+                        {{ $property->name }}
+                    </h1>
+
+                    <p class="text-emerald-300 text-sm sm:text-base lg:text-lg flex items-center gap-2 font-medium drop-shadow">
+                        <i class="ri-map-pin-2-fill text-emerald-400 text-lg"></i>
+                        <span>{{ $property->display_location }}</span>
+                    </p>
+
+                    @if($property->description)
+                        <p class="text-gray-200 text-xs sm:text-sm lg:text-base max-w-3xl line-clamp-2 leading-relaxed text-shadow-sm">
+                            {{ Str::limit(strip_tags($property->description), 180) }}
+                        </p>
+                    @endif
                 </div>
-                <div @click="activeImage = 2; galleryOpen = true" class="rounded-2xl overflow-hidden relative cursor-pointer group bg-gray-100" x-show="images.length > 2">
-                    <img :src="images[2]" alt="{{ $property->name }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center transition group-hover:bg-black/60" x-show="images.length > 3">
-                        <span class="text-white font-bold text-xl flex items-center gap-1"><i class="ri-image-2-line"></i> +<span x-text="images.length - 3"></span> Photos</span>
+
+                <!-- Right Column: Price Badge -->
+                <div class="lg:col-span-4 flex flex-col items-start lg:items-end justify-end space-y-3">
+                    <div class="p-4 sm:p-5 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/15 shadow-2xl text-left lg:text-right w-full sm:w-auto">
+                        <p class="text-xs text-gray-300 font-medium uppercase tracking-wider mb-1">Asking Price</p>
+                        <div class="text-3xl sm:text-4xl font-black text-white flex items-baseline gap-1">
+                            <span class="text-emerald-400">{{ $property->currency ?? '₦' }}{{ number_format($property->cost) }}</span>
+                            @if($freqSuffix)
+                                <span class="text-xs sm:text-sm font-normal text-gray-300">{{ $freqSuffix }}</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- Lightbox Overlay -->
-        <div x-show="galleryOpen" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-sm" x-transition.opacity style="display: none;">
-            <button @click="galleryOpen = false" class="absolute top-6 right-6 text-white/70 hover:text-white transition bg-black/20 hover:bg-black/40 rounded-full w-12 h-12 flex items-center justify-center z-[110]">
-                <i class="ri-close-line text-3xl"></i>
-            </button>
-            
-            <button @click.stop="prev()" class="absolute left-6 text-white/70 hover:text-white transition bg-black/20 hover:bg-black/40 rounded-full w-12 h-12 flex items-center justify-center z-[110]">
-                <i class="ri-arrow-left-s-line text-3xl"></i>
-            </button>
-            
-            <img :src="images[activeImage]" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl transition-all duration-300" @click.stop="">
-            
-            <button @click.stop="next()" class="absolute right-6 text-white/70 hover:text-white transition bg-black/20 hover:bg-black/40 rounded-full w-12 h-12 flex items-center justify-center z-[110]">
-                <i class="ri-arrow-right-s-line text-3xl"></i>
-            </button>
-            
-            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white font-medium bg-black/40 px-4 py-1.5 rounded-full backdrop-blur-md">
-                <span x-text="activeImage + 1"></span> / <span x-text="images.length"></span>
+        <!-- Slider Dots Indicator (Only if multiple images) -->
+        <template x-if="images.length > 1">
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+                <template x-for="(img, idx) in images" :key="idx">
+                    <button @click="activeSlide = idx" 
+                            :class="activeSlide === idx ? 'w-8 bg-emerald-400' : 'w-2.5 bg-white/40 hover:bg-white/70'" 
+                            class="h-2.5 rounded-full transition-all duration-300 cursor-pointer"></button>
+                </template>
             </div>
-        </div>
+        </template>
 
+    </section>
+
+    <!-- PAGE BODY CONTENT BELOW HERO -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Column -->
+            
+            <!-- Left Main Column -->
             <div class="lg:col-span-2 space-y-8">
                 
-                <!-- Quick Overview -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-wrap gap-8">
-                    <div>
-                        <p class="text-gray-500 text-sm mb-1">Bedrooms</p>
-                        <p class="font-bold text-xl flex items-center gap-2"><i class="ri-hotel-bed-line text-emerald-600"></i> {{ $property->featureValue('bedrooms') ?? 'N/A' }}</p>
+                <!-- Quick Overview Bar -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200/80 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+                    <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                        <i class="ri-hotel-bed-line text-2xl text-emerald-600 mb-1 block"></i>
+                        <p class="text-xs text-gray-500 font-medium">Bedrooms</p>
+                        <p class="text-base font-bold text-gray-900">{{ $property->featureValue('bedrooms') ?? 'N/A' }} Beds</p>
                     </div>
-                    <div>
-                        <p class="text-gray-500 text-sm mb-1">Bathrooms</p>
-                        <p class="font-bold text-xl flex items-center gap-2"><i class="ri-drop-line text-emerald-600"></i> {{ $property->featureValue('bathrooms') ?? 'N/A' }}</p>
+                    <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                        <i class="ri-drop-line text-2xl text-emerald-600 mb-1 block"></i>
+                        <p class="text-xs text-gray-500 font-medium">Bathrooms</p>
+                        <p class="text-base font-bold text-gray-900">{{ $property->featureValue('bathrooms') ?? 'N/A' }} Baths</p>
                     </div>
-                    <div>
-                        <p class="text-gray-500 text-sm mb-1">Area</p>
-                        <p class="font-bold text-xl flex items-center gap-2"><i class="ri-ruler-line text-emerald-600"></i> {{ $property->featureValue('area') ?? 'N/A' }}</p>
+                    <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                        <i class="ri-restaurant-line text-2xl text-emerald-600 mb-1 block"></i>
+                        <p class="text-xs text-gray-500 font-medium">Kitchens</p>
+                        <p class="text-base font-bold text-gray-900">{{ $property->featureValue('kitchens') ?? 'N/A' }} Kitchens</p>
                     </div>
-                    <div>
-                        <p class="text-gray-500 text-sm mb-1">Category</p>
-                        <p class="font-bold text-xl text-emerald-600">{{ $property->category->name ?? 'Property' }}</p>
+                    <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                        <i class="ri-file-text-line text-2xl text-emerald-600 mb-1 block"></i>
+                        <p class="text-xs text-gray-500 font-medium">Document / Type</p>
+                        <p class="text-base font-bold text-gray-900 truncate" title="{{ $property->featureValue('title_document') ?? $property->featureValue(($property->category?->slug ?? '').'-type') ?? 'Verified' }}">
+                            {{ $property->featureValue('title_document') ?? $property->featureValue(($property->category?->slug ?? '').'-type') ?? 'Verified' }}
+                        </p>
                     </div>
                 </div>
 
-                <!-- Description -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <h2 class="text-2xl font-bold mb-4 text-gray-900">About this property</h2>
-                    <div class="prose max-w-none text-gray-600 leading-relaxed space-y-4">
+                <!-- Detailed Description -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200/80 space-y-4">
+                    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <i class="ri-file-list-3-line text-emerald-600"></i> Property Description
+                    </h3>
+                    <div class="prose max-w-none text-gray-700 text-sm sm:text-base leading-relaxed space-y-3">
                         {!! nl2br(e($property->description)) !!}
                     </div>
                 </div>
 
-                <!-- Features & Amenities -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-900">Features & Amenities</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2">
-                        @forelse ($property->features as $feature)
-                        <div class="flex items-center gap-3 text-gray-700">
-                            <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600"><i class="ri-check-line"></i></div>
-                            <span>{{ $feature->feature }} {{ $feature->value && $feature->value !== '1' ? ' - ' . $feature->value : '' }}</span>
+                <!-- Property Features Checklist -->
+                @if(!empty($featuresList))
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200/80 space-y-4">
+                        <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="ri-checkbox-circle-line text-emerald-600"></i> Key Amenities & Features
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                            @foreach($featuresList as $feat)
+                                <div class="flex items-center gap-2.5 p-3 bg-stone-50 rounded-xl border border-stone-200/60 font-medium text-gray-800">
+                                    <i class="ri-check-line text-emerald-600 font-bold"></i> {{ $feat['feature'] }}
+                                </div>
+                            @endforeach
                         </div>
-                        @empty
-                        <div class="text-gray-500 text-sm">No specific features listed.</div>
-                        @endforelse
                     </div>
-                </div>
+                @endif
 
                 <!-- Map Location -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -127,15 +232,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Down Payment (20%)</label>
-                            <input type="text" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500" value="₦30,000,000" readonly>
+                            <input type="text" class="w-full p-2 border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500" value="₦30,000,000" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Interest Rate</label>
-                            <input type="text" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500" value="15%">
+                            <input type="text" class="w-full p-2 border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500" value="15%">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Loan Term</label>
-                            <select class="w-full border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            <select class="w-full p-2 border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
                                 <option>15 Years</option>
                                 <option>20 Years</option>
                                 <option>30 Years</option>
@@ -176,63 +281,84 @@
 
             </div>
 
-            <!-- Right Sidebar -->
+            <!-- Right Sticky Sidebar: Contact & Owner Info -->
             <div class="space-y-6">
-                <!-- Sticky Action Card -->
-                <div class="bg-white rounded-2xl p-6 shadow-lg border border-emerald-50 sticky top-28">
-                    <div class="mb-6">
-                        <p class="text-sm text-gray-500 mb-1">Asking Price</p>
-                        <div class="text-4xl font-extrabold text-emerald-600 tracking-tight">{{ $property->currency?->symbol ?? '₦' }}{{ number_format($property->cost) }}</div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-emerald-100 space-y-6 sticky top-24">
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Asking Price</p>
+                        <div class="text-3xl font-extrabold text-emerald-600 tracking-tight flex items-baseline gap-1">
+                            <span>{{ $property->currency ?? '₦' }}{{ number_format($property->cost) }}</span>
+                            @if($freqSuffix)
+                                <span class="text-sm font-normal text-gray-500">{{ $freqSuffix }}</span>
+                            @endif
+                        </div>
                     </div>
                     
                     <div class="space-y-3">
                         @if($property->contact_whatsapp)
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $property->contact_whatsapp) }}" target="_blank" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition transform hover:-translate-y-0.5">
-                            <i class="ri-whatsapp-line text-xl"></i> WhatsApp Owner
-                        </a>
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $property->contact_whatsapp) }}" target="_blank" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition transform hover:-translate-y-0.5">
+                                <i class="ri-whatsapp-line text-xl"></i> WhatsApp Owner
+                            </a>
                         @endif
                         <div class="grid grid-cols-2 gap-3">
-                            <a href="tel:{{ $property->contact_phone }}" class="w-full py-3 border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold rounded-xl flex items-center justify-center gap-2 transition">
-                                <i class="ri-phone-fill"></i> Call
-                            </a>
-                            <a href="mailto:{{ $property->contact_email }}" class="w-full py-3 border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold rounded-xl flex items-center justify-center gap-2 transition">
-                                <i class="ri-mail-send-fill"></i> Email
-                            </a>
+                            @if($property->contact_phone)
+                                <a href="tel:{{ $property->contact_phone }}" class="w-full py-3 border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold rounded-xl flex items-center justify-center gap-2 transition text-xs sm:text-sm">
+                                    <i class="ri-phone-fill"></i> Call
+                                </a>
+                            @endif
+                            @if($property->contact_email)
+                                <a href="mailto:{{ $property->contact_email }}" class="w-full py-3 border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold rounded-xl flex items-center justify-center gap-2 transition text-xs sm:text-sm">
+                                    <i class="ri-mail-send-fill"></i> Email
+                                </a>
+                            @endif
                         </div>
                     </div>
 
-
-
-                    <div class="mt-6 pt-6 border-t border-gray-100 grid grid-cols-2 gap-3">
-                        <button class="py-2.5 px-2 text-gray-700 font-medium rounded-xl flex flex-col items-center justify-center gap-1 transition bg-gray-50 hover:bg-emerald-50 hover:text-emerald-600 group">
-                            <i class="ri-heart-3-line text-xl group-hover:fill-emerald-600"></i> 
-                            <span class="text-xs">Save Property</span>
-                        </button>
-                        <button class="py-2.5 px-2 text-gray-700 font-medium rounded-xl flex flex-col items-center justify-center gap-1 transition bg-gray-50 hover:bg-emerald-50 hover:text-emerald-600 group">
-                            <i class="ri-notification-3-line text-xl"></i> 
-                            <span class="text-xs">Set Alert</span>
-                        </button>
-                    </div>
-                    
-                    <div class="mt-6 bg-gray-50 rounded-xl p-4 flex items-center gap-4 border border-gray-100">
+                    <!-- Owner Profile Box -->
+                    <div class="bg-gray-50 rounded-xl p-4 flex items-center gap-4 border border-gray-100">
                         <div class="relative">
-                            <img src="{{ $property->user?->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($property->user?->name ?? 'User') }}" alt="Owner" class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm">
+                            <img src="{{ $property->user?->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($property->contact_name ?? $property->user?->name ?? 'User') }}" alt="Owner" class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm">
                             <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-bold text-gray-900 truncate flex items-center gap-1">{{ $property->user?->name ?? 'Property Owner' }} <i class="ri-verified-badge-fill text-blue-500 text-sm"></i></p>
-                            <p class="text-xs text-gray-500 mb-1">Listed Property Owner</p>
+                            <p class="font-bold text-gray-900 truncate flex items-center gap-1">
+                                {{ $property->contact_name ?? $property->user?->name ?? 'Property Owner' }} 
+                                <i class="ri-verified-badge-fill text-blue-500 text-sm"></i>
+                            </p>
+                            <p class="text-xs text-gray-500 mb-1">Listed Property Contact</p>
                             <p class="text-xs text-emerald-600 font-medium">Verified Profile</p>
                         </div>
                     </div>
                     
-                    <div class="mt-4 text-center">
-                        <button wire:click="$set('showReportModal', true)" class="text-xs text-gray-400 hover:text-red-500 transition underline">Report this listing</button>
+                    <div class="text-center pt-2">
+                        <button wire:click="$set('showReportModal', true)" class="text-xs text-gray-400 hover:text-red-500 transition underline cursor-pointer">Report this listing</button>
                     </div>
                 </div>
             </div>
+
         </div>
     </main>
+
+    <!-- FULLSCREEN LIGHTBOX OVERLAY -->
+    <div x-show="galleryOpen" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-md" x-transition.opacity style="display: none;">
+        <button @click="galleryOpen = false" class="absolute top-6 right-6 text-white/70 hover:text-white transition bg-black/40 hover:bg-black/60 rounded-full w-12 h-12 flex items-center justify-center z-[110] cursor-pointer">
+            <i class="ri-close-line text-3xl"></i>
+        </button>
+        
+        <button @click.stop="prev()" class="absolute left-6 text-white/70 hover:text-white transition bg-black/40 hover:bg-black/60 rounded-full w-12 h-12 flex items-center justify-center z-[110] cursor-pointer">
+            <i class="ri-arrow-left-s-line text-3xl"></i>
+        </button>
+        
+        <img :src="images[activeSlide]" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl transition-all duration-300" @click.stop="">
+        
+        <button @click.stop="next()" class="absolute right-6 text-white/70 hover:text-white transition bg-black/40 hover:bg-black/60 rounded-full w-12 h-12 flex items-center justify-center z-[110] cursor-pointer">
+            <i class="ri-arrow-right-s-line text-3xl"></i>
+        </button>
+        
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white font-medium bg-black/50 px-4 py-1.5 rounded-full backdrop-blur-md text-xs sm:text-sm">
+            <span x-text="activeSlide + 1"></span> / <span x-text="images.length"></span>
+        </div>
+    </div>
 
     <!-- Report Modal -->
     @if($showReportModal)
@@ -282,4 +408,5 @@
         <p class="text-sm font-medium">{{ session('success') }}</p>
     </div>
     @endif
+
 </div>

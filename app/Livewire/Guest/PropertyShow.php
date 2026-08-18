@@ -3,6 +3,7 @@
 namespace App\Livewire\Guest;
 
 use App\Models\Property;
+use App\Models\PropertyReport;
 use Livewire\Component;
 
 class PropertyShow extends Component
@@ -24,7 +25,7 @@ class PropertyShow extends Component
             'reportDescription' => 'nullable|string|max:1000',
         ]);
 
-        \App\Models\PropertyReport::create([
+        PropertyReport::create([
             'property_id' => $this->property->id,
             'user_id' => auth()->id(),
             'reason' => $this->reportReason,

@@ -104,7 +104,7 @@
                 <tr class="border-b border-gray-100">
                   <td class="py-3 font-medium">{{ $property->name }}</td>
                   <td class="py-3">{{ $property->category?->name ?? '—' }}</td>
-                  <td class="py-3">{{ $property->currency() }} {{ $property->price }}</td>
+                  <td class="py-3">{{ $property->currency }} {{ $property->price }}</td>
                   <td class="py-3">
                     @php
                       $statusClass = match($property->status) {

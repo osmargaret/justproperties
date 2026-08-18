@@ -42,7 +42,7 @@
         </div>
         <div class="flex justify-between items-center pt-3 border-t border-gray-100">
             <span class="font-bold text-emerald-600 text-xl flex items-baseline gap-0.5">
-                <span>{{ $property->currency()?->symbol ?? '₦' }}{{ number_format($property->cost) }}</span>
+                <span>{{ $property->currency ?? '₦' }}{{ number_format($property->cost) }}</span>
                 @if($freqSuffix)
                     <span class="text-xs font-normal text-gray-500">{{ $freqSuffix }}</span>
                 @endif

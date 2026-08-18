@@ -19,6 +19,7 @@ trait DisplaysCategoryProperties
 
     // Filter Form State Properties
     public string $search = '';
+    public string $category;
     public string $country_id = '';
     public string $state_id = '';
     public array $cities = [];
@@ -39,7 +40,58 @@ trait DisplaysCategoryProperties
     public function mountDisplaysCategoryProperties(): void
     {
         $this->initDefaultCountry();
+        $this->hydrateFiltersFromQuery();
         $this->applyFilters();
+    }
+
+    protected function hydrateFiltersFromQuery(): void
+    {
+        $request = request();
+
+        if ($request->has('city') && ! empty($request->get('city'))) {
+            $city = trim((string) $request->get('city'));
+            if (! in_array($city, $this->cities, true)) {
+                $this->cities[] = $city;
+            }
+        }
+
+        if ($request->has('search') && ! empty($request->get('search')) && empty($this->search)) {
+            $this->search = trim((string) $request->get('search'));
+        }
+
+        if ($request->has('price_range') && ! empty($request->get('price_range'))) {
+            $range = (string) $request->get('price_range');
+            [$min, $max] = $this->parsePriceRange($range);
+            if ($min !== null) {
+                $this->minPrice = (string) $min;
+            }
+            if ($max !== null) {
+                $this->maxPrice = (string) $max;
+            }
+        }
+
+        if ($request->has('minPrice') && ! empty($request->get('minPrice'))) {
+            $this->minPrice = (string) $request->get('minPrice');
+        }
+
+        if ($request->has('maxPrice') && ! empty($request->get('maxPrice'))) {
+            $this->maxPrice = (string) $request->get('maxPrice');
+        }
+    }
+
+    protected function parsePriceRange(string $range): array
+    {
+        return match (strtolower(trim($range))) {
+            '0-1m', '0-10m', 'under 1m', 'under 10m' => [null, 1_000_000],
+            '1m-5m' => [1_000_000, 5_000_000],
+            '5m-10m' => [5_000_000, 10_000_000],
+            '10m-30m' => [10_000_000, 30_000_000],
+            '10m-50m' => [10_000_000, 50_000_000],
+            '30m-50m' => [30_000_000, 50_000_000],
+            '50m-100m' => [50_000_000, 100_000_000],
+            '100m+', 'above 100m' => [100_000_000, null],
+            default => [null, null],
+        };
     }
 
     protected function initDefaultCountry(): void
@@ -53,6 +105,18 @@ trait DisplaysCategoryProperties
             }
             $this->country_id = $defaultCountry ? (string) $defaultCountry->id : '';
         }
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->appliedFilters['search'] = trim($this->search);
+        $this->resetPage();
+    }
+
+    public function updatedSortBy(): void
+    {
+        $this->appliedFilters['sortBy'] = $this->sortBy;
+        $this->resetPage();
     }
 
     public function updatedCountryId($value): void
@@ -102,10 +166,33 @@ trait DisplaysCategoryProperties
         $this->applyFilters();
     }
 
+    public function addCityTag(string $city): void
+    {
+        $city = trim($city);
+        if ($city !== '') {
+            $exists = false;
+            foreach ($this->cities as $c) {
+                if (strtolower($c) === strtolower($city)) {
+                    $exists = true;
+                    break;
+                }
+            }
+            if (! $exists) {
+                $this->cities[] = $city;
+            }
+        }
+    }
+
+    public function push(string $property, mixed $value): void
+    {
+        if ($property === 'cities') {
+            $this->addCityTag((string) $value);
+        }
+    }
+
     public function removeCityTag(string $city): void
     {
         $this->cities = array_values(array_filter($this->cities, fn ($c) => strtolower($c) !== strtolower($city)));
-        $this->applyFilters();
     }
 
     #[Computed]
@@ -226,7 +313,11 @@ trait DisplaysCategoryProperties
         }
 
         if (! empty($applied['country_id'])) {
-            $query->where('country_id', $applied['country_id']);
+            $countryId = $applied['country_id'];
+            $query->where(function ($q) use ($countryId) {
+                $q->where('country_id', $countryId)
+                    ->orWhereNull('country_id');
+            });
         }
 
         if (! empty($applied['state_id'])) {
@@ -238,7 +329,9 @@ trait DisplaysCategoryProperties
             $query->where(function ($q) use ($cities) {
                 foreach ($cities as $city) {
                     $q->orWhere('city', 'like', "%{$city}%")
-                        ->orWhere('neighborhood', 'like', "%{$city}%");
+                        ->orWhere('neighborhood', 'like', "%{$city}%")
+                        ->orWhere('name', 'like', "%{$city}%")
+                        ->orWhere('address', 'like', "%{$city}%");
                 }
             });
         }

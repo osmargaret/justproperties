@@ -237,9 +237,9 @@ class Property extends Model
         );
     }
 
-    public function currency()
+    public function getCurrencyAttribute()
     {
-        return $this->user->country?->currency->symbol ?? '$';
+        return $this->user->country->currency->symbol ?? '$';
     }
 
     public function featureValue(string $feature): ?string

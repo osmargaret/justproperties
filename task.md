@@ -1,5 +1,5 @@
 ## PHASE 1 — All Migrations
-- [ ] add_bank_details_to_countries_table
+- [*] add_bank_details_to_countries_table
 - [ ] add_receipt_to_payments_table
 - [ ] create_faqs_table
 - [ ] add_is_property_to_categories_table

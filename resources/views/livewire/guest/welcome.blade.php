@@ -17,20 +17,22 @@
                             Connect Directly with Property Owners
                         </p>
                     </div>
-                    <form class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4">
+                    <form wire:submit="searchProperties" class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4">
                         <div class="space-y-2.5 sm:space-y-3">
                             <div class="relative">
                                 <i
                                     class="ri-map-pin-line absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base sm:text-lg"></i><input
+                                    wire:model="location"
                                     placeholder="Location (e.g., Lekki, Maitama)"
                                     class="w-full pl-10 sm:pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                                    type="text" value="" />
+                                    type="text" />
                             </div>
                             <div class="relative">
                                 <i
                                     class="ri-home-4-line absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base sm:text-lg"></i><select
+                                    wire:model="category_slug"
                                     class="w-full pl-10 sm:pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none text-sm cursor-pointer">
-                                    <option value="">Property Type</option>
+                                    <option value="">Property Category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->slug }}">{{ $category->name }}</option>
                                     @endforeach
@@ -39,13 +41,15 @@
                             <div class="relative">
                                 <i
                                     class="ri-money-naira-circle-line absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base sm:text-lg"></i><select
+                                    wire:model="price_range"
                                     class="w-full pl-10 sm:pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none text-sm cursor-pointer">
                                     <option value="">Price Range</option>
-                                    <option value="0-10m">Under ₦10M</option>
-                                    <option value="10m-30m">₦10M - ₦30M</option>
-                                    <option value="30m-50m">₦30M - ₦50M</option>
-                                    <option value="50m-100m">₦50M - ₦100M</option>
-                                    <option value="100m+">Above ₦100M</option>
+                                    <option value="0-1m">Under 1M</option>
+                                    <option value="1m-5m">1M - 5M</option>
+                                    <option value="5m-10m">5M - 10M</option>
+                                    <option value="10m-50m">10M - 50M</option>
+                                    <option value="50m-100m">50M - 100M</option>
+                                    <option value="100m+">Above 100M</option>
                                 </select>
                             </div>
                         </div>
@@ -79,7 +83,7 @@
                                 class="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl group">
                                 <img alt="Landed Properties"
                                     class="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
-                                    src="https://readdy.ai/api/search-image?query=elegant%20modern%20duplex%20house%20with%20beautiful%20landscaping%2C%20contemporary%20Nigerian%20architecture%2C%20spacious%20compound%20with%20paved%20driveway%2C%20luxury%20residential%20property%2C%20professional%20real%20estate%20photography%20with%20clear%20blue%20sky%20background&amp;width=800&amp;height=600&amp;seq=cat1&amp;orientation=landscape" />
+                                    src="{{ asset('frontend/images/landed-properties.jpg') }}" />
                                 <div
                                     class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
                                 </div>
@@ -95,8 +99,7 @@
                                     </h3>
                                     <p
                                         class="text-emerald-100 text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg line-clamp-2">
-                                        Browse premium landed properties including duplexes,
-                                        bungalows, and mansions
+                                        Discover prime plots, dry land, serviced plots, and strategic development land with verified titles
                                     </p>
                                     <a href="#properties"
                                         class="inline-flex items-center space-x-2 text-white font-semibold text-sm mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer hover:text-emerald-300"><span
@@ -111,7 +114,7 @@
                                 class="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl group">
                                 <img alt="Uncompleted Structures"
                                     class="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
-                                    src="https://readdy.ai/api/search-image?query=uncompleted%20building%20construction%20showing%20concrete%20framework%20and%20structural%20elements%2C%20multiple%20floors%20visible%2C%20construction%20site%20with%20clear%20documentation%2C%20professional%20photography%20with%20simple%20sky%20background&amp;width=800&amp;height=600&amp;seq=cat2&amp;orientation=landscape" />
+                                    src="{{ asset('frontend/images/uncompleted-properties.jpg') }}" />
                                 <div
                                     class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
                                 </div>
@@ -127,8 +130,7 @@
                                     </h3>
                                     <p
                                         class="text-emerald-100 text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg line-clamp-2">
-                                        Investment opportunities in uncompleted buildings at
-                                        great prices
+                                        Explore structural shells, building projects, and uncompleted properties at great investment prices
                                     </p>
                                     <a href="#properties"
                                         class="inline-flex items-center space-x-2 text-white font-semibold text-sm mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer hover:text-emerald-300"><span
@@ -143,7 +145,7 @@
                                 class="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl group">
                                 <img alt="Completed Properties"
                                     class="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
-                                    src="https://readdy.ai/api/search-image?query=beautiful%20completed%20residential%20property%20with%20modern%20finishing%2C%20fully%20furnished%20interior%20visible%20through%20windows%2C%20well%20maintained%20exterior%2C%20professional%20real%20estate%20photography%20with%20clear%20background&amp;width=800&amp;height=600&amp;seq=cat3&amp;orientation=landscape" />
+                                    src="{{ asset('frontend/images/completed-properties.jpg') }}" />
                                 <div
                                     class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
                                 </div>
@@ -159,8 +161,7 @@
                                     </h3>
                                     <p
                                         class="text-emerald-100 text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg line-clamp-2">
-                                        Move-in ready properties with all finishing and
-                                        documentation
+                                        Discover move-in ready duplexes, bungalows, apartments, and luxury mansions with verified documentation
                                     </p>
                                     <a href="#properties"
                                         class="inline-flex items-center space-x-2 text-white font-semibold text-sm mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer hover:text-emerald-300"><span
@@ -175,7 +176,7 @@
                                 class="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl group">
                                 <img alt="Rented/Lease Properties"
                                     class="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
-                                    src="https://readdy.ai/api/search-image?query=modern%20apartment%20building%20exterior%20with%20multiple%20units%2C%20clean%20facade%2C%20balconies%2C%20well%20maintained%20rental%20property%2C%20professional%20real%20estate%20photography%20with%20clear%20sky%20background&amp;width=800&amp;height=600&amp;seq=cat4&amp;orientation=landscape" />
+                                    src="{{ asset('frontend/images/rent-lease.jpg') }}" />
                                 <div
                                     class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
                                 </div>
@@ -191,8 +192,7 @@
                                     </h3>
                                     <p
                                         class="text-emerald-100 text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg line-clamp-2">
-                                        Find your perfect rental home or lease commercial
-                                        spaces
+                                        Find residential rental homes, apartments, commercial offices, and long-term lease properties
                                     </p>
                                     <a href="#properties"
                                         class="inline-flex items-center space-x-2 text-white font-semibold text-sm mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer hover:text-emerald-300"><span
@@ -207,7 +207,7 @@
                                 class="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl group">
                                 <img alt="Short-Let Apartments"
                                     class="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
-                                    src="https://readdy.ai/api/search-image?query=luxury%20furnished%20apartment%20interior%20with%20stylish%20modern%20furniture%2C%20spacious%20living%20area%2C%20elegant%20decor%2C%20city%20view%20through%20large%20windows%2C%20professional%20interior%20photography%20with%20clean%20background&amp;width=800&amp;height=600&amp;seq=cat5&amp;orientation=landscape" />
+                                    src="{{ asset('frontend/images/shortlet.jpg') }}" />
                                 <div
                                     class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
                                 </div>
@@ -223,8 +223,7 @@
                                     </h3>
                                     <p
                                         class="text-emerald-100 text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg line-clamp-2">
-                                        Fully furnished apartments for daily, weekly, or
-                                        monthly stays
+                                        Fully furnished luxury apartments, studio suites, and villas for daily, weekly, or monthly stays
                                     </p>
                                     <a href="#properties"
                                         class="inline-flex items-center space-x-2 text-white font-semibold text-sm mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer hover:text-emerald-300"><span
@@ -233,6 +232,38 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="slide-5"
+                            class="absolute w-[85%] sm:w-[65%] lg:w-[55%] h-full transition-all duration-700 ease-in-out cursor-pointer z-20 opacity-100 scale-100 translate-x-0">
+                            <div
+                                class="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl group">
+                                <img alt="Facilities"
+                                    class="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
+                                    src="{{ asset('frontend/images/facility.jpg') }}" />
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
+                                </div>
+                                <div class="absolute top-4 right-4 sm:top-6 sm:right-6">
+                                    <span
+                                        class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-emerald-500 text-white text-xs sm:text-sm font-bold rounded-full whitespace-nowrap">142+
+                                        Facilities</span>
+                                </div>
+                                <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-8 lg:p-10">
+                                    <h3
+                                        class="text-xl sm:text-2xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 group-hover:text-emerald-300 transition-colors">
+                                        Facilities
+                                    </h3>
+                                    <p
+                                        class="text-emerald-100 text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg line-clamp-2">
+                                        Explore commercial and industrial facilities including warehouses, factories, event halls, and office complexes
+                                    </p>
+                                    <a href="#properties"
+                                        class="inline-flex items-center space-x-2 text-white font-semibold text-sm mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer hover:text-emerald-300"><span
+                                            class="whitespace-nowrap">View All</span><i
+                                            class="ri-arrow-right-line"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
                     <button id="prev-btn"
                         class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/90 hover:bg-white text-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110 cursor-pointer whitespace-nowrap"
@@ -244,7 +275,7 @@
                     </button>
                     <div class="flex items-center justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
                         <button id="dot-0"
-                            class="transition-all duration-500 rounded-full cursor-pointer w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-300 hover:bg-gray-400"
+                            class="transition-all duration-500 rounded-full cursor-pointer w-8 sm:w-10 h-2.5 sm:h-3 bg-emerald-500"
                             aria-label="Go to category 1"></button><button id="dot-1"
                             class="transition-all duration-500 rounded-full cursor-pointer w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-300 hover:bg-gray-400"
                             aria-label="Go to category 2"></button><button id="dot-2"
@@ -252,8 +283,10 @@
                             aria-label="Go to category 3"></button><button id="dot-3"
                             class="transition-all duration-500 rounded-full cursor-pointer w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-300 hover:bg-gray-400"
                             aria-label="Go to category 4"></button><button id="dot-4"
-                            class="transition-all duration-500 rounded-full cursor-pointer w-8 sm:w-10 h-2.5 sm:h-3 bg-emerald-500"
-                            aria-label="Go to category 5"></button>
+                            class="transition-all duration-500 rounded-full cursor-pointer w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-300 hover:bg-gray-400"
+                            aria-label="Go to category 5"></button><button id="dot-5"
+                            class="transition-all duration-500 rounded-full cursor-pointer w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-300 hover:bg-gray-400"
+                            aria-label="Go to category 6"></button>
                     </div>
                 </div>
             </div>
@@ -1436,45 +1469,52 @@
 @push('scripts')
     <script>
         // Property Categories Slider
-        let currentSlide = 4; // Start with slide-4 (Short-Let Apartments) as active
-        const totalSlides = 5;
+        let currentSlide = 0; // Start with slide-0 (Landed Properties) as active
+        const totalSlides = 6;
 
-        // Slide positions configuration
+        // Slide positions configuration (offset = (i - currentSlide + totalSlides) % totalSlides)
         const slideConfigs = [{
+                z: 20,
+                opacity: 1,
+                scale: 1,
+                translateX: '0%',
+                translateXSm: '0%'
+            }, // offset 0: Active Center
+            {
                 z: 10,
                 opacity: 0.5,
                 scale: 0.9,
                 translateX: '75%',
                 translateXSm: '60%'
-            }, // slide-0
+            }, // offset 1: Peek Right
             {
                 z: 0,
                 opacity: 0,
                 scale: 0.75,
                 translateX: '0%',
                 translateXSm: '0%'
-            }, // slide-1
+            }, // offset 2: Hidden
             {
                 z: 0,
                 opacity: 0,
                 scale: 0.75,
                 translateX: '0%',
                 translateXSm: '0%'
-            }, // slide-2
+            }, // offset 3: Hidden
+            {
+                z: 0,
+                opacity: 0,
+                scale: 0.75,
+                translateX: '0%',
+                translateXSm: '0%'
+            }, // offset 4: Hidden
             {
                 z: 10,
                 opacity: 0.5,
                 scale: 0.9,
                 translateX: '-75%',
                 translateXSm: '-60%'
-            }, // slide-3
-            {
-                z: 20,
-                opacity: 1,
-                scale: 1,
-                translateX: '0%',
-                translateXSm: '0%'
-            } // slide-4 (active)
+            } // offset 5: Peek Left
         ];
 
         function updateSlides() {

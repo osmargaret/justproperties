@@ -47,6 +47,7 @@ use App\Livewire\Guest\Facilities;
 use App\Livewire\Guest\LandedProperty;
 use App\Livewire\Guest\Pricing;
 use App\Livewire\Guest\PrivacyPolicy;
+use App\Livewire\Guest\PropertyShow;
 use App\Livewire\Guest\RentLease;
 use App\Livewire\Guest\ShortLet;
 use App\Livewire\Guest\TermsOfService;
@@ -160,4 +161,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
 require __DIR__.'/settings.php';
 
-Route::get('/property/{property:slug}', \App\Livewire\Guest\PropertyShow::class)->name('property.show');
+Route::get('/property/{property:slug}', PropertyShow::class)->name('property.show');
+Route::get('/property-hero-preview', function () {
+    return view('preview.property-hero-preview-copy');
+})->name('property.hero.preview');

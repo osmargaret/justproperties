@@ -16,13 +16,6 @@ Payment{
     }
 }
 
-Orientation page update (role-welcome){
-    Currently we have buyer & seller sections. 
-    We need to split them into 6 based on what the user wants to do:
-    Rent | Shortlet | Buy | Sell | Seller Dashboard | Buyer Dashboard
-    
-}
-
 FAQ{
    on app.blade.php{
       Open the chat on the bottom right corner

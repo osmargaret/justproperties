@@ -27,7 +27,7 @@
                 <!-- Quick Search Box -->
                 <div class="relative flex-1 max-w-sm hidden sm:block">
                     <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-base"></i>
-                    <input type="text" wire:model="search" wire:keydown.enter="applyFilters" placeholder="Quick search location, title, keyword..." class="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-gray-50/50 transition">
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Quick search location, title, keyword..." class="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-gray-50/50 transition">
                 </div>
             </div>
 
@@ -38,7 +38,7 @@
                 </p>
                 <div class="flex items-center gap-2">
                     <label for="sortBySelect" class="text-xs text-gray-500 font-medium hidden lg:inline-block">Sort by:</label>
-                    <select id="sortBySelect" wire:model="sortBy" wire:change="applyFilters" class="px-3 py-2 border border-gray-200 rounded-xl text-gray-700 text-sm outline-none focus:border-emerald-500 bg-white cursor-pointer shadow-xs">
+                    <select id="sortBySelect" wire:model.live="sortBy" class="px-3 py-2 border border-gray-200 rounded-xl text-gray-700 text-sm outline-none focus:border-emerald-500 bg-white cursor-pointer shadow-xs">
                         <option value="newest">Newest First</option>
                         <option value="price_asc">Price: Low to High</option>
                         <option value="price_desc">Price: High to Low</option>
@@ -119,10 +119,10 @@
 </div>
 
 <!-- Off-Canvas Backdrop -->
-<div id="filterBackdrop" onclick="closeFilterDrawer()" class="fixed inset-0 bg-gray-900/60 backdrop-blur-xs z-50 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+<div id="filterBackdrop" onclick="closeFilterDrawer()" class="fixed inset-0 bg-gray-900/60 backdrop-blur-xs z-50 transition-opacity duration-300 opacity-0 pointer-events-none" wire:ignore.self></div>
 
 <!-- Off-Canvas Slide-Over Drawer -->
-<div id="filterDrawer" class="fixed inset-y-0 right-0 max-w-full flex w-full sm:w-[480px] z-50 transform transition-transform duration-300 ease-in-out translate-x-full">
+<div id="filterDrawer" class="fixed inset-y-0 right-0 max-w-full flex w-full sm:w-[480px] z-50 transform transition-transform duration-300 ease-in-out translate-x-full" wire:ignore.self>
     <div class="w-full bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden">
         
         <!-- Drawer Header -->
@@ -349,21 +349,33 @@
 
 <!-- Vanilla JavaScript for Off-Canvas Drawer & City Input -->
 <script>
+    window.isFilterDrawerOpen = window.isFilterDrawerOpen || false;
+
     function openFilterDrawer() {
-        const drawer = document.getElementById('filterDrawer');
-        const backdrop = document.getElementById('filterBackdrop');
-        if (drawer && backdrop) {
-            drawer.classList.remove('translate-x-full');
-            backdrop.classList.remove('opacity-0', 'pointer-events-none');
-            document.body.classList.add('overflow-hidden');
-        }
+        window.isFilterDrawerOpen = true;
+        syncFilterDrawerState();
     }
 
     function closeFilterDrawer() {
+        window.isFilterDrawerOpen = false;
+        syncFilterDrawerState();
+    }
+
+    function syncFilterDrawerState() {
         const drawer = document.getElementById('filterDrawer');
         const backdrop = document.getElementById('filterBackdrop');
-        if (drawer && backdrop) {
+        if (!drawer || !backdrop) return;
+
+        if (window.isFilterDrawerOpen) {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('translate-x-0');
+            backdrop.classList.remove('opacity-0', 'pointer-events-none');
+            backdrop.classList.add('opacity-100');
+            document.body.classList.add('overflow-hidden');
+        } else {
+            drawer.classList.remove('translate-x-0');
             drawer.classList.add('translate-x-full');
+            backdrop.classList.remove('opacity-100');
             backdrop.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden');
         }
@@ -373,6 +385,12 @@
         if (e.key === 'Escape') {
             closeFilterDrawer();
         }
+    });
+
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.hook('morph.updated', () => {
+            syncFilterDrawerState();
+        });
     });
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -417,9 +435,7 @@
         function addTag(value) {
             value = value.trim();
             if (!value) return;
-            // Notify Livewire component of added city
-            @this.call('applyFilters');
-            @this.push('cities', value);
+            @this.call('addCityTag', value);
             cityInput.value = '';
             updatePlaceholder();
         }
