@@ -138,25 +138,135 @@
             </div>
         </div>
 
-        <!-- Who Should Advertise -->
-        <div class="mb-20">
-            <div class="text-center mb-12">
-                <span class="text-emerald-600 text-sm font-semibold uppercase tracking-widest">Ideal Partners</span>
-                <h2 class="text-3xl font-bold text-gray-900 mt-2 font-serif">Who Advertises With Us?</h2>
+        <!-- Who Can Advertise With Us (Creative Interactive Grid) -->
+        <div class="mb-24">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-widest rounded-full mb-3">
+                    <i class="ri-user-heart-line text-sm"></i> Ideal Advertising Partners
+                </span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 font-serif tracking-tight">
+                    Who Can Advertise With Us?
+                </h2>
+                <p class="text-base sm:text-lg text-gray-600 mt-4 leading-relaxed">
+                    Propatis provides a high-converting stage for financial institutions, real estate professionals, legal experts, and property service providers looking to reach ready buyers, sellers, and investors.
+                </p>
             </div>
-            <div class="grid md:grid-cols-4 gap-6 text-center">
-                @foreach([
-                        ['icon' => 'ri-bank-line', 'label' => 'Mortgage & Finance Companies'],
-                        ['icon' => 'ri-tools-line', 'label' => 'Construction & Building Materials'],
-                        ['icon' => 'ri-paint-brush-line', 'label' => 'Interior Design & Furnishing'],
-                        ['icon' => 'ri-shield-check-line', 'label' => 'Insurance & Property Law Firms'],
-                    ] as $partner)
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                            <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mx-auto mb-4">
-                                <i class="{{ $partner['icon'] }} text-2xl"></i>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                @php
+                    $advertisers = [
+                        [
+                            'title' => 'Mortgage Companies',
+                            'tag' => 'Financing',
+                            'icon' => 'ri-bank-card-2-line',
+                            'bg' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                            'badge' => 'bg-emerald-100 text-emerald-800',
+                            'desc' => 'Promote home financing, mortgage packages, and competitive loan rates directly to ready buyers.'
+                        ],
+                        [
+                            'title' => 'Investment Firms',
+                            'tag' => 'Capital',
+                            'icon' => 'ri-funds-box-line',
+                            'bg' => 'bg-blue-50 text-blue-600 border-blue-100',
+                            'badge' => 'bg-blue-100 text-blue-800',
+                            'desc' => 'Connect with high-net-worth real estate investors seeking property funds and asset growth.'
+                        ],
+                        [
+                            'title' => 'Insurance Companies',
+                            'tag' => 'Protection',
+                            'icon' => 'ri-shield-user-line',
+                            'bg' => 'bg-violet-50 text-violet-600 border-violet-100',
+                            'badge' => 'bg-violet-100 text-violet-800',
+                            'desc' => 'Offer home, building, and fire hazard protection insurance to new property owners & landlords.'
+                        ],
+                        [
+                            'title' => 'Banks',
+                            'tag' => 'Banking',
+                            'icon' => 'ri-bank-line',
+                            'bg' => 'bg-amber-50 text-amber-600 border-amber-100',
+                            'badge' => 'bg-amber-100 text-amber-800',
+                            'desc' => 'Showcase retail banking solutions, escrow services, and acquisition financing for real estate.'
+                        ],
+                        [
+                            'title' => 'Real Estate Agents',
+                            'tag' => 'Agency',
+                            'icon' => 'ri-user-star-line',
+                            'bg' => 'bg-rose-50 text-rose-600 border-rose-100',
+                            'badge' => 'bg-rose-100 text-rose-800',
+                            'desc' => 'Amplify your agency brand, list featured property portfolios, and generate high-intent buyer leads.'
+                        ],
+                        [
+                            'title' => 'Property Developers',
+                            'tag' => 'Development',
+                            'icon' => 'ri-building-4-line',
+                            'bg' => 'bg-cyan-50 text-cyan-600 border-cyan-100',
+                            'badge' => 'bg-cyan-100 text-cyan-800',
+                            'desc' => 'Promote off-plan developments, luxury residential estates, and new housing projects to buyers.'
+                        ],
+                        [
+                            'title' => 'Property Management',
+                            'tag' => 'Management',
+                            'icon' => 'ri-home-gear-line',
+                            'bg' => 'bg-teal-50 text-teal-600 border-teal-100',
+                            'badge' => 'bg-teal-100 text-teal-800',
+                            'desc' => 'Offer facility management, tenancy supervision, and routine maintenance to property owners.'
+                        ],
+                        [
+                            'title' => 'Tax Consultants',
+                            'tag' => 'Advisory',
+                            'icon' => 'ri-percent-line',
+                            'bg' => 'bg-orange-50 text-orange-600 border-orange-100',
+                            'badge' => 'bg-orange-100 text-orange-800',
+                            'desc' => 'Guide buyers and landlords on real estate tax compliance, capital gains, and stamp duties.'
+                        ],
+                        [
+                            'title' => 'Legal Practitioners',
+                            'tag' => 'Legal',
+                            'icon' => 'ri-scales-3-line',
+                            'bg' => 'bg-indigo-50 text-indigo-600 border-indigo-100',
+                            'badge' => 'bg-indigo-100 text-indigo-800',
+                            'desc' => 'Provide title searches, land verification, and deed documentation services to property buyers.'
+                        ],
+                        [
+                            'title' => 'Law Firms',
+                            'tag' => 'Corporate Legal',
+                            'icon' => 'ri-briefcase-4-line',
+                            'bg' => 'bg-slate-100 text-slate-700 border-slate-200',
+                            'badge' => 'bg-slate-200 text-slate-800',
+                            'desc' => 'Offer corporate conveyancing, real estate dispute resolution, and commercial contract advisory.'
+                        ]
+                    ];
+                @endphp
+
+                @foreach($advertisers as $item)
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:border-emerald-300 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between group relative overflow-hidden">
+                        <!-- Top Accent Blur Glow -->
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500"></div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 rounded-2xl {{ $item['bg'] }} border flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-300">
+                                    <i class="{{ $item['icon'] }} text-2xl"></i>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full {{ $item['badge'] }}">
+                                    {{ $item['tag'] }}
+                                </span>
                             </div>
-                            <p class="text-sm font-semibold text-gray-800">{{ $partner['label'] }}</p>
+
+                            <h3 class="font-bold text-gray-900 text-base mb-2 group-hover:text-emerald-600 transition-colors">
+                                {{ $item['title'] }}
+                            </h3>
+
+                            <p class="text-gray-500 text-xs sm:text-sm leading-relaxed mb-4">
+                                {{ $item['desc'] }}
+                            </p>
                         </div>
+
+                        <div class="pt-3 border-t border-gray-50 flex items-center justify-between text-xs font-semibold text-emerald-600 group-hover:text-emerald-700">
+                            <span>Promote Your Brand</span>
+                            <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
                 @endforeach
             </div>
         </div>
@@ -167,8 +277,11 @@
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
             <div class="relative z-10">
                 <h2 class="text-3xl md:text-4xl font-bold font-serif mb-4">Ready to Put Your Brand on the Map?</h2>
-                <p class="text-emerald-100 max-w-xl mx-auto mb-8 leading-relaxed">Reach out to our team and we'll create a tailored advertising package that fits your goals and budget. All placements are reviewed and approved by our editorial team.</p>
+                <p class="text-emerald-100 max-w-xl mx-auto mb-8 leading-relaxed">Reach out to our team and we'll create a tailored advertising package that fits your goals and budget. Download our official Rate Card for detailed ad spot specifications and pricing.</p>
                 <div class="flex flex-wrap justify-center gap-4">
+                    <a href="{{ route('advertise.rate-card') }}" target="_blank" class="inline-flex items-center gap-2 bg-yellow-400 text-gray-950 font-extrabold px-8 py-3.5 rounded-xl shadow-xl hover:bg-yellow-300 hover:scale-105 transition duration-300">
+                        <i class="ri-file-download-line text-xl"></i> Download Pricing Rate Card (PDF)
+                    </a>
                     <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold px-8 py-3.5 rounded-xl shadow-lg hover:bg-emerald-50 transition">
                         <i class="ri-chat-1-line"></i> Contact Our Team
                     </a>

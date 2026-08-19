@@ -77,7 +77,7 @@
                         placeholder="you@example.com" required>
                 </div>
                 @error('email')
-                    <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                    <p style="color:red;" class="text-sm text-red-600 mt-2">{{ $message }}</p>
                 @enderror
             </div>
 

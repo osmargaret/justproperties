@@ -165,3 +165,7 @@ Route::get('/property/{property:slug}', PropertyShow::class)->name('property.sho
 Route::get('/property-hero-preview', function () {
     return view('preview.property-hero-preview-copy');
 })->name('property.hero.preview');
+
+Route::get('/advertise/rate-card', function () {
+    return view('guest.advertise-rate-card-pdf');
+})->name('advertise.rate-card');
