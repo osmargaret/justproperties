@@ -19,7 +19,6 @@ trait DisplaysCategoryProperties
 
     // Filter Form State Properties
     public string $search = '';
-    public string $category;
     public string $country_id = '';
     public string $state_id = '';
     public array $cities = [];
