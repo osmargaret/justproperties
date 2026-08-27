@@ -37,7 +37,7 @@ class Register extends Component
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['required', 'string', 'max:40'],
             'country_id' => ['required', 'integer', 'exists:countries,id'],
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            'password' => ['required', 'string','min:8','confirmed'],
             'terms' => ['accepted'],
         ];
     }

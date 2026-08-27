@@ -75,7 +75,7 @@
                             autocomplete="given-name" required>
                     </div>
                     @error('first_name')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        <p style="color:red;" class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="form-group">
@@ -86,7 +86,7 @@
                             autocomplete="family-name" required>
                     </div>
                     @error('last_name')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        <p style="color:red;" class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
@@ -99,7 +99,7 @@
                         autocomplete="email" required>
                 </div>
                 @error('email')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p style="color:red;" class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -111,7 +111,7 @@
                         autocomplete="tel" required>
                 </div>
                 @error('phone')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p style="color:red;" class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -128,7 +128,7 @@
                     </select>
                 </div>
                 @error('country_id')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p style="color:red;" class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -144,7 +144,7 @@
                     </button>
                 </div>
                 @error('password')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p style="color:red;" class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -171,7 +171,7 @@
                 </label>
             </div>
             @error('terms')
-                <p class="text-sm text-red-600 mb-2">{{ $message }}</p>
+                <p style="color:red;" class="text-sm text-red-600 mb-2">{{ $message }}</p>
             @enderror
 
             <button type="submit" class="submit-btn" wire:loading.attr="disabled">
