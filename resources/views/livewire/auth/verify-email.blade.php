@@ -31,7 +31,7 @@
 
         <form method="POST" action="{{ route('logout') }}" class="mt-4">
             @csrf
-            <button type="submit" class="w-full py-3 text-center text-sm font-medium text-gray-600 hover:text-emerald-700 border border-gray-200 rounded-lg">
+            <button type="submit" class="w-full py-3 text-center text-sm font-medium text-gray-600 hover:text-red-700 border border-gray-200 rounded-lg">
                 {{ __('Sign out') }}
             </button>
         </form>
