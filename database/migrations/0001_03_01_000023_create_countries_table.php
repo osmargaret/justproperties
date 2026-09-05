@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('currency_id')->nullable();
             $table->string('language_code')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
            
         });

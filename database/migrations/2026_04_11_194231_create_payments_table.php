@@ -26,7 +26,11 @@ return new class extends Migration
             $table->decimal('vat_value', 10, 2)->default(0);
             $table->decimal('total', 10, 2)->default(0);
             $table->string('method')->nullable();
+            $table->string('gateway')->nullable();
+            $table->text('details')->nullable();
+            $table->json('gateway_payload')->nullable();
             $table->string('status')->default('pending'); // pending, completed, failed, refunded, cancelled
+            $table->timestamp('paid_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('no action')->onDelete('cascade');
@@ -34,10 +38,7 @@ return new class extends Migration
             $table->foreign('coupon_id')->references('id')->on('coupons');
             
 
-            $table->timestamp('paid_at')->nullable()->after('status');
-            $table->string('gateway')->nullable()->after('method');
-            $table->text('details')->nullable()->after('gateway');
-            $table->json('gateway_payload')->nullable()->after('details');
+            
             $table->string('receipt')->nullable();
             $table->index('paid_at');
             $table->index('status');

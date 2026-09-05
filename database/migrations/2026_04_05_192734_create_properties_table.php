@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->nullable();
             $table->text('description');
-            $table->decimal('cost', 14, 2)->default(0)->after('description');
+            $table->decimal('cost', 14, 2)->default(0);
             $table->foreignId('category_id')->constrained('categories');
 
             $table->text('location')->nullable();
