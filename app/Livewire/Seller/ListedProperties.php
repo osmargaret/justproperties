@@ -45,7 +45,7 @@ class ListedProperties extends Component
     public function render()
     {
         $query = Property::query()
-            ->with(['category'])
+            ->with(['category', 'latestModeration', 'activeSubscribedPropertyLink'])
             ->where('user_id', Auth::id());
 
         // Search filter
@@ -64,18 +64,7 @@ class ListedProperties extends Component
 
         // Moderation status filter - get the latest moderation status
         if ($this->filterModeration) {
-            $query->leftJoinSub(
-                (new Moderation)
-                    ->select('moderatable_id', 'status')
-                    ->whereColumn('moderatable_id', 'properties.id')
-                    ->where('moderatable_type', Property::class)
-                    ->latestOfMany(),
-                'latest_moderation',
-                function ($join) {
-                    $join->on('properties.id', '=', 'latest_moderation.moderatable_id');
-                }
-            )
-            ->where('latest_moderation.status', $this->filterModeration);
+            $query->moderationStatus($this->filterModeration);
         }
 
         // Sorting

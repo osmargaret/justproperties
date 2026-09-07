@@ -168,6 +168,33 @@ class Property extends Model
         return $this->activeSubscribedPropertyLink();
     }
 
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('is_published', true);
+    }
+
+    public function scopeModerationStatus(Builder $query, string $status): Builder
+    {
+        return $query->whereHas('latestModeration', function (Builder $m) use ($status) {
+            $m->where('status', $status);
+        });
+    }
+
+    public function scopeApproved(Builder $query): Builder
+    {
+        return $this->scopeModerationStatus($query, 'approved');
+    }
+
+    public function scopePending(Builder $query): Builder
+    {
+        return $this->scopeModerationStatus($query, 'pending');
+    }
+
+    public function scopeRejected(Builder $query): Builder
+    {
+        return $this->scopeModerationStatus($query, 'rejected');
+    }
+
     public function scopeWithOverviewStats(Builder $query): Builder
     {
         return $query->withCount([
@@ -216,7 +243,9 @@ class Property extends Model
                     return 'draft';
                 }
 
-                $hasActiveSubscription = $this->activeSubscribedPropertyLink()->exists();
+                $hasActiveSubscription = $this->relationLoaded('activeSubscribedPropertyLink')
+                    ? $this->activeSubscribedPropertyLink !== null
+                    : $this->activeSubscribedPropertyLink()->exists();
                 $latestModeration = $this->latestModeration;
 
                 if ($latestModeration) {

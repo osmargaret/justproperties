@@ -15,6 +15,8 @@ class PlansCouponsSeeder extends Seeder
      */
     public function run(): void
     {
+        $currency = \App\Models\Currency::where('code', 'NGN')->first() ?? \App\Models\Currency::firstOrFail();
+
         $plan = SubscriptionPlan::query()->updateOrCreate(
             ['slug' => 'starter'],
             [
@@ -26,7 +28,7 @@ class PlansCouponsSeeder extends Seeder
         );
         Price::query()->updateOrCreate(
             ['priceable_id' => $plan->id,
-                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 1],
+                'priceable_type' => SubscriptionPlan::class, 'currency_id' => $currency->id],
             ['amount' => 500.00]
         );
         
@@ -42,7 +44,7 @@ class PlansCouponsSeeder extends Seeder
         );
         Price::query()->updateOrCreate(
             ['priceable_id' => $plan->id,
-                'priceable_type' => SubscriptionPlan::class, 'currency_id' => 1],
+                'priceable_type' => SubscriptionPlan::class, 'currency_id' => $currency->id],
             ['amount' => 1500.00]
         );
         
@@ -57,7 +59,7 @@ class PlansCouponsSeeder extends Seeder
         );
         Price::query()->updateOrCreate(
             ['priceable_id' => $plan->id,
-                'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
+                'priceable_type' => PromotionPlan::class, 'currency_id' => $currency->id],
             ['amount' => 500.00]
         );
         
@@ -72,7 +74,7 @@ class PlansCouponsSeeder extends Seeder
         );
         Price::query()->updateOrCreate(
             ['priceable_id' => $plan->id,
-                'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
+                'priceable_type' => PromotionPlan::class, 'currency_id' => $currency->id],
             ['amount' => 1500.00]
         );
         
@@ -86,7 +88,7 @@ class PlansCouponsSeeder extends Seeder
         );
         Price::query()->updateOrCreate(
             ['priceable_id' => $plan->id,
-                'priceable_type' => PromotionPlan::class, 'currency_id' => 1],
+                'priceable_type' => PromotionPlan::class, 'currency_id' => $currency->id],
             ['amount' => 2500.00]
         );
 

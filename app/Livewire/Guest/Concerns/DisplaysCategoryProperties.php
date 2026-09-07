@@ -295,7 +295,8 @@ trait DisplaysCategoryProperties
 
         $query = Property::query()
             ->where('category_id', $category->id)
-            ->where('is_published', true)
+            ->published()
+            ->approved()
             ->with(['media', 'features', 'country', 'state', 'user']);
 
         $applied = $this->appliedFilters;

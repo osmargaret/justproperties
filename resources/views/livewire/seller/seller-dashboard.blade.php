@@ -97,11 +97,12 @@
                                     <td class="py-3 font-medium text-gray-900">{{ $property->name }}</td>
                                      <td class="py-3">
                                          @php
-                                             $statusClass = match($property->status) {
-                                                 'Live' => 'bg-emerald-100 text-emerald-700',
+                                             $statusClass = match(strtolower($property->status)) {
+                                                 'live' => 'bg-emerald-100 text-emerald-700',
                                                  'pending' => 'bg-yellow-100 text-yellow-800',
                                                  'draft' => 'bg-gray-100 text-gray-700',
                                                  'no subscription' => 'bg-slate-100 text-slate-700',
+                                                 'rejected' => 'bg-red-100 text-red-700',
                                                  default => 'bg-slate-100 text-slate-700',
                                              };
                                          @endphp

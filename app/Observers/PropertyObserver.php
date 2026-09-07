@@ -11,7 +11,7 @@ class PropertyObserver
 
     public function created(Property $property): void
     {
-        if ($property->is_published && $this->hasSubscription($property)) {
+        if (self::$seeding || ($property->is_published && $this->hasSubscription($property))) {
             $this->createModerationRecord($property, 'created');
         }
     }
