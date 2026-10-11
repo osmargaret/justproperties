@@ -84,7 +84,7 @@
                 </div>
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">City / LGA</dt>
-                    <dd class="font-medium text-gray-900">{{ $property->city?->name ?? '—' }}</dd>
+                    <dd class="font-medium text-gray-900">{{ $property->city ?: '—' }}</dd>
                 </div>
                 @if ($property->show_address)
                     <div class="flex justify-between gap-4">

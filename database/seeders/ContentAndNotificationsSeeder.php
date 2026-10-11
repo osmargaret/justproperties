@@ -38,26 +38,13 @@ class ContentAndNotificationsSeeder extends Seeder
 
         BlogSubscription::query()->firstOrCreate(
             [
-                'user_id' => $buyer->id,
+                'email' => $buyer->email,
                 'category_id' => $blogCategory->id,
-                'post_id' => null,
             ],
             [
+                'post_id' => $post->id,
                 'property_id' => null,
                 'get_new_posts' => true,
-                'get_comments' => false,
-            ]
-        );
-
-        BlogSubscription::query()->firstOrCreate(
-            [
-                'user_id' => $buyer->id,
-                'category_id' => $blogCategory->id,
-                'post_id' => $post->id,
-            ],
-            [
-                'property_id' => null,
-                'get_new_posts' => false,
                 'get_comments' => true,
             ]
         );

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    'user_id',
+    'email',
     'category_id',
     'post_id',
     'property_id',
@@ -29,7 +29,7 @@ class BlogSubscription extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'email', 'email');
     }
 
     public function category(): BelongsTo

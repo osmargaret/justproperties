@@ -26,8 +26,9 @@ class Footer extends Component
         $this->validate();
 
         try {
+            $email = mb_strtolower(trim($this->email));
             $exists = BlogSubscription::query()
-                ->where('email', $this->email)
+                ->where('email', $email)
                 ->where('category_id', $this->categoryId)
                 ->exists();
 
@@ -38,9 +39,10 @@ class Footer extends Component
             }
 
             BlogSubscription::query()->create([
-                'email' => $this->email,
+                'email' => $email,
                 'category_id' => $this->categoryId,
-                'is_active' => true,
+                'get_new_posts' => true,
+                'get_comments' => false,
             ]);
 
             $this->reset(['email', 'categoryId']);

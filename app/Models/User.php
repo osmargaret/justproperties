@@ -93,7 +93,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
 
     public function blogSubscriptions(): HasMany
     {
-        return $this->hasMany(BlogSubscription::class);
+        return $this->hasMany(BlogSubscription::class, 'email', 'email');
     }
 
     public function moderations(): MorphMany

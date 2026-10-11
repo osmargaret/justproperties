@@ -67,12 +67,6 @@ class Property extends Model
         return $this->belongsTo(State::class);
     }
 
-    public function city(): BelongsTo
-    {
-        // Cities are stored as freeform strings on the property now.
-        throw new \BadMethodCallException('Property::city relation removed; use the `city` attribute instead.');
-    }
-
     public function features(): HasMany
     {
         return $this->hasMany(PropertyFeature::class);

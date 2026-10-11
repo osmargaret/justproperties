@@ -53,7 +53,7 @@
                 <a href="/" class="hover:text-emerald-400 transition">Home</a>
                 <i class="ri-arrow-right-s-line text-gray-400"></i>
                 @if($property->category)
-                    <a href="{{ route($property->category->slug) }}" class="hover:text-emerald-400 transition cursor-pointer">{{ $property->category->name }}</a>
+                    <a href="{{ route($property->category->slug === 'short-let' ? 'short-lets' : $property->category->slug) }}" class="hover:text-emerald-400 transition cursor-pointer">{{ $property->category->name }}</a>
                     <i class="ri-arrow-right-s-line text-gray-400"></i>
                 @endif
                 <span class="text-white font-medium truncate max-w-[200px]">{{ $property->city ?? $property->state?->name ?? 'Details' }}</span>

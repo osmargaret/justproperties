@@ -5,10 +5,7 @@ namespace App\Livewire\Guest;
 use App\Models\BlogSubscription;
 use App\Models\Post;
 use App\Models\PostComment;
-use App\Models\User;
-use App\Notifications\BlogSubscriptionWelcomeNotification;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -76,37 +73,18 @@ class BlogPost extends Component
             'subscriptionEmail' => 'required|email|max:150',
         ]);
 
-        $user = User::query()->where('email', $this->subscriptionEmail)->first();
-        $password = null;
-
-        if (! $user) {
-            $password = Str::random(12);
-
-            $user = User::query()->create([
-                'name' => Str::before($this->subscriptionEmail, '@') ?: 'Subscriber',
-                'email' => $this->subscriptionEmail,
-                'password' => $password,
-                'email_verified_at' => now(),
-                'active_role' => 'buyer',
-            ]);
-        }
-
         BlogSubscription::query()->updateOrCreate(
             [
-                'user_id' => $user->id,
+                'email' => mb_strtolower(trim($this->subscriptionEmail)),
                 'category_id' => $this->post->category_id,
-                'post_id' => $this->post->id,
             ],
             [
+                'post_id' => $this->post->id,
                 'property_id' => null,
                 'get_new_posts' => true,
                 'get_comments' => true,
             ]
         );
-
-        if ($password) {
-            $user->notify(new BlogSubscriptionWelcomeNotification($user, $password));
-        }
 
         $this->reset('subscriptionEmail');
         $this->statusMessage = 'You are subscribed. We will send updates for this post and related content.';

@@ -14,7 +14,7 @@
                 <i class="ri-arrow-right-s-line"></i>
                 <a href="#" class="hover:text-emerald-600">{{ $property->category->name ?? 'Category' }}</a>
                 <i class="ri-arrow-right-s-line"></i>
-                <span class="text-gray-900">{{ $property->city->name ?? 'City' }}</span>
+                <span class="text-gray-900">{{ $property->city ?: 'City' }}</span>
             </div>
             <h1 class="text-3xl font-bold text-gray-900">{{ $property->name }}</h1>
             <p class="text-gray-500 mt-2 text-lg"><i class="ri-map-pin-line mr-1 text-emerald-600"></i> {{ $property->display_location }}</p>
