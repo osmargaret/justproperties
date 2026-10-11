@@ -128,8 +128,9 @@ return new class extends Migration
         }
 
         Schema::table('blog_subscriptions', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
             $table->dropIndex(['user_id']);
-            $table->dropConstrainedForeignId('user_id');
+            $table->dropColumn('user_id');
             $table->string('email')->nullable(false)->change();
             $table->unique(['email', 'post_id'], 'blog_subscriptions_email_post_unique');
             $table->unique(['email', 'property_id'], 'blog_subscriptions_email_property_unique');
