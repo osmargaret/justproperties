@@ -16,7 +16,7 @@ class Footer extends Component
     protected function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email:rfc,dns', 'max:255'],
             'categoryId' => ['required', 'integer', 'exists:categories,id'],
         ];
     }
@@ -57,9 +57,12 @@ class Footer extends Component
 
     public function render()
     {
+        $propertyCategories = Category::query()->where('is_property', true)->orderBy('name', 'asc')->get();
+        $nonPropertyCategories = Category::query()->where('is_property', false)->orderBy('name', 'asc')->get();
+        
         return view('livewire.guest.footer', [
-            'propertyCategories' => Category::query()->where('is_property', true)->orderBy('name', 'asc')->get(),
-            'nonPropertyCategories' => Category::query()->where('is_property', false)->orderBy('name', 'asc')->get(),
+            'propertyCategories' => $propertyCategories,
+            'nonPropertyCategories' => $nonPropertyCategories,
         ]);
     }
 }

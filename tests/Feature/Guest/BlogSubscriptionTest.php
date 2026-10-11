@@ -51,6 +51,28 @@ class BlogSubscriptionTest extends TestCase
         ]);
     }
 
+    public function test_post_subscription_rejects_an_email_domain_without_dns_records(): void
+    {
+        $author = User::factory()->create();
+        $category = Category::query()->create([
+            'name' => 'Market Updates',
+            'slug' => 'market-updates',
+            'is_property' => false,
+        ]);
+        $post = Post::query()->create([
+            'user_id' => $author->id,
+            'category_id' => $category->id,
+            'title' => 'Market update',
+            'content' => 'Market update content',
+            'status' => 'published',
+        ]);
+
+        Livewire::test(BlogPost::class, ['post' => $post])
+            ->set('subscriptionEmail', 'guest@domain-that-does-not-exist.invalid')
+            ->call('subscribe')
+            ->assertHasErrors(['subscriptionEmail' => 'email']);
+    }
+
     public function test_blog_subscription_user_relationship_matches_by_email(): void
     {
         $user = User::factory()->create();
@@ -92,6 +114,21 @@ class BlogSubscriptionTest extends TestCase
             'get_new_posts' => true,
             'get_comments' => false,
         ]);
+    }
+
+    public function test_footer_subscription_rejects_an_email_domain_without_dns_records(): void
+    {
+        $category = Category::query()->create([
+            'name' => 'Property Updates',
+            'slug' => 'property-updates',
+            'is_property' => true,
+        ]);
+
+        Livewire::test(Footer::class)
+            ->set('email', 'guest@domain-that-does-not-exist.invalid')
+            ->set('categoryId', $category->id)
+            ->call('subscribe')
+            ->assertHasErrors(['email' => 'email']);
     }
 
     public function test_migration_backfills_and_merges_duplicate_subscriptions(): void

@@ -70,7 +70,7 @@ class BlogPost extends Component
     public function subscribe(): void
     {
         $this->validate([
-            'subscriptionEmail' => 'required|email|max:150',
+            'subscriptionEmail' => 'required|email:rfc,dns|max:150',
         ]);
 
         BlogSubscription::query()->updateOrCreate(

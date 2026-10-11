@@ -32,7 +32,7 @@ class ResetPassword extends Component
         return [
             'token' => ['required'],
             'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string', 'confirmed', PasswordRule::defaults()],
+            'password' => ['required', 'string','min:8','confirmed'],
         ];
     }
 
