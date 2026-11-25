@@ -184,12 +184,16 @@
                             class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 focus:border-emerald-500 focus:outline-none"
                             role="combobox" aria-autocomplete="list" :aria-expanded="open.toString()">
                         <div x-show="open" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-lg">
-                            <template x-for="country in filteredCountries" :key="country.id">
-                                <button type="button" @click="selectCountry(country)"
+                            @foreach ($this->countries as $country)
+                                <button type="button"
+                                    data-country-option
+                                    data-search="{{ \Illuminate\Support\Str::lower($country->name) }}"
+                                    x-show="!search.trim() || $el.dataset.search.includes(search.trim().toLowerCase())"
+                                    @click="selectCountry({ id: {{ $country->id }}, name: @js($country->name) })"
                                     class="block w-full px-3.5 py-2.5 text-left text-sm text-gray-700 hover:bg-emerald-50">
-                                    <span x-text="[country.flag, country.name].filter(Boolean).join(' ')"></span>
+                                    {{ collect([$country->flag, $country->name])->filter()->join(' ') }}
                                 </button>
-                            </template>
+                            @endforeach
                             <p x-show="filteredCountries.length === 0" class="px-3.5 py-2.5 text-sm text-gray-500">No countries found.</p>
                         </div>
                     </div>
@@ -233,11 +237,16 @@
                             role="combobox" aria-autocomplete="list" :aria-expanded="open.toString()">
                         <div x-show="open" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-lg">
                             <button type="button" @click="clearState()" class="block w-full px-3.5 py-2.5 text-left text-sm text-gray-500 hover:bg-gray-50">All States</button>
-                            <template x-for="state in filteredStates" :key="state.id">
-                                <button type="button" @click="selectState(state)"
-                                    class="block w-full px-3.5 py-2.5 text-left text-sm text-gray-700 hover:bg-emerald-50"
-                                    x-text="state.name"></button>
-                            </template>
+                            @foreach ($this->states as $state)
+                                <button type="button"
+                                    data-state-option
+                                    data-search="{{ \Illuminate\Support\Str::lower($state->name) }}"
+                                    x-show="!search.trim() || $el.dataset.search.includes(search.trim().toLowerCase())"
+                                    @click="selectState({ id: {{ $state->id }}, name: @js($state->name) })"
+                                    class="block w-full px-3.5 py-2.5 text-left text-sm text-gray-700 hover:bg-emerald-50">
+                                    {{ $state->name }}
+                                </button>
+                            @endforeach
                             <p x-show="states.length === 0" class="px-3.5 py-2.5 text-sm text-gray-500">No states available for this country.</p>
                             <p x-show="states.length > 0 && filteredStates.length === 0" class="px-3.5 py-2.5 text-sm text-gray-500">No states match your search.</p>
                         </div>

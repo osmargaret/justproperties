@@ -86,6 +86,8 @@ class ListPropertyTest extends TestCase
         Livewire::actingAs($seller)
             ->test(ListProperty::class)
             ->assertSet('country_id', $canada->id)
+            ->assertDontSee('x-for="country in filteredCountries"')
+            ->assertDontSee('x-for="state in filteredStates"')
             ->assertSee('Ontario')
             ->assertDontSee('Lagos');
     }

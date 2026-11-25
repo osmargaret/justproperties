@@ -182,11 +182,3 @@ Route::get('/advertise/rate-card', function () {
             ->get(),
     ]);
 })->name('advertise.rate-card');
-
-Route::get('fetchstate',function(){
-    $response = Curl::to('https://api.countrystatecity.in/v1/countries/NG/states')
-                ->withHeaders(['X-CSCAPI-KEY' => config('services.countrystatecity', '')])
-                ->asJson()
-                ->get();
-    dd($response);
-});
