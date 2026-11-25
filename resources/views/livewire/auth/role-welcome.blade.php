@@ -66,29 +66,17 @@
                 <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
             </a>
 
-            {{-- 5: Seller Dashboard --}}
-            <button type="button" wire:click="chooseRole('seller')" class="rw-card rw-card--seller-dash">
+            {{-- 5: Member Dashboard --}}
+            <a href="{{ route('account.dashboard') }}" class="rw-card rw-card--seller-dash">
                 <div class="rw-card-icon">
                     <i class="ri-building-2-line"></i>
                 </div>
                 <div class="rw-card-body">
-                    <h2 class="rw-card-title">Seller Dashboard</h2>
-                    <p class="rw-card-desc">Manage your listings, subscriptions, documents, and track leads from buyers.</p>
+                    <h2 class="rw-card-title">Member Dashboard</h2>
+                    <p class="rw-card-desc">Manage your listings, bookmarks, notifications, and promotions in one place.</p>
                 </div>
                 <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
-            </button>
-
-            {{-- 6: Buyer Dashboard --}}
-            <button type="button" wire:click="chooseRole('buyer')" class="rw-card rw-card--buyer-dash">
-                <div class="rw-card-icon">
-                    <i class="ri-heart-3-line"></i>
-                </div>
-                <div class="rw-card-body">
-                    <h2 class="rw-card-title">Buyer Dashboard</h2>
-                    <p class="rw-card-desc">View saved properties, set alerts, manage subscriptions and stay updated on new listings.</p>
-                </div>
-                <div class="rw-card-arrow"><i class="ri-arrow-right-line"></i></div>
-            </button>
+            </a>
 
         </div>
 

@@ -3,95 +3,64 @@
 namespace App\Livewire\Admin\Settings;
 
 use App\Models\Currency;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class AdminCurrencies extends Component
 {
+    use WithPagination;
+
     public bool $showModal = false;
 
     public ?int $editingId = null;
 
-    public string $name = '';
+    public string $search = '';
 
-    public string $code = '';
+    public string $currency_code = '';
 
-    public string $slug = '';
+    public string $currency_name = '';
 
-    public string $symbol = '';
-
-    public string $symbol_position = 'before';
-
-    public string $thousands_separator = ',';
-
-    public string $decimal_separator = '.';
-
-    public int $decimal_multiplier = 100;
-
-    public bool $is_default = false;
-
-    public bool $is_active = true;
+    public string $currency_symbol = '';
 
     public ?string $payment_gateway = null;
 
-    // Manual payment / bank details
     public bool $show_manual_payment = false;
+
     public string $bank_name = '';
+
     public string $bank_account_number = '';
+
     public string $account_name = '';
+
     public string $swift_code = '';
+
     public string $bank_instructions = '';
 
     public function openCreate(): void
     {
-        $this->editingId = null;
-        $this->name = '';
-        $this->code = '';
-        $this->slug = '';
-        $this->symbol = '';
-        $this->symbol_position = 'before';
-        $this->thousands_separator = ',';
-        $this->decimal_separator = '.';
-        $this->decimal_multiplier = 100;
-        $this->is_default = false;
-        $this->is_active = true;
-        $this->payment_gateway = null;
-        $this->show_manual_payment = false;
-        $this->bank_name = '';
-        $this->bank_account_number = '';
-        $this->account_name = '';
-        $this->swift_code = '';
-        $this->bank_instructions = '';
-        $this->resetErrorBag();
+        $this->resetCurrencyForm();
+        $this->resetValidation();
         $this->showModal = true;
     }
 
     public function openEdit(int $id): void
     {
-        $c = Currency::query()->findOrFail($id);
-        $this->editingId = $c->id;
-        $this->name = $c->name;
-        $this->code = $c->code;
-        $this->slug = (string) ($c->slug ?? '');
-        $this->symbol = (string) ($c->symbol ?? '');
-        $this->symbol_position = $c->symbol_position ?? 'before';
-        $this->thousands_separator = (string) ($c->thousands_separator ?? ',');
-        $this->decimal_separator = (string) ($c->decimal_separator ?? '.');
-        $this->decimal_multiplier = (int) ($c->decimal_multiplier ?? 100);
-        $this->is_default = (bool) $c->is_default;
-        $this->is_active = (bool) $c->is_active;
-        $this->payment_gateway = $c->payment_gateway;
+        $currency = Currency::query()->findOrFail($id);
+        $bankDetails = $currency->bank_details ?? [];
 
-        $bankDetails = $c->bank_details ?? [];
+        $this->editingId = $currency->id;
+        $this->currency_code = $currency->currency_code;
+        $this->currency_name = $currency->currency_name;
+        $this->currency_symbol = (string) ($currency->currency_symbol ?? '');
+        $this->payment_gateway = $currency->payment_gateway;
         $this->show_manual_payment = ! empty($bankDetails);
         $this->bank_name = $bankDetails['bank_name'] ?? '';
         $this->bank_account_number = $bankDetails['bank_account_number'] ?? '';
         $this->account_name = $bankDetails['account_name'] ?? '';
         $this->swift_code = $bankDetails['swift_code'] ?? '';
         $this->bank_instructions = $bankDetails['instructions'] ?? '';
-
-        $this->resetErrorBag();
+        $this->resetValidation();
         $this->showModal = true;
     }
 
@@ -103,25 +72,41 @@ class AdminCurrencies extends Component
 
     public function saveCurrency(): void
     {
-        $codeRule = Rule::unique('currencies', 'code');
-        $slugRule = Rule::unique('currencies', 'slug');
+        $this->currency_code = strtoupper(trim($this->currency_code));
+
         if ($this->editingId) {
-            $codeRule = $codeRule->ignore($this->editingId);
-            $slugRule = $slugRule->ignore($this->editingId);
+            $existingCurrency = Currency::query()->findOrFail($this->editingId);
+            if (
+                $existingCurrency->currency_code !== $this->currency_code
+                && (
+                    $existingCurrency->promotionPlanPrices()->exists()
+                    || $existingCurrency->advertisementPlanPrices()->exists()
+                    || $existingCurrency->countries()->exists()
+                    || $existingCurrency->payments()->exists()
+                )
+            ) {
+                $this->addError('currency_code', __('The code cannot be changed while this currency is used by plans, assigned to countries, or referenced by payments.'));
+
+                return;
+            }
+        }
+
+        $currencyCodeRule = Rule::unique('currencies', 'currency_code');
+        if ($this->editingId) {
+            $currencyCodeRule->ignore($this->editingId);
         }
 
         $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:8', $codeRule],
-            'slug' => ['nullable', 'string', 'max:255', $slugRule],
-            'symbol' => ['nullable', 'string', 'max:8'],
-            'symbol_position' => ['required', Rule::in(['before', 'after'])],
-            'thousands_separator' => ['required', 'string', 'max:4'],
-            'decimal_separator' => ['required', 'string', 'max:4'],
-            'decimal_multiplier' => ['required', 'integer', 'min:1'],
-            'is_default' => ['boolean'],
-            'is_active' => ['boolean'],
+            'currency_code' => [
+                'required',
+                'string',
+                'size:3',
+                $currencyCodeRule,
+            ],
+            'currency_name' => ['required', 'string', 'max:150'],
+            'currency_symbol' => ['nullable', 'string', 'max:16'],
             'payment_gateway' => ['nullable', 'string', Rule::in(['paystack', 'flutterwave'])],
+            'show_manual_payment' => ['boolean'],
             'bank_name' => [$this->show_manual_payment ? 'required' : 'nullable', 'string', 'max:255'],
             'bank_account_number' => [$this->show_manual_payment ? 'required' : 'nullable', 'string', 'max:255'],
             'account_name' => [$this->show_manual_payment ? 'required' : 'nullable', 'string', 'max:255'],
@@ -129,19 +114,11 @@ class AdminCurrencies extends Component
             'bank_instructions' => ['nullable', 'string'],
         ]);
 
-        $slug = $this->slug !== '' ? Str::slug($this->slug) : Str::slug($this->code);
-
         $payload = [
-            'name' => $this->name,
-            'code' => strtoupper($this->code),
-            'slug' => $slug,
-            'symbol' => $this->symbol,
-            'symbol_position' => $this->symbol_position,
-            'thousands_separator' => $this->thousands_separator,
-            'decimal_separator' => $this->decimal_separator,
-            'decimal_multiplier' => $this->decimal_multiplier,
-            'is_active' => $this->is_active,
-            'payment_gateway' => $this->payment_gateway !== '' ? $this->payment_gateway : null,
+            'currency_code' => $this->currency_code,
+            'currency_name' => $this->currency_name,
+            'currency_symbol' => $this->currency_symbol !== '' ? $this->currency_symbol : null,
+            'payment_gateway' => $this->payment_gateway ?: null,
             'bank_details' => $this->show_manual_payment ? [
                 'bank_name' => $this->bank_name,
                 'bank_account_number' => $this->bank_account_number,
@@ -151,15 +128,8 @@ class AdminCurrencies extends Component
             ] : null,
         ];
 
-        if ($this->is_default) {
-            Currency::query()->update(['is_default' => false]);
-            $payload['is_default'] = true;
-        } else {
-            $payload['is_default'] = false;
-        }
-
         if ($this->editingId) {
-            Currency::query()->whereKey($this->editingId)->update($payload);
+            Currency::query()->findOrFail($this->editingId)->update($payload);
         } else {
             Currency::query()->create($payload);
         }
@@ -168,36 +138,61 @@ class AdminCurrencies extends Component
         $this->closeModal();
     }
 
-    public function setDefault(int $id): void
-    {
-        Currency::query()->update(['is_default' => false]);
-        Currency::query()->whereKey($id)->update(['is_default' => true]);
-        session()->flash('status', __('Default currency updated.'));
-    }
-
     public function deleteCurrency(int $id): void
     {
-        $c = Currency::query()->findOrFail($id);
-        if ($c->prices()->exists() || $c->payments()->exists()) {
-            session()->flash('error', __('Cannot delete a currency referenced by prices or payments.'));
+        $currency = Currency::query()->findOrFail($id);
+
+        if (
+            $currency->promotionPlanPrices()->exists()
+            || $currency->advertisementPlanPrices()->exists()
+            || $currency->countries()->exists()
+            || $currency->payments()->exists()
+        ) {
+            session()->flash('error', __('Cannot delete a currency used by plans, assigned to countries, or referenced by payments.'));
 
             return;
         }
-        if ($c->is_default) {
-            session()->flash('error', __('Unset default before deleting.'));
 
-            return;
-        }
-        $c->delete();
+        $currency->delete();
         session()->flash('status', __('Currency deleted.'));
+    }
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
     }
 
     public function render()
     {
-        $currencies = Currency::query()->orderByDesc('is_default')->orderBy('code')->get();
-
         return view('livewire.admin.settings.admin-currencies', [
-            'currencies' => $currencies,
+            'currencies' => Currency::query()
+                ->withCount(['promotionPlanPrices', 'advertisementPlanPrices'])
+                ->when(trim($this->search) !== '', function ($query): void {
+                    $search = '%'.trim($this->search).'%';
+
+                    $query->where(function ($query) use ($search): void {
+                        $query->where('currency_code', 'like', $search)
+                            ->orWhere('currency_name', 'like', $search)
+                            ->orWhere('currency_symbol', 'like', $search);
+                    });
+                })
+                ->orderBy('currency_code')
+                ->paginate(15),
         ]);
+    }
+
+    private function resetCurrencyForm(): void
+    {
+        $this->editingId = null;
+        $this->currency_code = '';
+        $this->currency_name = '';
+        $this->currency_symbol = '';
+        $this->payment_gateway = null;
+        $this->show_manual_payment = false;
+        $this->bank_name = '';
+        $this->bank_account_number = '';
+        $this->account_name = '';
+        $this->swift_code = '';
+        $this->bank_instructions = '';
     }
 }

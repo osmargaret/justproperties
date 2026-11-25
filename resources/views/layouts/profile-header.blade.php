@@ -21,5 +21,7 @@
             </span>
         </div>
     </div>
-    @livewire('auth.switch-active-role')
+    @if (auth()->user()->is_admin)
+        @livewire('auth.switch-active-role')
+    @endif
 </div>

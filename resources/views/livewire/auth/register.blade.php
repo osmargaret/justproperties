@@ -117,15 +117,51 @@
 
             <div class="form-group">
                 <label class="form-label" for="country_id"><i class="ri-map-pin-line"></i> Country</label>
-                <div class="input-group">
+                <div class="input-group"
+                    x-data="{
+                        open: false,
+                        search: @js($countries->firstWhere('id', $country_id)?->name ?? ''),
+                        selectedCountryId: @js($country_id),
+                        countries: @js($countries->map(fn ($country) => [
+                            'id' => $country->id,
+                            'name' => $country->name,
+                            'flag' => $country->flag,
+                        ])->values()),
+                        get filteredCountries() {
+                            const query = this.search.trim().toLowerCase();
+
+                            return this.countries.filter(country => country.name.toLowerCase().includes(query));
+                        },
+                        selectCountry(country) {
+                            this.selectedCountryId = country.id;
+                            this.search = country.name;
+                            this.open = false;
+                            this.$wire.set('country_id', country.id);
+                        }
+                    }"
+                    @click.outside="open = false">
                     <i class="ri-map-pin-line input-icon"></i>
-                    <select id="country_id" class="form-input form-select" wire:model="country_id" required
-                        style="appearance: none; padding-right: 2.5rem;">
-                        <option value="">Select your country</option>
-                        @foreach ($countries as $country)
-                            <option value="{{ $country->id }}">{{ $country->flag }} {{ $country->name }}</option>
-                        @endforeach
-                    </select>
+                    <input id="country_id" type="text" class="form-input form-select" x-model="search"
+                        @focus="open = true; $event.target.select()"
+                        @input="open = true; if (selectedCountryId !== null) { selectedCountryId = null; $wire.set('country_id', null); }"
+                        @keydown.escape="open = false"
+                        @keydown.enter.prevent="if (search.trim() && filteredCountries.length) selectCountry(filteredCountries[0])"
+                        autocomplete="off" placeholder="Search for your country" role="combobox"
+                        aria-autocomplete="list" aria-controls="country-options" :aria-expanded="open.toString()"
+                        :aria-activedescendant="null" required>
+
+                    <div id="country-options" class="country-options" role="listbox" x-show="open" x-cloak>
+                        <template x-for="country in filteredCountries" :key="country.id">
+                            <button type="button" class="country-option" role="option"
+                                :aria-selected="selectedCountryId === country.id"
+                                @click="selectCountry(country)">
+                                <span x-text="[country.flag, country.name].filter(Boolean).join(' ')"></span>
+                            </button>
+                        </template>
+                        <p class="country-no-results" x-show="filteredCountries.length === 0">
+                            No countries found.
+                        </p>
+                    </div>
                 </div>
                 @error('country_id')
                     <p style="color:red;" class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -280,6 +316,45 @@
             position: relative;
             display: flex;
             align-items: center;
+        }
+
+        .country-options {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            z-index: 20;
+            max-height: 15rem;
+            overflow-y: auto;
+            padding: 0.25rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .country-option {
+            display: block;
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 0;
+            border-radius: 0.5rem;
+            background: white;
+            color: #374151;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .country-option:hover,
+        .country-option:focus {
+            outline: none;
+            background: #ecfdf5;
+        }
+
+        .country-no-results {
+            padding: 0.625rem 0.75rem;
+            color: #6b7280;
+            font-size: 0.875rem;
         }
 
         .input-icon {

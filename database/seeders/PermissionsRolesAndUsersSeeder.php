@@ -24,7 +24,6 @@ class PermissionsRolesAndUsersSeeder extends Seeder
                     'name' => 'Super Admin',
                     'slug' => 'super-admin',
                     'users_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
-                    'subscriptions_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
                     'promotions_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
                     'properties_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
                     'posts_permission' => ['browse', 'read', 'edit', 'add', 'delete'],

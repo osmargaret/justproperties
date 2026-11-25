@@ -6,7 +6,10 @@
         <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') }}</div>
     @endif
 
-    <div class="mb-4">
+    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search countries by name..."
+            aria-label="Search countries by name"
+            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm sm:max-w-sm">
         <button type="button" wire:click="openCreate" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">Add country</button>
     </div>
 
@@ -17,7 +20,6 @@
                     <th class="px-4 py-3">Name</th>
                     <th class="px-4 py-3">Code</th>
                     <th class="px-4 py-3">Currency</th>
-                    <th class="px-4 py-3">Active</th>
                     <th class="px-4 py-3">Default</th>
                     <th class="px-4 py-3">Actions</th>
                 </tr>
@@ -32,8 +34,8 @@
                             @endif
                         </td>
                         <td class="px-4 py-3">{{ $country->code ?? '—' }}</td>
-                        <td class="px-4 py-3">{{ $country->currency?->code ?? '—' }}</td>
-                        <td class="px-4 py-3">{{ $country->is_active ? 'Yes' : 'No' }}</td>
+                        <td class="px-4 py-3">{{ trim(($country->currency_symbol ?? '').' '.($country->currency_code ?? '')) ?: '—' }}</td>
+                        
                         <td class="px-4 py-3">
                             @if ($country->is_default)
                                 <span class="text-emerald-700 font-medium">Yes</span>
@@ -47,10 +49,13 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No countries.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">No countries found.</td></tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="mt-4">
+        {{ $countries->links() }}
     </div>
 
     @if ($showModal)
@@ -75,15 +80,22 @@
                             @error('slug') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
                     </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">Currency</label>
-                        <select wire:model="currency_id" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
-                            <option value="">—</option>
-                            @foreach ($currencies as $c)
-                                <option value="{{ $c->id }}">{{ $c->code }} — {{ $c->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('currency_id') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Currency</label>
+                            <input type="text" wire:model="currency" placeholder="Nigerian Naira" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+                            @error('currency') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Code</label>
+                            <input type="text" wire:model="currency_code" placeholder="NGN" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm uppercase" />
+                            @error('currency_code') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Symbol</label>
+                            <input type="text" wire:model="currency_symbol" placeholder="₦" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+                            @error('currency_symbol') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -100,10 +112,7 @@
                         <input type="text" wire:model="flag" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
                     </div>
                     <div class="flex items-center gap-4 pt-1">
-                        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-                            <input type="checkbox" wire:model="is_active" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                            Active
-                        </label>
+                        
                         <label class="inline-flex items-center gap-2 text-sm text-gray-700">
                             <input type="checkbox" wire:model="is_default" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
                             Default country

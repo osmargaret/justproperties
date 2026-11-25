@@ -51,11 +51,6 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(Property::class);
     }
 
-    public function subscriptions(): HasMany
-    {
-        return $this->hasMany(Subscription::class);
-    }
-
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
@@ -79,6 +74,11 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function viewedProperties(): HasMany
     {
         return $this->hasMany(ViewedProperty::class);
+    }
+
+    public function viewedPosts(): HasMany
+    {
+        return $this->hasMany(ViewedPost::class);
     }
 
     public function media(): HasMany
@@ -159,13 +159,10 @@ class User extends Authenticatable implements MustVerifyEmailContract
                         return 'Admin';
                     }
 
-                    return $role === 'seller' ? 'Seller' : 'Buyer';
-                }
-                if ($this->active_role === null || $this->active_role === '') {
-                    return 'Member';
+                    return $role === 'admin' ? 'Admin' : 'Member';
                 }
 
-                return $this->active_role === 'seller' ? 'Seller' : 'Buyer';
+                return 'Member';
             }
         );
     }
@@ -178,16 +175,16 @@ class User extends Authenticatable implements MustVerifyEmailContract
                     return route('admin.dashboard', absolute: false);
                 }
                 if ($this->active_role === 'buyer') {
-                    return route('buyer.dashboard', absolute: false);
+                    return route('account.dashboard', absolute: false);
                 }
                 if ($this->active_role === 'seller') {
-                    return route('seller.dashboard', absolute: false);
+                    return route('account.dashboard', absolute: false);
                 }
                 if ($this->is_admin) {
                     return route('admin.dashboard', absolute: false);
                 }
 
-                return route('home', absolute: false);
+                return route('account.dashboard', absolute: false);
             }
         );
     }

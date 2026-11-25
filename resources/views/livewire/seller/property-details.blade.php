@@ -24,7 +24,6 @@
                                     'draft' => 'bg-gray-100 text-gray-700',
                                     'pending' => 'bg-yellow-100 text-yellow-800',
                                     'live' => 'bg-emerald-100 text-emerald-700',
-                                    'no subscription' => 'bg-slate-100 text-slate-700',
                                     'rejected' => 'bg-red-100 text-red-700',
                                     default => 'bg-slate-100 text-slate-700',
                                  };
@@ -33,12 +32,6 @@
                              
                          </div>
                     </div>
-                    @if ($pendingPayment)
-                        <div class="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
-                            Pending payment detected for this listing.
-                            <a class="font-medium underline ml-1" href="{{ route('seller.checkout', ['payment' => $pendingPayment->id]) }}">Continue checkout</a>
-                        </div>
-                    @endif
                 </div>
 
                 <div class="border-b border-gray-200">

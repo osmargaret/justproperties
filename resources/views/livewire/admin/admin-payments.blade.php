@@ -31,7 +31,7 @@
                         <td class="px-4 py-3 font-mono text-xs">{{ $payment->reference }}</td>
                         <td class="px-4 py-3">{{ $payment->details ?: '—' }}</td>
                         <td class="px-4 py-3">{{ $payment->user?->name ?? '—' }}</td>
-                        <td class="px-4 py-3">{{ $payment->currency?->symbol ?? '' }}{{ number_format((float) $payment->total, 2) }}</td>
+                        <td class="px-4 py-3">{{ $payment->currency?->currency_symbol ?? $payment->country?->currency_symbol ?? '' }}{{ number_format((float) $payment->total, 2) }} {{ $payment->currency_code }}</td>
                         <td class="px-4 py-3">{{ $payment->status }}</td>
                         <td class="px-4 py-3"><button wire:click="showPayment({{ $payment->id }})" class="font-medium text-emerald-600 hover:underline">View</button></td>
                     </tr>
@@ -53,7 +53,7 @@
                 <div class="space-y-2 text-sm text-gray-700">
                     <p><span class="font-medium">Reference:</span> {{ $selectedPayment->reference }}</p>
                     <p><span class="font-medium">User:</span> {{ $selectedPayment->user?->name ?? '—' }}</p>
-                    <p><span class="font-medium">Amount:</span> {{ $selectedPayment->currency?->symbol ?? '' }}{{ number_format((float) $selectedPayment->total, 2) }}</p>
+                    <p><span class="font-medium">Amount:</span> {{ $selectedPayment->currency?->currency_symbol ?? $selectedPayment->country?->currency_symbol ?? '' }}{{ number_format((float) $selectedPayment->total, 2) }} {{ $selectedPayment->currency_code }}</p>
                     <p><span class="font-medium">Status:</span> <span class="capitalize font-semibold px-2 py-0.5 rounded text-xs {{ $selectedPayment->status === 'success' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">{{ $selectedPayment->status }}</span></p>
                     <p><span class="font-medium">Gateway:</span> {{ $selectedPayment->gateway ?? '—' }}</p>
                     <p><span class="font-medium">Details:</span> {{ $selectedPayment->details ?? '—' }}</p>

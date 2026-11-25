@@ -40,13 +40,12 @@ class AdminUsers extends Component
 
     public function render()
     {
-        $allowedSorts = ['name', 'properties_count', 'subscription_seats'];
+        $allowedSorts = ['name', 'properties_count'];
         $sortBy = in_array($this->sortBy, $allowedSorts, true) ? $this->sortBy : 'name';
 
         $users = User::query()
-            ->with(['country', 'subscriptions'])
+            ->with('country')
             ->withCount('properties')
-            ->withSum('subscriptions as subscription_seats', 'seats')
             ->when($this->search !== '', function (Builder $query) {
                 $query->where(function (Builder $inner) {
                     $inner->where('name', 'like', '%'.$this->search.'%')

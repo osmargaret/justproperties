@@ -29,7 +29,7 @@ class BlogSubscriptionWelcomeNotification extends Notification implements Should
             ->greeting(__('Hello :name!', ['name' => $this->user->name]))
             ->line(__('Thank you for subscribing to our blog updates.'))
             ->line(__('You will receive new post and comment updates as they become available.'))
-            ->line(__('If you want to sign in to manage your subscriptions, use the credentials below.'))
+            ->line(__('Sign in to manage your newsletter preferences from your profile.'))
             ->line(__('Email: :email', ['email' => $this->user->email]))
             ->line(__('Password: :password', ['password' => $this->password]))
             ->action(__('Login'), url(route('login', absolute: false)))

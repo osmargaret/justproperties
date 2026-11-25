@@ -5,16 +5,16 @@ namespace Tests\Feature\Seller;
 use App\Livewire\Seller\PropertyDetails;
 use App\Models\Category;
 use App\Models\Country;
-use App\Models\Currency;
 use App\Models\FeaturedProperty;
 use App\Models\Media;
 use App\Models\Moderation;
 use App\Models\Newsletter;
 use App\Models\NewsletterRecipient;
 use App\Models\Payment;
-use App\Models\Price;
 use App\Models\Promotion;
+use App\Models\Currency;
 use App\Models\PromotionPlan;
+use App\Models\PromotionPlanPrice;
 use App\Models\Property;
 use App\Models\State;
 use App\Models\User;
@@ -135,14 +135,16 @@ class PropertyDetailsTest extends TestCase
             'type' => 'featured',
             'features' => ['clicks' => 1000],
         ]);
-        $currency = Currency::query()->where('code', 'NGN')->firstOrFail();
+        $currency = Currency::query()->firstOrCreate(
+            ['currency_code' => 'NGN'],
+            ['currency_name' => 'Nigerian Naira', 'currency_symbol' => '₦']
+        );
         $currency->update(['payment_gateway' => 'paystack']);
-        Price::query()->create([
-            'priceable_type' => PromotionPlan::class,
-            'priceable_id' => $plan->id,
+        PromotionPlanPrice::query()->create([
+            'promotion_plan_id' => $plan->id,
             'currency_id' => $currency->id,
-            'country_id' => $seller->country_id,
             'amount' => 15000,
+            'is_default' => true,
         ]);
 
         Livewire::actingAs($seller)
@@ -160,6 +162,39 @@ class PropertyDetailsTest extends TestCase
         $this->assertSame(1000, (int) $promotion->target_count);
         $this->assertSame(Promotion::class, $payment->paymentable_type);
         $this->assertSame($promotion->id, (int) $payment->paymentable_id);
+        $this->assertSame('NGN', $payment->currency_code);
+    }
+
+    public function test_promotion_payment_persists_the_default_currency_when_country_price_is_missing(): void
+    {
+        [$seller, $property] = $this->seedProperty();
+        $plan = PromotionPlan::query()->create([
+            'name' => 'Featured USD',
+            'slug' => 'featured-usd',
+            'type' => 'featured',
+            'features' => ['clicks' => 1000],
+        ]);
+        $currency = Currency::query()->create([
+            'currency_code' => 'USD',
+            'currency_name' => 'US Dollar',
+            'currency_symbol' => '$',
+        ]);
+        PromotionPlanPrice::query()->create([
+            'promotion_plan_id' => $plan->id,
+            'currency_id' => $currency->id,
+            'amount' => 10,
+            'is_default' => true,
+        ]);
+
+        Livewire::actingAs($seller)
+            ->test(PropertyDetails::class, ['property' => $property])
+            ->call('openPromotionWizard')
+            ->call('selectPromotionPlan', $plan->id)
+            ->call('confirmPromotionPurchase');
+
+        $payment = Payment::query()->latest('id')->firstOrFail();
+        $this->assertSame($seller->country_id, $payment->country_id);
+        $this->assertSame('USD', $payment->currency_code);
     }
 
     public function test_checkout_marks_featured_promotion_active_and_creates_deliverable(): void
@@ -171,7 +206,7 @@ class PropertyDetailsTest extends TestCase
             'type' => 'featured',
             'features' => ['clicks' => 1000],
         ]);
-        $currency = Currency::query()->where('code', 'NGN')->firstOrFail();
+        $country = Country::query()->where('code', 'NG')->firstOrFail();
         $promotion = Promotion::query()->create([
             'user_id' => $seller->id,
             'property_id' => $property->id,
@@ -184,7 +219,7 @@ class PropertyDetailsTest extends TestCase
         ]);
         $payment = Payment::query()->create([
             'user_id' => $seller->id,
-            'currency_id' => $currency->id,
+            'country_id' => $country->id,
             'paymentable_id' => $promotion->id,
             'paymentable_type' => Promotion::class,
             'reference' => 'TEST-PROMO-001',
@@ -219,8 +254,8 @@ class PropertyDetailsTest extends TestCase
             'type' => 'newsletter',
             'features' => ['emails' => 10],
         ]);
-        $currency = Currency::query()->where('code', 'NGN')->firstOrFail();
-        $currency->update(['payment_gateway' => 'paystack']);
+        $country = Country::query()->where('code', 'NG')->firstOrFail();
+        Currency::query()->where('currency_code', 'NGN')->update(['payment_gateway' => 'paystack']);
         $newsletter = Newsletter::query()->create([
             'user_id' => $seller->id,
             'title' => 'NL',
@@ -244,7 +279,7 @@ class PropertyDetailsTest extends TestCase
         ]);
         $payment = Payment::query()->create([
             'user_id' => $seller->id,
-            'currency_id' => $currency->id,
+            'country_id' => $country->id,
             'paymentable_id' => $promotion->id,
             'paymentable_type' => Promotion::class,
             'reference' => 'TEST-PROMO-NL',
@@ -272,24 +307,17 @@ class PropertyDetailsTest extends TestCase
             'name' => 'Nigeria',
             'slug' => 'nigeria',
             'code' => 'NG',
-            'is_active' => true,
+            'currency' => 'Nigerian Naira',
+            'currency_code' => 'NGN',
+            'currency_symbol' => '₦',
         ]);
         $state = State::query()->create([
             'name' => 'Lagos',
             'slug' => 'lagos',
             'code' => 'LA',
             'country_id' => $country->id,
-            'is_active' => true,
         ]);
         
-        Currency::query()->create([
-            'name' => 'Naira',
-            'slug' => 'naira',
-            'code' => 'NGN',
-            'symbol' => '₦',
-            'is_default' => true,
-            'is_active' => true,
-        ]);
         $category = Category::query()->create([
             'name' => 'Landed Properties',
             'slug' => 'landed-properties',

@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -15,10 +13,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'code',
     'flag',
     'phone_code',
-    'currency_id',
     'language_code',
-    'is_default',
-    'is_active',
+    'currency',
+    'currency_code',
+    'currency_symbol',
+    'is_default'
 ])]
 class Country extends Model
 {
@@ -26,7 +25,6 @@ class Country extends Model
     {
         return [
             'is_default' => 'boolean',
-            'is_active' => 'boolean',
         ];
     }
 
@@ -45,9 +43,9 @@ class Country extends Model
         return $this->hasMany(User::class);
     }
 
-    public function currency(): BelongsTo
+    public function payments(): HasMany
     {
-        return $this->belongsTo(Currency::class);
+        return $this->hasMany(Payment::class);
     }
 
     public function settings(): HasOne
@@ -55,9 +53,4 @@ class Country extends Model
         return $this->hasOne(CountrySetting::class);
     }
 
-    public function currencies(): BelongsToMany
-    {
-        return $this->belongsToMany(Currency::class, 'country_currencies')
-            ->withTimestamps();
-    }
 }

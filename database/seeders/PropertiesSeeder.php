@@ -17,6 +17,15 @@ class PropertiesSeeder extends Seeder
 {
     public function run(): void
     {
+        $country = Country::query()->where('code', 'NG')->first();
+        $state = $country
+            ? State::query()->where('slug', 'lagos')->where('country_id', $country->id)->first()
+            : null;
+
+        if (! $country || ! $state) {
+            return;
+        }
+
         // Set observer seeding flag to true so that it creates approved moderation records
         PropertyObserver::$seeding = true;
 
@@ -26,8 +35,6 @@ class PropertiesSeeder extends Seeder
         }
 
         $categories = Category::query()->where('is_property', true)->get();
-        $country = Country::query()->where('code', 'NG')->firstOrFail();
-        $state = State::query()->where('slug', 'lagos')->where('country_id', $country->id)->firstOrFail();
         $neighborhoods = ['Lekki Phase 1', 'Ikoyi', 'Victoria Island', 'Ikeja GRA', 'Ajah', 'Surulere', 'Yaba', 'Gbagada'];
         $citiesList = ['Ikeja', 'Lekki', 'Ikoyi', 'Victoria Island', 'Ajah', 'Surulere', 'Yaba', 'Gbagada'];
         $propertyTypes = [
@@ -49,7 +56,7 @@ class PropertiesSeeder extends Seeder
             $cityName = $citiesList[array_rand($citiesList)];
             $neighborhood = $neighborhoods[array_rand($neighborhoods)];
             $type = $propertyTypes[array_rand($propertyTypes)];
-            
+
             $name = $type . ' — ' . $neighborhood . ' (Unit ' . $i . ')';
             $slug = Str::slug($name);
             $cost = rand(5, 250) * 1000000; // between 5M and 250M

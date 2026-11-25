@@ -25,14 +25,9 @@ class RoleWelcome extends Component
             return;
         }
 
-        if ($user->active_role !== null && $user->active_role !== '') {
-            $this->redirect($user->dashboard_url);
-        }
+        $this->redirect(route('account.dashboard'));
     }
 
-    /**
-     * Set the user's active role and redirect to the appropriate dashboard.
-     */
     public function chooseRole(string $role): void
     {
         $user = Auth::user();
@@ -42,16 +37,7 @@ class RoleWelcome extends Component
             return;
         }
 
-        $validRoles = ['buyer', 'seller'];
-
-        if (! in_array($role, $validRoles)) {
-            return;
-        }
-
-        $user->active_role = $role;
-        $user->save();
-
-        $this->redirect($user->dashboard_url, navigate: true);
+        $this->redirect(route('account.dashboard'), navigate: true);
     }
 
     public function render()

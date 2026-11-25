@@ -1,6 +1,6 @@
 @php
     $stats = $this->overviewStats;
-    $currencySymbol = $this->activeCurrency?->symbol ?? '₦';
+    $currencySymbol = $this->activeCurrency?->currency_symbol ?? '₦';
 @endphp
 
 <div class="space-y-6">
@@ -135,65 +135,6 @@
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl p-6 shadow-md">
-            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i class="ri-crown-line text-emerald-600"></i> Subscription seat
-            </h3>
-            @if ($this->currentSubscriptionAssignment)
-                @php($sub = $this->currentSubscriptionAssignment)
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-lg">
-                        <div>
-                            <p class="font-semibold text-gray-900">{{ $sub->plan?->name ?? 'Plan' }}</p>
-                            <p class="text-sm text-gray-600">
-                                Ends {{ $sub->end_at?->format('M d, Y') ?? 'N/A' }}
-                                · {{ $sub->usedSeats() }} / {{ $sub->seats }} seats used on this plan
-                            </p>
-                        </div>
-                        <span class="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Assigned</span>
-                    </div>
-                    <button
-                        type="button"
-                        wire:click="removePropertyFromSubscription"
-                        wire:confirm="Remove this property from the subscription? The seat will become available again."
-                        class="text-sm text-red-600 hover:underline"
-                    >
-                        Remove from subscription
-                    </button>
-                </div>
-            @else
-                <p class="text-sm text-gray-500 mb-4">This listing is not using a subscription seat yet. Assign it to an active plan with seats available.</p>
-                @if ($this->assignableSubscriptions->isEmpty())
-                    <a href="{{ route('seller.subscriptions') }}" class="inline-flex text-sm font-medium text-emerald-700 hover:underline">
-                        View subscriptions →
-                    </a>
-                @else
-                    <form wire:submit="assignPropertyToSubscription" class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">Subscription plan</label>
-                            <select wire:model="selectedSubscriptionId" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
-                                <option value="">Select a subscription…</option>
-                                @foreach ($this->assignableSubscriptions as $subscription)
-                                    <option value="{{ $subscription->id }}">
-                                        {{ $subscription->plan?->name ?? 'Plan' }}
-                                        ({{ $subscription->usedSeats() }}/{{ $subscription->seats }} used
-                                        @if ($subscription->remainingSeats() > 0)
-                                            · {{ $subscription->remainingSeats() }} left
-                                        @endif
-                                        · ends {{ $subscription->end_at?->format('M d, Y') }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('selectedSubscriptionId') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                        </div>
-                        <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
-                            Assign to subscription
-                        </button>
-                    </form>
-                @endif
-            @endif
-        </div>
-
         <div class="bg-white rounded-xl p-6 shadow-md">
             <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
                 <i class="ri-shield-check-line text-emerald-600"></i> Moderation

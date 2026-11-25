@@ -84,3 +84,10 @@
 - [ ] GeographyService.php — NEW service (fetch+save states & cities)
 - [ ] Register.php — call GeographyService after user creation (afterResponse dispatch)
 - [ ] State.php + City.php — add lat/lng fillable fields (already done in Phase 2)
+
+Advertisement PDF ad areas pricing
+Property moderation
+Test coupon with buying subscription & promotion
+Test Notifications 
+Buyer side 
+-------------------------------------------

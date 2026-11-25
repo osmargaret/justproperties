@@ -53,7 +53,8 @@ class AdminProperties extends Component
                     return;
                 }
 
-                $query->whereHas('latestModeration', fn (Builder $m) => $m->where('status', $this->status));
+                $moderationStatus = $this->status === 'live' ? 'approved' : $this->status;
+                $query->whereHas('latestModeration', fn (Builder $m) => $m->where('status', $moderationStatus));
             })
             ->latest('created_at')
             ->paginate(10);
@@ -61,7 +62,7 @@ class AdminProperties extends Component
         return view('livewire.admin.admin-properties', [
             'properties' => $properties,
             'categories' => Category::query()->where('is_property', true)->orderBy('name', 'asc')->get(['id', 'name']),
-            'statusOptions' => ['draft', 'pending', 'live', 'no subscription', 'rejected'],
+            'statusOptions' => ['draft', 'pending', 'live', 'rejected'],
         ]);
     }
 }

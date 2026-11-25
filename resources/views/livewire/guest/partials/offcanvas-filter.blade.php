@@ -155,23 +155,93 @@
                 <!-- Country -->
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1">Country</label>
-                    <select wire:model.live="country_id" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-gray-700 text-sm focus:outline-none focus:border-emerald-500 bg-white cursor-pointer">
-                        <option value="">Select Country</option>
-                        @foreach($this->countries as $c)
-                            <option value="{{ $c->id }}">{{ $c->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="relative" x-data="{
+                        open: false,
+                        search: @js($this->countries->firstWhere('id', $country_id)?->name ?? ''),
+                        selectedCountryId: @js($country_id),
+                        countries: @js($this->countries->map(fn ($country) => [
+                            'id' => $country->id,
+                            'name' => $country->name,
+                            'flag' => $country->flag,
+                        ])->values()),
+                        get filteredCountries() {
+                            const query = this.search.trim().toLowerCase();
+                            return this.countries.filter(country => country.name.toLowerCase().includes(query));
+                        },
+                        selectCountry(country) {
+                            this.selectedCountryId = country.id;
+                            this.search = country.name;
+                            this.open = false;
+                            this.$wire.set('country_id', country.id);
+                        }
+                    }" @click.outside="open = false">
+                        <input type="text" x-model="search"
+                            @focus="open = true; $event.target.select()"
+                            @input="open = true; if (selectedCountryId !== null) { selectedCountryId = null; $wire.set('country_id', ''); }"
+                            @keydown.escape="open = false"
+                            @keydown.enter.prevent="if (filteredCountries.length) selectCountry(filteredCountries[0])"
+                            autocomplete="off" placeholder="Search for a country"
+                            class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 focus:border-emerald-500 focus:outline-none"
+                            role="combobox" aria-autocomplete="list" :aria-expanded="open.toString()">
+                        <div x-show="open" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-lg">
+                            <template x-for="country in filteredCountries" :key="country.id">
+                                <button type="button" @click="selectCountry(country)"
+                                    class="block w-full px-3.5 py-2.5 text-left text-sm text-gray-700 hover:bg-emerald-50">
+                                    <span x-text="[country.flag, country.name].filter(Boolean).join(' ')"></span>
+                                </button>
+                            </template>
+                            <p x-show="filteredCountries.length === 0" class="px-3.5 py-2.5 text-sm text-gray-500">No countries found.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- State -->
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1">State</label>
-                    <select wire:model="state_id" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-gray-700 text-sm focus:outline-none focus:border-emerald-500 bg-white cursor-pointer">
-                        <option value="">All States</option>
-                        @foreach($this->states as $s)
-                            <option value="{{ $s->id }}">{{ $s->name }}</option>
-                        @endforeach
-                    </select>
+                    <div wire:key="offcanvas-state-picker-{{ $country_id ?: 'none' }}" class="relative" x-data="{
+                        open: false,
+                        search: @js($this->states->firstWhere('id', $state_id)?->name ?? ''),
+                        selectedStateId: @js($state_id),
+                        states: @js($this->states->map(fn ($state) => [
+                            'id' => $state->id,
+                            'name' => $state->name,
+                        ])->values()),
+                        get filteredStates() {
+                            const query = this.search.trim().toLowerCase();
+                            return this.states.filter(state => state.name.toLowerCase().includes(query));
+                        },
+                        selectState(state) {
+                            this.selectedStateId = state.id;
+                            this.search = state.name;
+                            this.open = false;
+                            this.$wire.set('state_id', state.id);
+                        },
+                        clearState() {
+                            this.selectedStateId = '';
+                            this.search = '';
+                            this.open = false;
+                            this.$wire.set('state_id', '');
+                        }
+                    }" @click.outside="open = false">
+                        <input type="text" x-model="search"
+                            @focus="open = true; $event.target.select()"
+                            @input="open = true; if (selectedStateId !== '') { selectedStateId = ''; $wire.set('state_id', ''); }"
+                            @keydown.escape="open = false"
+                            @keydown.enter.prevent="if (filteredStates.length) selectState(filteredStates[0])"
+                            autocomplete="off" placeholder="Search states or choose all"
+                            class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 focus:border-emerald-500 focus:outline-none"
+                            role="combobox" aria-autocomplete="list" :aria-expanded="open.toString()">
+                        <div x-show="open" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-lg">
+                            <button type="button" @click="clearState()" class="block w-full px-3.5 py-2.5 text-left text-sm text-gray-500 hover:bg-gray-50">All States</button>
+                            <template x-for="state in filteredStates" :key="state.id">
+                                <button type="button" @click="selectState(state)"
+                                    class="block w-full px-3.5 py-2.5 text-left text-sm text-gray-700 hover:bg-emerald-50"
+                                    x-text="state.name"></button>
+                            </template>
+                            <p x-show="states.length === 0" class="px-3.5 py-2.5 text-sm text-gray-500">No states available for this country.</p>
+                            <p x-show="states.length > 0 && filteredStates.length === 0" class="px-3.5 py-2.5 text-sm text-gray-500">No states match your search.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- City / Area (inline tag input) -->

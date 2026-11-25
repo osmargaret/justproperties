@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Settings;
 
-use App\Livewire\Settings\Security;
+use App\Livewire\Buyer\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -17,9 +17,9 @@ class SecurityTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)
-            ->get(route('security.edit'))
-            ->assertOk()
+        Livewire::withQueryParams(['tab' => 'security'])
+            ->actingAs($user)
+            ->test(Profile::class)
             ->assertSee('Update password');
     }
 
@@ -31,10 +31,10 @@ class SecurityTest extends TestCase
 
         $this->actingAs($user);
 
-        Livewire::test(Security::class)
+        Livewire::test(Profile::class)
             ->set('current_password', 'password')
-            ->set('password', 'NewPassword1!')
-            ->set('password_confirmation', 'NewPassword1!')
+            ->set('new_password', 'NewPassword1!')
+            ->set('new_password_confirmation', 'NewPassword1!')
             ->call('updatePassword')
             ->assertHasNoErrors();
 
@@ -49,10 +49,10 @@ class SecurityTest extends TestCase
 
         $this->actingAs($user);
 
-        Livewire::test(Security::class)
+        Livewire::test(Profile::class)
             ->set('current_password', 'wrong-password')
-            ->set('password', 'NewPassword1!')
-            ->set('password_confirmation', 'NewPassword1!')
+            ->set('new_password', 'NewPassword1!')
+            ->set('new_password_confirmation', 'NewPassword1!')
             ->call('updatePassword')
             ->assertHasErrors(['current_password']);
     }

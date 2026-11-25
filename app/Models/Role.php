@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'name',
     'slug',
     'users_permission',
-    'subscriptions_permission',
     'promotions_permission',
     'properties_permission',
     'posts_permission',
@@ -28,7 +27,6 @@ class Role extends Model
      */
     public const PERMISSION_GROUPS = [
         'users_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
-        'subscriptions_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
         'promotions_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
         'properties_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
         'posts_permission' => ['browse', 'read', 'edit', 'add', 'delete'],
@@ -41,7 +39,6 @@ class Role extends Model
     {
         return [
             'users_permission' => 'array',
-            'subscriptions_permission' => 'array',
             'promotions_permission' => 'array',
             'properties_permission' => 'array',
             'posts_permission' => 'array',

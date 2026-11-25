@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Moderation;
 use App\Models\Property;
+use App\Services\Notifications\NotifiesPropertyAlertSubscribers;
 use Livewire\Component;
 
 class AdminPropertyDetails extends Component
@@ -17,13 +18,13 @@ class AdminPropertyDetails extends Component
 
     public function approve(): void
     {
-        $pendingModeration = Moderation::query()
+        $pendingModerations = Moderation::query()
             ->where('moderatable_type', Property::class)
             ->where('moderatable_id', $this->property->id)
             ->where('status', 'pending')
-            ->first();
+            ->get();
 
-        if ($pendingModeration) {
+        foreach ($pendingModerations as $pendingModeration) {
             $pendingModeration->update([
                 'status' => 'approved',
                 'moderated_by' => auth()->id(),
@@ -32,6 +33,9 @@ class AdminPropertyDetails extends Component
 
         $this->property->update(['is_published' => true]);
         $this->property->refresh();
+        if ($pendingModerations->isNotEmpty()) {
+            app(NotifiesPropertyAlertSubscribers::class)->notify($this->property);
+        }
         $this->logModeration('approved', 'approve');
         session()->flash('status', __('Property approved.'));
     }
@@ -85,7 +89,6 @@ class AdminPropertyDetails extends Component
             'user',
             'category',
             'media',
-            'subscribedPropertyLinks.subscription.plan',
             'promotions.plan',
         ]);
         $moderations = Moderation::query()

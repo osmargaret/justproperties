@@ -9,9 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -123,45 +121,6 @@ class Property extends Model
     }
 
     
-    public function subscriptions(): BelongsToMany
-    {
-        return $this->belongsToMany(Subscription::class, 'subscribed_properties')
-            ->withTimestamps();
-    }
-
-    /**
-     * Pivot rows in subscribed_properties (property ↔ subscription seat usage).
-     */
-    public function subscribedPropertyLinks(): HasMany
-    {
-        return $this->hasMany(SubscribedProperty::class);
-    }
-
-    /** @deprecated Use subscribedPropertyLinks() — kept for existing eager loads */
-    public function subscriptionLinks(): HasMany
-    {
-        return $this->subscribedPropertyLinks();
-    }
-
-    /**
-     * The subscribed_properties row tying this listing to an active subscription (if any).
-     */
-    public function activeSubscribedPropertyLink(): HasOne
-    {
-        return $this->hasOne(SubscribedProperty::class)
-            ->whereHas('subscription', function (Builder $query): void {
-                $query->where('status', 'active')
-                    ->where('end_at', '>=', now());
-            })
-            ->latestOfMany();
-    }
-
-    /** @deprecated Use activeSubscribedPropertyLink() */
-    public function activeSubscriptionLink(): HasOne
-    {
-        return $this->activeSubscribedPropertyLink();
-    }
-
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('is_published', true);
@@ -237,15 +196,12 @@ class Property extends Model
                     return 'draft';
                 }
 
-                $hasActiveSubscription = $this->relationLoaded('activeSubscribedPropertyLink')
-                    ? $this->activeSubscribedPropertyLink !== null
-                    : $this->activeSubscribedPropertyLink()->exists();
                 $latestModeration = $this->latestModeration;
 
                 if ($latestModeration) {
                     switch ($latestModeration->status) {
                         case 'approved':
-                            return $hasActiveSubscription ? 'live' : 'no subscription';
+                            return 'live';
                         case 'pending':
                         case 'rejected':
                             return $latestModeration->status;
@@ -254,15 +210,14 @@ class Property extends Model
                     }
                 }
 
-                // No moderation record - check subscription status
-                return $hasActiveSubscription ? 'live' : 'no subscription';
+                return 'pending';
             },
         );
     }
 
     public function getCurrencyAttribute()
     {
-        return $this->user->country->currency->symbol ?? '$';
+        return $this->user->country->currency_symbol ?? '$';
     }
 
     public function featureValue(string $feature): ?string

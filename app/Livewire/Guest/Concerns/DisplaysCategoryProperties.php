@@ -7,6 +7,7 @@ use App\Models\CategoryField;
 use App\Models\Country;
 use App\Models\Property;
 use App\Models\State;
+use App\Services\GeographyService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\WithPagination;
@@ -95,15 +96,21 @@ trait DisplaysCategoryProperties
 
     protected function initDefaultCountry(): void
     {
-        if (Auth::check() && Auth::user()->country_id) {
-            $this->country_id = (string) Auth::user()->country_id;
-        } else {
-            $defaultCountry = Country::query()->where('is_default', true)->first();
-            if (! $defaultCountry) {
-                $defaultCountry = Country::query()->where('code', 'NG')->first() ?? Country::query()->first();
-            }
-            $this->country_id = $defaultCountry ? (string) $defaultCountry->id : '';
+        $locationCountryId = session('current_location.country_id');
+        $defaultCountry = $locationCountryId
+            ? Country::query()->find($locationCountryId)
+            : null;
+
+        if (! $defaultCountry && Auth::check() && Auth::user()->country_id) {
+            $defaultCountry = Country::query()->find(Auth::user()->country_id);
         }
+
+        $defaultCountry ??= Country::query()->where('is_default', true)->first()
+            ?? Country::query()->where('code', 'NG')->first()
+            ?? Country::query()->first();
+
+        $this->country_id = $defaultCountry ? (string) $defaultCountry->id : '';
+        $this->ensureStatesExistForCountry($defaultCountry);
     }
 
     public function updatedSearch(): void
@@ -121,6 +128,10 @@ trait DisplaysCategoryProperties
     public function updatedCountryId($value): void
     {
         $this->state_id = '';
+        $country = $value !== null && $value !== ''
+            ? Country::query()->find((int) $value)
+            : null;
+        $this->ensureStatesExistForCountry($country);
     }
 
     public function applyFilters(): void
@@ -222,6 +233,13 @@ trait DisplaysCategoryProperties
             ->where('country_id', $this->country_id)
             ->orderBy('name')
             ->get();
+    }
+
+    protected function ensureStatesExistForCountry(?Country $country): void
+    {
+        if ($country && ! $country->states()->exists()) {
+            app(GeographyService::class)->fetchAndSaveStates($country);
+        }
     }
 
     #[Computed]

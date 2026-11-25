@@ -6,7 +6,6 @@ use App\Models\Country;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -76,7 +75,6 @@ class Register extends Component
     {
         return view('livewire.auth.register', [
             'countries' => Country::query()
-                ->where('is_active', true)
                 ->orderBy('name','asc')
                 ->get(['id', 'name', 'flag']),
         ]);

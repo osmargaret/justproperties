@@ -2,19 +2,23 @@
 
 namespace App\Livewire\Admin\Settings;
 
+use App\Jobs\FetchCountryStates;
 use App\Models\Country;
 use App\Models\CountrySetting;
-use App\Models\Currency;
-use App\Services\GeographyService;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class AdminCountries extends Component
 {
+    use WithPagination;
+
     public bool $showModal = false;
 
     public ?int $editingId = null;
+
+    public string $search = '';
 
     public string $name = '';
 
@@ -30,9 +34,11 @@ class AdminCountries extends Component
 
     public bool $is_default = false;
 
-    public bool $is_active = true;
+    public string $currency = '';
 
-    public ?int $currency_id = null;
+    public string $currency_code = '';
+
+    public string $currency_symbol = '';
 
     public function openCreate(): void
     {
@@ -44,8 +50,9 @@ class AdminCountries extends Component
         $this->phone_code = '';
         $this->language_code = '';
         $this->is_default = false;
-        $this->is_active = true;
-        $this->currency_id = Currency::query()->where('is_active', true)->orderByDesc('is_default')->value('id');
+        $this->currency = '';
+        $this->currency_code = '';
+        $this->currency_symbol = '';
         $this->resetErrorBag();
         $this->showModal = true;
     }
@@ -61,8 +68,9 @@ class AdminCountries extends Component
         $this->phone_code = (string) ($country->phone_code ?? '');
         $this->language_code = (string) ($country->language_code ?? '');
         $this->is_default = (bool) $country->is_default;
-        $this->is_active = (bool) $country->is_active;
-        $this->currency_id = $country->currency_id;
+        $this->currency = (string) ($country->currency ?? '');
+        $this->currency_code = (string) ($country->currency_code ?? '');
+        $this->currency_symbol = (string) ($country->currency_symbol ?? '');
         $this->resetErrorBag();
         $this->showModal = true;
     }
@@ -90,8 +98,10 @@ class AdminCountries extends Component
             'phone_code' => ['nullable', 'string', 'max:32'],
             'language_code' => ['nullable', 'string', 'max:16'],
             'is_default' => ['boolean'],
-            'is_active' => ['boolean'],
-            'currency_id' => ['nullable', 'integer', 'exists:currencies,id'],
+            
+            'currency' => ['nullable', 'string', 'max:255'],
+            'currency_code' => ['nullable', 'string', 'size:3'],
+            'currency_symbol' => ['nullable', 'string', 'max:8'],
         ]);
 
         $payload = [
@@ -101,8 +111,9 @@ class AdminCountries extends Component
             'flag'          => $this->flag !== '' ? $this->flag : null,
             'phone_code'    => $this->phone_code !== '' ? $this->phone_code : null,
             'language_code' => $this->language_code !== '' ? $this->language_code : null,
-            'is_active'     => $this->is_active,
-            'currency_id'   => $this->currency_id,
+            'currency' => $this->currency !== '' ? $this->currency : null,
+            'currency_code' => $this->currency_code !== '' ? strtoupper($this->currency_code) : null,
+            'currency_symbol' => $this->currency_symbol !== '' ? $this->currency_symbol : null,
         ];
 
         if ($this->is_default) {
@@ -113,20 +124,24 @@ class AdminCountries extends Component
         }
 
         if ($this->editingId) {
-            Country::query()->whereKey($this->editingId)->update($payload);
+            $country = Country::query()->findOrFail($this->editingId);
+            $country->update($payload);
         } else {
             $country = Country::query()->create($payload);
 
-            // Fetch states & cities for the newly created country in background
+            // Fetch states for the newly created country in the background.
             if ($country && ! $country->states()->exists()) {
-                dispatch(function () use ($country) {
-                    app(GeographyService::class)->fetchAndSave($country);
-                })->afterResponse();
+                FetchCountryStates::dispatch($country);
             }
         }
 
         session()->flash('status', __('Country saved.'));
         $this->closeModal();
+    }
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
     }
 
     public function setDefault(int $id): void
@@ -139,8 +154,8 @@ class AdminCountries extends Component
     public function deleteCountry(int $id): void
     {
         $country = Country::query()->findOrFail($id);
-        if ($country->users()->exists() || $country->properties()->exists()) {
-            session()->flash('error', __('Cannot delete a country that has users or properties.'));
+        if ($country->users()->exists() || $country->properties()->exists() || $country->payments()->exists()) {
+            session()->flash('error', __('Cannot delete a country that has users, properties, or payments.'));
 
             return;
         }
@@ -156,12 +171,12 @@ class AdminCountries extends Component
 
     public function render()
     {
-        $countries = Country::query()->with('currency')->orderByDesc('is_default')->orderBy('name', 'asc')->get();
-        $currencies = Currency::query()->where('is_active', true)->orderBy('code')->get();
+        $countries = Country::query()
+            ->when($this->search !== '', fn ($query) => $query->where('name', 'like', '%'.$this->search.'%'))
+            ->orderByDesc('is_default')
+            ->orderBy('name', 'asc')
+            ->paginate(15);
 
-        return view('livewire.admin.settings.admin-countries', [
-            'countries' => $countries,
-            'currencies' => $currencies,
-        ]);
+        return view('livewire.admin.settings.admin-countries', ['countries' => $countries]);
     }
 }

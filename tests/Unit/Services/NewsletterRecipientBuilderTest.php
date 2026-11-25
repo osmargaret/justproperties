@@ -75,15 +75,13 @@ class NewsletterRecipientBuilderTest extends TestCase
         $country = Country::query()->create([
             'name' => 'Nigeria',
             'slug' => 'nigeria',
-            'code' => 'NG',
-            'is_active' => true,
+            'code' => 'NG'
         ]);
         $state = State::query()->create([
             'name' => 'Lagos',
             'slug' => 'lagos',
             'code' => 'LA',
-            'country_id' => $country->id,
-            'is_active' => true,
+            'country_id' => $country->id
         ]);
         
         $category = Category::query()->create([

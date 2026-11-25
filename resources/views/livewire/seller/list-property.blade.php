@@ -36,7 +36,7 @@
                             @error('listing_category_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block font-medium text-sm text-gray-700 mb-2">Cost ({{ $activeCurrency?->symbol ?? '₦' }}) *</label>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Cost *</label>
                             <input type="number" min="1" wire:model.blur="cost" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g., 85000000" />
                             @error('cost') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -56,18 +56,91 @@
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Country *</label>
+                            <div class="relative" x-data="{
+                                open: false,
+                                search: @js($countries->firstWhere('id', $country_id)?->name ?? ''),
+                                selectedCountryId: @js($country_id),
+                                countries: @js($countries->map(fn ($country) => [
+                                    'id' => $country->id,
+                                    'name' => $country->name,
+                                    'flag' => $country->flag,
+                                ])->values()),
+                                get filteredCountries() {
+                                    const query = this.search.trim().toLowerCase();
+                                    return this.countries.filter(country => country.name.toLowerCase().includes(query));
+                                },
+                                selectCountry(country) {
+                                    this.selectedCountryId = country.id;
+                                    this.search = country.name;
+                                    this.open = false;
+                                    this.$wire.set('country_id', country.id);
+                                }
+                            }" @click.outside="open = false">
+                                <input type="text" x-model="search"
+                                    @focus="open = true; $event.target.select()"
+                                    @input="open = true; if (selectedCountryId !== null) { selectedCountryId = null; $wire.set('country_id', null); }"
+                                    @keydown.escape="open = false"
+                                    @keydown.enter.prevent="if (filteredCountries.length) selectCountry(filteredCountries[0])"
+                                    autocomplete="off" placeholder="Search for a country"
+                                    class="w-full rounded-lg border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    role="combobox" aria-autocomplete="list" :aria-expanded="open.toString()">
+                                <div x-show="open" x-cloak class="absolute z-40 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                                    <template x-for="country in filteredCountries" :key="country.id">
+                                        <button type="button" @click="selectCountry(country)"
+                                            class="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-emerald-50">
+                                            <span x-text="[country.flag, country.name].filter(Boolean).join(' ')"></span>
+                                        </button>
+                                    </template>
+                                    <p x-show="filteredCountries.length === 0" class="px-4 py-3 text-sm text-gray-500">No countries found.</p>
+                                </div>
+                            </div>
+                            @error('country_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div wire:key="listing-state-picker-{{ $country_id ?: 'none' }}">
                             <label class="block font-medium text-sm text-gray-700 mb-2">State *</label>
-                            <select wire:model.live="state_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-                                <option value="">Select state</option>
-                                @foreach ($states as $state)
-                                    <option value="{{ $state->id }}">{{ $state->name }}</option>
-                                @endforeach
-                            </select>
+                            <div class="relative" x-data="{
+                                open: false,
+                                search: @js($states->firstWhere('id', $state_id)?->name ?? ''),
+                                selectedStateId: @js($state_id),
+                                states: @js($states->map(fn ($state) => [
+                                    'id' => $state->id,
+                                    'name' => $state->name,
+                                ])->values()),
+                                get filteredStates() {
+                                    const query = this.search.trim().toLowerCase();
+                                    return this.states.filter(state => state.name.toLowerCase().includes(query));
+                                },
+                                selectState(state) {
+                                    this.selectedStateId = state.id;
+                                    this.search = state.name;
+                                    this.open = false;
+                                    this.$wire.set('state_id', state.id);
+                                }
+                            }" @click.outside="open = false">
+                                <input type="text" x-model="search"
+                                    @focus="open = true; $event.target.select()"
+                                    @input="open = true; if (selectedStateId !== null) { selectedStateId = null; $wire.set('state_id', null); }"
+                                    @keydown.escape="open = false"
+                                    @keydown.enter.prevent="if (filteredStates.length) selectState(filteredStates[0])"
+                                    autocomplete="off" placeholder="Search for a state"
+                                    class="w-full rounded-lg border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    role="combobox" aria-autocomplete="list" :aria-expanded="open.toString()">
+                                <div x-show="open" x-cloak class="absolute z-40 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                                    <template x-for="state in filteredStates" :key="state.id">
+                                        <button type="button" @click="selectState(state)"
+                                            class="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-emerald-50"
+                                            x-text="state.name"></button>
+                                    </template>
+                                    <p x-show="states.length === 0" class="px-4 py-3 text-sm text-gray-500">No states available for this country.</p>
+                                    <p x-show="states.length > 0 && filteredStates.length === 0" class="px-4 py-3 text-sm text-gray-500">No states match your search.</p>
+                                </div>
+                            </div>
                             @error('state_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="block font-medium text-sm text-gray-700 mb-2">City/LGA *</label>
-                            <input wire:model.live="city" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">       
+                            <input wire:model.live="city" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                             @error('city') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div class="sm:col-span-2">
@@ -159,101 +232,18 @@
 
                 </div>
 
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <i class="ri-crown-line text-emerald-600"></i> Subscription
-                    </h3>
-                    @if ($this->hasUnusedSubscriptions)
-                        <fieldset class="space-y-3 mb-4">
-                            <legend class="text-xs font-medium text-gray-600 mb-1">Apply this listing using</legend>
-                            <label @class([
-                                'flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition-colors',
-                                'border-emerald-500 bg-emerald-50/70' => $subscription_source === 'existing',
-                                'border-gray-200' => $subscription_source !== 'existing',
-                            ])>
-                                <input type="radio" wire:model.live="subscription_source" value="existing" class="mt-0.5 border-gray-300 text-emerald-600 focus:ring-emerald-500">
-                                <span>
-                                    <span class="block text-sm font-medium text-gray-900">Use an existing subscription</span>
-                                    <span class="block text-xs text-gray-500 mt-0.5">Uses one free slot. No plan charge for this listing.</span>
-                                </span>
-                            </label>
-                            <label @class([
-                                'flex items-start gap-3 cursor-pointer rounded-lg border p-3 transition-colors',
-                                'border-emerald-500 bg-emerald-50/70' => $subscription_source === 'purchase',
-                                'border-gray-200' => $subscription_source !== 'purchase',
-                            ])>
-                                <input type="radio" wire:model.live="subscription_source" value="purchase" class="mt-0.5 border-gray-300 text-emerald-600 focus:ring-emerald-500">
-                                <span>
-                                    <span class="block text-sm font-medium text-gray-900">Buy a new subscription</span>
-                                    <span class="block text-xs text-gray-500 mt-0.5">Purchase a plan for this listing even if you still have slots elsewhere.</span>
-                                </span>
-                            </label>
-                        </fieldset>
-                        @if ($subscription_source === 'existing')
-                            <p class="text-xs text-gray-500 mb-2">Select which subscription should cover this listing.</p>
-                            <select wire:model.live="selected_subscription_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
-                                <option value="">Choose subscription</option>
-                                @foreach ($availableSubscriptions as $subscription)
-                                    <option value="{{ $subscription->id }}">
-                                        {{ $subscription->plan?->name ?? 'Subscription' }} — {{ $subscription->remaining_slots }} slot(s) left
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('selected_subscription_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
-                        @else
-                            <p class="text-xs text-gray-500 mb-2">Choose a plan to purchase for this listing.</p>
-                            <select wire:model.live="selected_subscription_plan_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
-                                <option value="">Choose subscription plan</option>
-                                @foreach ($subscriptionPlans as $plan)
-                                    <option value="{{ $plan->id }}">{{ $plan->name }} ({{ $plan->seats }} listings / {{ $plan->days }} days)</option>
-                                @endforeach
-                            </select>
-                            @error('selected_subscription_plan_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
-                        @endif
-                        @error('subscription_source') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
-                    @else
-                        <p class="text-xs text-gray-500 mb-3">No unused subscription found. Choose a plan to purchase.</p>
-                        <select wire:model.live="selected_subscription_plan_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white">
-                            <option value="">Choose subscription plan</option>
-                            @foreach ($subscriptionPlans as $plan)
-                                <option value="{{ $plan->id }}">{{ $plan->name }} ({{ $plan->seats }} listings / {{ $plan->days }} days)</option>
-                            @endforeach
-                        </select>
-                        @error('selected_subscription_plan_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
-                    @endif
+                <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-6 text-sm text-emerald-900">
+                    <h3 class="font-semibold mb-2">Free property listings</h3>
+                    <p>Submitting a property is free. Paid promotion options are available after your listing is created.</p>
                 </div>
 
-<div class="bg-white rounded-xl p-6 shadow-md sticky top-24">
-                    <h3 class="text-xl font-semibold mb-6 pb-4 border-b border-gray-200">Payment Summary</h3>
-                    <div class="space-y-3 mb-6">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Subscription</span>
-                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->subscriptionAmount(), 2) }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">VAT ({{ number_format($this->vatRate(), 1) }}%)</span>
-                            <span class="font-medium">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->vatAmount(), 2) }}</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between py-4 border-t-2 border-gray-200 mb-6">
-                        <span class="font-bold">Total</span>
-                        <span class="font-bold text-2xl text-emerald-600">{{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->totalAmount(), 2) }}</span>
-                    </div>
-
-                    <div class="rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-800 text-xs p-3 mb-4">
-                        Payment gateway is selected automatically based on your country settings.
-                    </div>
-
+                <div class="bg-white rounded-xl p-6 shadow-md sticky top-24">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <button type="button" wire:click="saveDraft" class="w-full py-4 border border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-semibold rounded-lg flex items-center justify-center gap-2 transition-all">
                             <i class="ri-save-line"></i> Save as Draft
                         </button>
                         <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all">
-                        @if ($this->requiresPayment())
-                            <i class="ri-lock-line"></i> Pay {{ $activeCurrency?->symbol ?? '₦' }}{{ number_format($this->totalAmount(), 2) }} & Submit Listing
-                        @else
                             <i class="ri-check-line"></i> Submit Listing
-                        @endif
                         </button>
                     </div>
                 </div>

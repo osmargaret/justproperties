@@ -29,7 +29,7 @@ class SwitchActiveRole extends Component
         }
         $this->user = Auth::user();
         $this->isAdmin = $this->user->is_admin;
-        $this->role = $this->isAdmin ? ($this->user->active_role ?: 'admin') : $this->user->active_role;
+        $this->role = $this->isAdmin ? ($this->user->active_role ?: 'admin') : null;
     }
 
     public function switchRole(string $role): void
@@ -37,6 +37,12 @@ class SwitchActiveRole extends Component
         $user = Auth::user();
         if (! $user) {
             $this->redirect(route('login'));
+
+            return;
+        }
+
+        if (! $user->is_admin) {
+            $this->redirect(route('account.dashboard'));
 
             return;
         }

@@ -26,7 +26,7 @@ class AuthenticationTest extends TestCase
             ->set('password', 'password')
             ->call('login')
             ->assertHasNoErrors()
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('account.dashboard'));
 
         $this->assertAuthenticatedAs($user);
     }
@@ -49,7 +49,8 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->post(route('logout'))
+            ->withSession(['_token' => 'logout-token'])
+            ->post(route('logout'), ['_token' => 'logout-token'])
             ->assertRedirect(route('welcome'));
 
         $this->assertGuest();

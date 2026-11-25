@@ -15,7 +15,6 @@
         <div class="rounded-lg border border-gray-200 p-4">
             <h3 class="mb-2 font-semibold text-gray-900">Activity summary</h3>
             <p class="text-sm text-gray-600">Properties: {{ $user->properties_count }}</p>
-            <p class="text-sm text-gray-600">Subscriptions: {{ $user->subscriptions_count }}</p>
             <p class="text-sm text-gray-600">Status: {{ $user->suspended_at ? 'Suspended' : 'Active' }}</p>
         </div>
     </div>
@@ -37,7 +36,6 @@
             <button wire:click="delete" wire:confirm="Delete this user?" type="button" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white">Delete</button>
         @endif
         <a href="{{ route('admin.properties', ['q' => $user->name]) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">View Properties</a>
-        <a href="{{ route('admin.subscriptions', ['q' => $user->name]) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">View Subscriptions</a>
     </div>
 
     <a href="{{ route('admin.users') }}" class="mt-6 inline-flex text-sm font-medium text-emerald-600 hover:text-emerald-700">← Back to users</a>

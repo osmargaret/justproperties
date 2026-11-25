@@ -14,16 +14,16 @@
             @endif
 
             @php
-                $symbol = $payment->currency?->symbol ?? '₦';
+                $symbol = $payment->currency?->currency_symbol ?? $payment->country?->currency_symbol ?? '$';
             @endphp
 
             <div class="space-y-2 text-sm">
-                <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>{{ $symbol }}{{ number_format((float) $payment->amount, 2) }}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>{{ $symbol }}{{ number_format((float) $payment->amount, 2) }} {{ $payment->currency_code }}</span></div>
                 @if($payment->coupon_value > 0)
-                <div class="flex justify-between text-emerald-600"><span class="font-medium">Coupon applied</span><span>- {{ $symbol }}{{ number_format((float) $payment->coupon_value, 2) }}</span></div>
+                <div class="flex justify-between text-emerald-600"><span class="font-medium">Coupon applied</span><span>- {{ $symbol }}{{ number_format((float) $payment->coupon_value, 2) }} {{ $payment->currency_code }}</span></div>
                 @endif
-                <div class="flex justify-between"><span class="text-gray-500">VAT ({{ number_format((float) $payment->vat_rate, 1) }}%)</span><span>{{ $symbol }}{{ number_format((float) $payment->vat_value, 2) }}</span></div>
-                <div class="flex justify-between pt-3 border-t border-gray-200 font-semibold text-base"><span>Total</span><span>{{ $symbol }}{{ number_format((float) $payment->total, 2) }}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">VAT ({{ number_format((float) $payment->vat_rate, 1) }}%)</span><span>{{ $symbol }}{{ number_format((float) $payment->vat_value, 2) }} {{ $payment->currency_code }}</span></div>
+                <div class="flex justify-between pt-3 border-t border-gray-200 font-semibold text-base"><span>Total</span><span>{{ $symbol }}{{ number_format((float) $payment->total, 2) }} {{ $payment->currency_code }}</span></div>
             </div>
 
             @if($payment->status === 'pending' && !$payment->coupon_id)
@@ -71,12 +71,12 @@
                 @elseif ($hasGateway)
                     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
                         Gateway: <span class="font-medium capitalize">{{ str_replace('_', ' ', $gateway) }}</span>
-                        <span class="text-gray-500">({{ $payment->currency->code }})</span>
+                        <span class="text-gray-500">({{ $payment->currency_code }})</span>
                     </div>
                 @elseif ($hasBank)
                     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
                         Payment Method: <span class="font-medium">Bank Transfer</span>
-                        <span class="text-gray-500">({{ $payment->currency->code }})</span>
+                        <span class="text-gray-500">({{ $payment->currency_code }})</span>
                     </div>
                 @endif
             @endif
@@ -155,19 +155,7 @@
                     </button>
                 @endif
 
-                @if ($payment->paymentable_type === \App\Models\Property::class && $payment->paymentable_id)
-                    <a href="{{ route('seller.properties.show', ['property' => $payment->paymentable_id]) }}" class="text-sm text-gray-600 hover:text-emerald-700">Back to property details</a>
-                @elseif ($payment->paymentable_type === \App\Models\Subscription::class && $payment->paymentable_id)
-                    @php
-                        $subscriptionPropertyId = \App\Models\SubscribedProperty::query()
-                            ->where('subscription_id', $payment->paymentable_id)
-                            ->latest('id')
-                            ->value('property_id');
-                    @endphp
-                    @if ($subscriptionPropertyId)
-                        <a href="{{ route('seller.properties.show', ['property' => $subscriptionPropertyId]) }}" class="text-sm text-gray-600 hover:text-emerald-700">Back to property details</a>
-                    @endif
-                @elseif ($payment->paymentable_type === \App\Models\Promotion::class && $payment->paymentable?->property_id)
+                @if ($payment->paymentable_type === \App\Models\Promotion::class && $payment->paymentable?->property_id)
                     <a href="{{ route('seller.properties.show', ['property' => $payment->paymentable->property_id, 'tab' => 'promotions']) }}" class="text-sm text-gray-600 hover:text-emerald-700">Back to promotions</a>
                 @endif
             </div>

@@ -2,12 +2,17 @@
 
 namespace App\Livewire\Buyer;
 
+use App\Models\BlogSubscription;
+use App\Models\Category;
 use App\Models\Media;
 use App\Models\Moderation;
+use App\Models\PropertyAlert;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\Attributes\Url;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
@@ -15,7 +20,12 @@ class Profile extends Component
 {
     use WithFileUploads;
 
+    #[Url(as: 'tab')]
     public string $activeTab = 'basic';
+
+    public array $propertyAlertCategoryIds = [];
+
+    public array $blogCategoryIds = [];
 
     public string $govt_id_number = '';
 
@@ -51,16 +61,11 @@ class Profile extends Component
 
     public string $linkedin = '';
 
-    public bool $new_inquiries = true;
-
-    public bool $listing_views = true;
-
-    public bool $instant_alerts = true;
-
     public function mount(): void
     {
         $user = Auth::user();
 
+        $this->address = $user->address ?? '';
         $this->phone = $user->phone ?? '';
         $this->whatsapp = $user->whatsapp ?? '';
         $this->website = $user->website ?? '';
@@ -69,6 +74,19 @@ class Profile extends Component
         $this->instagram = $user->instagram ?? '';
         $this->linkedin = $user->linkedin ?? '';
         $this->youtube = $user->youtube ?? '';
+        $this->propertyAlertCategoryIds = $user->propertyAlerts()
+            ->where('type', 'new_property')
+            ->where('status', 'active')
+            ->whereNull('property_id')
+            ->pluck('category_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+        $this->blogCategoryIds = BlogSubscription::query()
+            ->where('email', $user->email)
+            ->where('get_new_posts', true)
+            ->pluck('category_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
 
     public function submitVerification(): void
@@ -152,11 +170,12 @@ class Profile extends Component
         $this->reset(['current_password', 'new_password', 'new_password_confirmation']);
     }
 
-    public function updateNotifications(): void
+    public function updateProfile(): void
     {
         $user = Auth::user();
 
         $user->update([
+            'address' => $this->address,
             'phone' => $this->phone,
             'whatsapp' => $this->whatsapp,
             'website' => $this->website,
@@ -167,16 +186,76 @@ class Profile extends Component
             'youtube' => $this->youtube,
         ]);
 
-        session()->flash('status', __('Notification settings updated.'));
+        session()->flash('status', __('Profile information updated.'));
+    }
+
+    public function updateNotificationPreferences(): void
+    {
+        $this->validate([
+            'propertyAlertCategoryIds' => ['array'],
+            'propertyAlertCategoryIds.*' => ['integer', Rule::exists('categories', 'id')->where('is_property', true)],
+            'blogCategoryIds' => ['array'],
+            'blogCategoryIds.*' => ['integer', Rule::exists('categories', 'id')->where('is_property', false)],
+        ]);
+
+        $user = Auth::user();
+        $propertyCategoryIds = Category::query()->where('is_property', true)->pluck('id')->all();
+        $blogCategoryIds = Category::query()->where('is_property', false)->pluck('id')->all();
+
+        foreach ($propertyCategoryIds as $categoryId) {
+            $selected = in_array((int) $categoryId, array_map('intval', $this->propertyAlertCategoryIds), true);
+            $alert = PropertyAlert::withTrashed()->firstOrNew([
+                'user_id' => $user->id,
+                'category_id' => $categoryId,
+                'property_id' => null,
+                'type' => 'new_property',
+            ]);
+
+            if (! $alert->exists && ! $selected) {
+                continue;
+            }
+
+            if ($alert->trashed()) {
+                $alert->restore();
+            }
+            $alert->status = $selected ? 'active' : 'inactive';
+            $alert->save();
+        }
+
+        foreach ($blogCategoryIds as $categoryId) {
+            $selected = in_array((int) $categoryId, array_map('intval', $this->blogCategoryIds), true);
+            $subscription = BlogSubscription::withTrashed()->firstOrNew([
+                'email' => $user->email,
+                'category_id' => $categoryId,
+            ]);
+
+            if (! $subscription->exists && ! $selected) {
+                continue;
+            }
+
+            if ($subscription->trashed()) {
+                $subscription->restore();
+            }
+            $subscription->get_new_posts = $selected;
+            $subscription->get_comments = false;
+            $subscription->save();
+        }
+
+        session()->flash('status', __('Notification preferences updated.'));
     }
 
     public function switchTab(string $tab): void
     {
-        $this->activeTab = $tab;
+        if (in_array($tab, ['basic', 'notifications', 'verification', 'security'], true)) {
+            $this->activeTab = $tab;
+        }
     }
 
     public function render()
     {
-        return view('livewire.buyer.profile');
+        return view('livewire.buyer.profile', [
+            'propertyAlertCategories' => Category::query()->where('is_property', true)->orderBy('name')->get(),
+            'blogCategories' => Category::query()->where('is_property', false)->orderBy('name')->get(),
+        ]);
     }
 }

@@ -1,9 +1,8 @@
-<x-admin.page title="Users" description="User management with subscriptions, seats and property activity.">
+<x-admin.page title="Users" description="Manage member accounts and property activity.">
     <div class="mb-4 flex flex-wrap gap-3">
         <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search name, email, phone..." class="w-full max-w-sm rounded-lg border border-gray-200 px-3 py-2 text-sm" />
         <button wire:click="sort('name')" type="button" class="rounded-lg border px-3 py-2 text-sm">Sort by Name</button>
         <button wire:click="sort('properties_count')" type="button" class="rounded-lg border px-3 py-2 text-sm">Sort by Properties</button>
-        <button wire:click="sort('subscription_seats')" type="button" class="rounded-lg border px-3 py-2 text-sm">Sort by Seats</button>
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-gray-200">
@@ -13,7 +12,6 @@
                     <th class="px-4 py-3">Details</th>
                     <th class="px-4 py-3">Country</th>
                     <th class="px-4 py-3">Properties</th>
-                    <th class="px-4 py-3">Active Subscriptions</th>
                     <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
@@ -27,15 +25,12 @@
                         </td>
                         <td class="px-4 py-3 text-gray-700">{{ $row->country?->name ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-700">{{ $row->properties_count }}</td>
-                        <td class="px-4 py-3 text-gray-700">
-                            {{ $row->subscriptions->where('status', 'active')->count() }} subscriptions | {{ (int) ($row->subscription_seats ?? 0) }} seats
-                        </td>
                         <td class="px-4 py-3">
                             <a href="{{ route('admin.users.show', ['user' => $row->id]) }}" class="font-medium text-emerald-600 hover:underline">View</a>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">No users found.</td></tr>
+                    <tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">No users found.</td></tr>
                 @endforelse
             </tbody>
         </table>

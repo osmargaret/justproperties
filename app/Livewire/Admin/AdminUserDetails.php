@@ -80,7 +80,7 @@ class AdminUserDetails extends Component
 
     public function render()
     {
-        $this->user->loadCount(['properties', 'subscriptions']);
+        $this->user->loadCount('properties');
 
         return view('livewire.admin.admin-user-details');
     }

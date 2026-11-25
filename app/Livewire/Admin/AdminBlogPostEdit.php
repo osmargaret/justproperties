@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Property;
+use App\Services\Notifications\NotifiesBlogSubscribers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -66,6 +67,7 @@ class AdminBlogPostEdit extends Component
     public function save(): mixed
     {
         $this->validate();
+        $wasPublished = $this->post->status === 'published';
 
         $tagsString = implode(', ', array_values(array_filter(array_map('trim', explode(',', $this->tagsInput)))));
 
@@ -99,6 +101,10 @@ class AdminBlogPostEdit extends Component
             'tags'         => $tagsString ?: null,
             'content_source' => $this->content_source,
         ]);
+
+        if (! $wasPublished && $this->post->status === 'published') {
+            app(NotifiesBlogSubscribers::class)->notify($this->post);
+        }
 
         if ($this->featuredImage) {
             $this->post->media()->where('is_primary', true)->delete();

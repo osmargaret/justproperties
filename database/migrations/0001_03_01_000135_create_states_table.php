@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('timezone', 64)->nullable();
             $table->unsignedBigInteger('country_id');
             $table->foreign('country_id')->references('id')->on('countries');
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->index('country_id');
         });

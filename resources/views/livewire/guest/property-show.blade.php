@@ -110,6 +110,24 @@
                     <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white font-serif leading-tight drop-shadow-lg">
                         {{ $property->name }}
                     </h1>
+                    <div class="flex flex-wrap items-center gap-3">
+                        @auth
+                            <form method="POST" action="{{ route('properties.bookmark.toggle', $property) }}">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20">
+                                    <i class="{{ auth()->user()->savedProperties()->where('property_id', $property->id)->exists() ? 'ri-bookmark-fill' : 'ri-bookmark-line' }}"></i>
+                                    {{ auth()->user()->savedProperties()->where('property_id', $property->id)->exists() ? 'Remove bookmark' : 'Bookmark' }}
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20">
+                                <i class="ri-bookmark-line"></i> Sign in to bookmark
+                            </a>
+                        @endauth
+                        @if (session('status'))
+                            <span class="text-sm text-white">{{ session('status') }}</span>
+                        @endif
+                    </div>
 
                     <p class="text-emerald-300 text-sm sm:text-base lg:text-lg flex items-center gap-2 font-medium drop-shadow">
                         <i class="ri-map-pin-2-fill text-emerald-400 text-lg"></i>

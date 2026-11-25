@@ -51,8 +51,7 @@ return [
         'public' => env('FLUTTERWAVE_PUBLIC_KEY'),
         'secret' => env('FLUTTERWAVE_SECRET_KEY'),
     ],
-    'countrystatecity' => [
-        'key' => env('COUNTRYSTATECITY'),
-    ],
+    'countrystatecity' => env('COUNTRYSTATECITY'),
+    'ipdata' => env('IPDATA_API_KEY'),
 
 ];

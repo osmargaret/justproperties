@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'image',
     'description',
-    'placement',
+    'advertisement_plan_id',
+    'currency_id',
     'company',
     'email',
     'amount',
@@ -27,5 +29,15 @@ class Advertisement extends Model
             'end_date' => 'date',
             'amount' => 'decimal:2',
         ];
+    }
+
+    public function advertisementPlan(): BelongsTo
+    {
+        return $this->belongsTo(AdvertisementPlan::class);
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class);
     }
 }

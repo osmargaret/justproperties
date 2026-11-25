@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('blog_subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            $table->string('email');
             $table->foreignId('category_id')->constrained('categories');
             $table->foreignId('post_id')->nullable()->constrained('posts');
             $table->foreignId('property_id')->nullable()->constrained('properties');
@@ -21,10 +21,10 @@ return new class extends Migration
             $table->boolean('get_comments')->default(false);
             $table->softDeletes();
             $table->timestamps();
-            $table->index('user_id');
-            $table->index('category_id');
-            $table->index('post_id');
-            $table->index('property_id');
+
+            $table->unique(['email', 'post_id'], 'blog_subscriptions_email_post_unique');
+            $table->unique(['email', 'property_id'], 'blog_subscriptions_email_property_unique');
+            $table->unique(['email', 'category_id'], 'blog_subscriptions_email_category_unique');
         });
     }
 

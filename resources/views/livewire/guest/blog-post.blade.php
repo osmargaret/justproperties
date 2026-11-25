@@ -3,7 +3,7 @@
   <header class="text-white pt-32 pb-16 bg-gradient-to-br from-emerald-900 to-emerald-600">
     <div class="max-w-4xl mx-auto px-4">
       <span class="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-semibold mb-6">
-        {{ $post->category?->name ?? 'Blog' }}
+        <a href="{{ route('blog') }}" class="hover:text-emerald-300">All Posts</a> / {{ $post->category?->name ?? 'Category' }}
       </span>
 
       <h1 class="font-bold font-serif mb-6 text-6xl leading-tight">{{ $post->title }}</h1>

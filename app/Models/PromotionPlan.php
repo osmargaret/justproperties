@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 #[Fillable(['name', 'slug', 'type', 'features'])]
 class PromotionPlan extends Model
@@ -25,9 +24,9 @@ class PromotionPlan extends Model
         return $this->hasMany(Promotion::class);
     }
 
-    public function prices(): MorphMany
+    public function prices(): HasMany
     {
-        return $this->morphMany(Price::class, 'priceable');
+        return $this->hasMany(PromotionPlanPrice::class);
     }
 
     /**

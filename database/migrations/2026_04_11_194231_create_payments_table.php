@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('currency_id');
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->string('currency_code', 3)->nullable();
             $table->unsignedBigInteger('paymentable_id')->nullable();
             $table->string('paymentable_type')->nullable();
             $table->string('reference');
@@ -34,7 +35,6 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('no action')->onDelete('cascade');
-            $table->foreign('currency_id')->references('id')->on('currencies');
             $table->foreign('coupon_id')->references('id')->on('coupons');
             
 
@@ -46,7 +46,7 @@ return new class extends Migration
             
             $table->index('paymentable_id');
             $table->index('paymentable_type');
-            $table->index('currency_id');
+            $table->index('country_id');
             $table->index('coupon_id');
             $table->index('user_id');
         });

@@ -5,9 +5,6 @@ namespace App\Livewire\Seller;
 use App\Http\Traits\PaymentTrait;
 use App\Models\Payment;
 use App\Models\Promotion;
-use App\Models\Property;
-use App\Models\SubscribedProperty;
-use App\Models\Subscription;
 use App\Services\Payments\CompletesPayment;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -32,8 +29,9 @@ class Checkout extends Component
     public function mount(Payment $payment): void
     {
         abort_unless($payment->user_id === Auth::id(), 403);
+        abort_unless($payment->paymentable_type === Promotion::class, 404);
 
-        $this->payment = $payment->load(['currency', 'paymentable', 'user']);
+        $this->payment = $payment->load(['country', 'currency', 'paymentable', 'user']);
 
         if ($this->payment->isCompleted()) {
             session()->flash('status', __('This payment has already been completed.'));
@@ -45,7 +43,7 @@ class Checkout extends Component
         $hasBankDetails = ! empty($this->payment->currency?->bank_details);
 
         if (! $gateway && ! $hasBankDetails) {
-            $this->gatewayError = __('No payment method is configured for this currency. Ask an admin to set one under Settings → Currencies.');
+            $this->gatewayError = __('No payment method is configured for this currency. Ask an admin to set one under Settings → Promotion Currencies.');
         } elseif ($gateway && ! $this->gatewayIsConfigured($gateway)) {
             if ($hasBankDetails) {
                 $this->paymentMethod = 'bank_transfer';
@@ -159,22 +157,7 @@ class Checkout extends Component
             return redirect()->route('seller.properties.show', ['property' => $propertyId, 'tab' => 'promotions']);
         }
 
-        if ($this->payment->paymentable_type === Subscription::class && $this->payment->paymentable_id) {
-            $propertyId = SubscribedProperty::query()
-                ->where('subscription_id', $this->payment->paymentable_id)
-                ->latest('id')
-                ->value('property_id');
-
-            if ($propertyId) {
-                return redirect()->route('seller.properties.show', ['property' => $propertyId]);
-            }
-        }
-
-        if ($this->payment->paymentable_type === Property::class && $this->payment->paymentable_id) {
-            return redirect()->route('seller.properties.show', ['property' => $this->payment->paymentable_id]);
-        }
-
-        return redirect()->route('seller.listed-properties');
+        return redirect()->route('account.promotions');
     }
 
     public function render()

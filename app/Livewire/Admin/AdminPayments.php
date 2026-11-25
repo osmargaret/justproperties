@@ -52,7 +52,7 @@ class AdminPayments extends Component
     public function render()
     {
         $payments = Payment::query()
-            ->with(['user', 'currency'])
+            ->with(['user', 'country', 'currency'])
             ->when($this->search !== '', function (Builder $query) {
                 $query->where(function (Builder $inner) {
                     $inner->where('reference', 'like', '%'.$this->search.'%')
@@ -66,7 +66,7 @@ class AdminPayments extends Component
             ->paginate(10);
 
         $selectedPayment = $this->selectedPaymentId
-            ? Payment::query()->with(['user', 'currency'])->find($this->selectedPaymentId)
+            ? Payment::query()->with(['user', 'country', 'currency'])->find($this->selectedPaymentId)
             : null;
 
         return view('livewire.admin.admin-payments', [

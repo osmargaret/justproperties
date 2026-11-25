@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
     'user_id',
-    'currency_id',
+    'country_id',
+    'currency_code',
     'paymentable_id',
     'paymentable_type',
     'reference',
@@ -52,9 +53,14 @@ class Payment extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function currency(): BelongsTo
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Currency::class, 'currency_code', 'currency_code');
     }
 
     public function coupon(): BelongsTo
@@ -76,7 +82,7 @@ class Payment extends Model
 
     protected function currencyCode(): Attribute
     {
-        return Attribute::make(get: fn (): string => strtoupper((string) ($this->currency?->code ?? 'NGN')));
+        return Attribute::make(get: fn (?string $value): string => strtoupper((string) ($value ?: ($this->country?->currency_code ?? 'NGN'))));
     }
 
     public function isPending(): bool

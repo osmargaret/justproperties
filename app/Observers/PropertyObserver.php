@@ -11,25 +11,21 @@ class PropertyObserver
 
     public function created(Property $property): void
     {
-        if (self::$seeding || ($property->is_published && $this->hasSubscription($property))) {
+        if (self::$seeding || $property->is_published) {
             $this->createModerationRecord($property, 'created');
         }
     }
 
     public function updated(Property $property): void
     {
-        if ($property->wasChanged('is_published') && $property->is_published && $this->hasSubscription($property)) {
+        if (
+            $property->wasChanged('is_published')
+            && $property->is_published
+            && $property->latestModeration?->status !== 'approved'
+        ) {
             $this->createModerationRecord($property, 'updated');
         }
-    }
 
-    protected function hasSubscription(Property $property): bool
-    {
-        if ($property->relationLoaded('activeSubscribedPropertyLink')) {
-            return $property->activeSubscribedPropertyLink !== null;
-        }
-
-        return (bool) $property->activeSubscribedPropertyLink()->exists();
     }
 
     protected function createModerationRecord(Property $property, string $action): void

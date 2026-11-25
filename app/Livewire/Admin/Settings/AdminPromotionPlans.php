@@ -3,8 +3,8 @@
 namespace App\Livewire\Admin\Settings;
 
 use App\Models\Currency;
-use App\Models\Price;
 use App\Models\PromotionPlan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -39,7 +39,7 @@ class AdminPromotionPlans extends Component
     /** @var list<array{key: string, value: string}> */
     public array $featureRows = [];
 
-    /** @var list<array{currency_id: int|null, amount: string}> */
+    /** @var list<array{currency_id: int|string, amount: string, is_default: bool}> */
     public array $priceRows = [];
 
     public function openCreate(): void
@@ -53,15 +53,17 @@ class AdminPromotionPlans extends Component
             fn ($key) => ['key' => $key, 'value' => ''],
             self::FEATURE_KEYS
         );
-        $defaultCurrency = Currency::query()->where('is_active', true)->orderByDesc('is_default')->orderBy('code')->value('id');
-        $this->priceRows = [['currency_id' => $defaultCurrency, 'amount' => '0']];
+        $defaultCurrencyId = $this->defaultCurrencyId();
+        $this->priceRows = $defaultCurrencyId
+            ? [['currency_id' => $defaultCurrencyId, 'amount' => '0', 'is_default' => true]]
+            : [];
         $this->resetErrorBag();
         $this->showModal = true;
     }
 
     public function openEdit(int $id): void
     {
-        $plan = PromotionPlan::query()->with(['prices' => fn ($q) => $q->whereNull('country_id')])->findOrFail($id);
+        $plan = PromotionPlan::query()->with('prices.currency')->findOrFail($id);
         $this->editingId = $plan->id;
         $this->name = $plan->name;
         $this->slug = (string) ($plan->slug ?? '');
@@ -72,11 +74,17 @@ class AdminPromotionPlans extends Component
         }, self::FEATURE_KEYS);
         $this->priceRows = [];
         foreach ($plan->prices as $p) {
-            $this->priceRows[] = ['currency_id' => $p->currency_id, 'amount' => (string) $p->amount];
+            $this->priceRows[] = [
+                'currency_id' => $p->currency_id,
+                'amount' => (string) $p->amount,
+                'is_default' => $p->is_default,
+            ];
         }
         if ($this->priceRows === []) {
-            $defaultCurrency = Currency::query()->where('is_active', true)->orderByDesc('is_default')->orderBy('code')->value('id');
-            $this->priceRows = [['currency_id' => $defaultCurrency, 'amount' => '0']];
+            $defaultCurrencyId = $this->defaultCurrencyId();
+            $this->priceRows = $defaultCurrencyId
+                ? [['currency_id' => $defaultCurrencyId, 'amount' => '0', 'is_default' => true]]
+                : [];
         }
         $this->resetErrorBag();
         $this->showModal = true;
@@ -90,8 +98,23 @@ class AdminPromotionPlans extends Component
 
     public function addPriceRow(): void
     {
-        $defaultCurrency = Currency::query()->where('is_active', true)->orderByDesc('is_default')->orderBy('code')->value('id');
-        $this->priceRows[] = ['currency_id' => $defaultCurrency, 'amount' => '0'];
+        $usedCurrencyIds = array_column($this->priceRows, 'currency_id');
+        $currencyId = Currency::query()
+            ->whereNotIn('id', $usedCurrencyIds ?: [0])
+            ->orderBy('currency_code')
+            ->value('id');
+
+        if (! $currencyId) {
+            $this->addError('priceRows', __('There are no additional currencies available.'));
+
+            return;
+        }
+
+        $this->priceRows[] = [
+            'currency_id' => $currencyId,
+            'amount' => '0',
+            'is_default' => false,
+        ];
     }
 
     public function removePriceRow(int $index): void
@@ -99,7 +122,10 @@ class AdminPromotionPlans extends Component
         unset($this->priceRows[$index]);
         $this->priceRows = array_values($this->priceRows);
         if ($this->priceRows === []) {
-            $this->addPriceRow();
+            $defaultCurrencyId = $this->defaultCurrencyId();
+            $this->priceRows = $defaultCurrencyId
+                ? [['currency_id' => $defaultCurrencyId, 'amount' => '0', 'is_default' => true]]
+                : [];
         }
     }
 
@@ -112,11 +138,21 @@ class AdminPromotionPlans extends Component
             'featureRows' => ['nullable', 'array'],
             'featureRows.*.value' => ['nullable', 'string', 'max:1000'],
             'priceRows' => ['required', 'array', 'min:1'],
-            'priceRows.*.currency_id' => ['required', 'integer', 'exists:currencies,id'],
+            'priceRows.*.currency_id' => ['required', 'integer', 'exists:currencies,id', 'distinct'],
             'priceRows.*.amount' => ['required', 'numeric', 'min:0'],
+            'priceRows.*.is_default' => ['required', 'boolean'],
         ]);
 
-        // Convert feature rows to associative array
+        $defaultCount = collect($this->priceRows)
+            ->filter(fn (array $row): bool => filter_var($row['is_default'] ?? false, FILTER_VALIDATE_BOOLEAN))
+            ->count();
+
+        if ($defaultCount !== 1) {
+            $this->addError('priceRows', __('Select exactly one default price.'));
+
+            return;
+        }
+
         $features = [];
         foreach ($this->featureRows as $row) {
             if (isset($row['key'], $row['value'])) {
@@ -126,37 +162,34 @@ class AdminPromotionPlans extends Component
 
         $slug = $this->slug !== '' ? Str::slug($this->slug) : Str::slug($this->name);
 
-        if ($this->editingId) {
-            $plan = PromotionPlan::query()->findOrFail($this->editingId);
-            $plan->update([
-                'name' => $this->name,
-                'slug' => $slug,
-                'type' => $this->type,
-                'features' => $features,
-            ]);
-        } else {
-            $plan = PromotionPlan::query()->create([
-                'name' => $this->name,
-                'slug' => $slug,
-                'type' => $this->type,
-                'features' => $features,
-            ]);
-        }
-
-        $plan->prices()->whereNull('country_id')->delete();
-
-        foreach ($this->priceRows as $row) {
-            if (! isset($row['currency_id'], $row['amount'])) {
-                continue;
+        DB::transaction(function () use ($features, $slug): void {
+            if ($this->editingId) {
+                $plan = PromotionPlan::query()->findOrFail($this->editingId);
+                $plan->update([
+                    'name' => $this->name,
+                    'slug' => $slug,
+                    'type' => $this->type,
+                    'features' => $features,
+                ]);
+            } else {
+                $plan = PromotionPlan::query()->create([
+                    'name' => $this->name,
+                    'slug' => $slug,
+                    'type' => $this->type,
+                    'features' => $features,
+                ]);
             }
-            Price::query()->create([
-                'priceable_type' => PromotionPlan::class,
-                'priceable_id' => $plan->id,
-                'country_id' => null,
-                'currency_id' => (int) $row['currency_id'],
-                'amount' => $row['amount'],
-            ]);
-        }
+
+            $plan->prices()->delete();
+
+            foreach ($this->priceRows as $row) {
+                $plan->prices()->create([
+                    'currency_id' => $row['currency_id'],
+                    'amount' => $row['amount'],
+                    'is_default' => filter_var($row['is_default'], FILTER_VALIDATE_BOOLEAN),
+                ]);
+            }
+        });
 
         session()->flash('status', __('Promotion plan saved.'));
         $this->closeModal();
@@ -178,16 +211,24 @@ class AdminPromotionPlans extends Component
     public function render()
     {
         $plans = PromotionPlan::query()
-            ->with(['prices' => fn ($q) => $q->whereNull('country_id')->with('currency')])
+            ->with('prices.currency')
             ->orderBy('name','asc')
             ->get();
 
-        $currencies = Currency::query()->where('is_active', true)->orderBy('code')->get();
+        $currencies = Currency::query()->orderBy('currency_code')->get();
 
         return view('livewire.admin.settings.admin-promotion-plans', [
             'plans' => $plans,
             'currencies' => $currencies,
             'planTypes' => self::TYPES,
         ]);
+    }
+
+    private function defaultCurrencyId(): ?int
+    {
+        $currencyId = Currency::query()->where('currency_code', 'USD')->value('id')
+            ?? Currency::query()->orderBy('currency_code')->value('id');
+
+        return $currencyId === null ? null : (int) $currencyId;
     }
 }

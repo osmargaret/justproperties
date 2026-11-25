@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Property;
+use App\Services\Notifications\NotifiesBlogSubscribers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -74,6 +75,10 @@ class AdminBlogPostCreate extends Component
             'published_at' => $this->status === 'published' ? now() : null,
             'tags'           => $tagsString ?: null,
         ]);
+
+        if ($post->status === 'published') {
+            app(NotifiesBlogSubscribers::class)->notify($post);
+        }
 
         if ($this->featuredImage) {
             $path = $this->featuredImage->store('posts', 'public');

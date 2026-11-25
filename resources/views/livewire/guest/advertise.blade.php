@@ -81,60 +81,56 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-2xl p-6 flex gap-4 items-start shadow-sm border border-gray-100">
-                    <div class="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                        <i class="ri-home-4-line text-xl"></i>
+                @forelse ($spaces as $space)
+                    <div class="bg-white rounded-2xl p-6 flex gap-4 items-start shadow-sm border border-gray-100">
+                        <div class="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
+                            <i class="{{ $space->icon ?: 'ri-advertisement-line' }} text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1">{{ $space->name }}</h4>
+                            <p class="text-sm text-gray-500">{{ $space->description }}</p>
+                            @if ($space->format || $space->dimensions)
+                                <p class="mt-2 text-xs text-gray-400">{{ collect([$space->format, $space->dimensions])->filter()->join(' · ') }}</p>
+                            @endif
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 mb-1">Homepage Banner</h4>
-                        <p class="text-sm text-gray-500">Premium top-of-page visibility on our highly visited landing page. Maximum exposure to all incoming visitors.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl p-6 flex gap-4 items-start shadow-sm border border-gray-100">
-                    <div class="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                        <i class="ri-building-line text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 mb-1">Properties Listing Page</h4>
-                        <p class="text-sm text-gray-500">Embedded banners within our land & property listing pages, reaching users actively browsing properties.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl p-6 flex gap-4 items-start shadow-sm border border-gray-100">
-                    <div class="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                        <i class="ri-article-line text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 mb-1">Blog Post & Sidebar</h4>
-                        <p class="text-sm text-gray-500">In-content native banners inside our editorial posts, plus persistent sidebar ads alongside all blog content.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl p-6 flex gap-4 items-start shadow-sm border border-gray-100">
-                    <div class="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                        <i class="ri-mail-open-line text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 mb-1">Newsletter & Email</h4>
-                        <p class="text-sm text-gray-500">Sponsored placement in our subscriber newsletter — a direct line to our most engaged and loyal audience.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl p-6 flex gap-4 items-start shadow-sm border border-gray-100">
-                    <div class="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                        <i class="ri-contacts-line text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 mb-1">About & Contact Pages</h4>
-                        <p class="text-sm text-gray-500">Contextual placement on high-trust pages where visitors are already engaged and receptive to brand messaging.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl p-6 flex gap-4 items-start shadow-sm border border-gray-100">
-                    <div class="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                        <i class="ri-price-tag-3-line text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 mb-1">Pricing Page</h4>
-                        <p class="text-sm text-gray-500">Reach potential subscribers at the decision-making moment — ideal for complementary services and fintech partners.</p>
-                    </div>
-                </div>
+                @empty
+                    <p class="col-span-full text-center text-sm text-gray-500">Advertising spaces will be announced soon.</p>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="mb-20">
+            <div class="mb-10 text-center">
+                <span class="text-emerald-600 text-sm font-semibold uppercase tracking-widest">Plans &amp; Pricing</span>
+                <h2 class="mt-2 font-serif text-3xl font-bold text-gray-900">Choose an Advertising Plan</h2>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                @forelse ($plans as $plan)
+                    <article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h3>
+                        @if ($plan->description)<p class="mt-2 text-sm text-gray-500">{{ $plan->description }}</p>@endif
+                        <p class="mt-4 text-2xl font-extrabold text-emerald-700">
+                            @foreach ($plan->prices as $price)
+                                <span class="block">{{ $price->currency?->currency_symbol }}{{ number_format((float) $price->amount, 2) }} <small class="text-sm font-semibold">{{ $price->currency?->currency_code }}{{ $price->is_default ? ' · default' : '' }}</small></span>
+                            @endforeach
+                        </p>
+                        <p class="mt-2 text-sm text-gray-500">Per {{ $plan->billing_quantity > 1 ? $plan->billing_quantity.' ' : '' }}{{ $plan->billing_period }}{{ $plan->billing_quantity > 1 && $plan->billing_period !== 'email' ? 's' : '' }}</p>
+                        @if ($plan->impressions_included)
+                            <p class="mt-2 text-sm text-gray-600">{{ number_format($plan->impressions_included) }} impressions included</p>
+                        @endif
+                        <ul class="mt-4 space-y-1 text-sm text-gray-600">
+                            @foreach ($plan->spaces as $space)
+                                <li>• {{ $space->name }}</li>
+                            @endforeach
+                            @foreach ($plan->features ?? [] as $feature)
+                                <li>• {{ $feature }}</li>
+                            @endforeach
+                        </ul>
+                    </article>
+                @empty
+                    <p class="col-span-full text-center text-sm text-gray-500">Advertising plans and rates will be announced soon.</p>
+                @endforelse
             </div>
         </div>
 

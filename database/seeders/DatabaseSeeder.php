@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             GeographySeeder::class,
+            AdvertisementCatalogueSeeder::class,
             PermissionsRolesAndUsersSeeder::class,
             UsersSeeder::class,
             CategoriesSeeder::class,
@@ -20,7 +21,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             BlogPostsSeeder::class,
             PropertiesSeeder::class,
-            SubscriptionsAndPaymentsSeeder::class,
+            PromotionsAndPaymentsSeeder::class,
             UserEngagementSeeder::class,
             ContentAndNotificationsSeeder::class,
         ]);

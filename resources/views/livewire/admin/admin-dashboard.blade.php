@@ -10,7 +10,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-4 border-b border-gray-200">
                         <div>
                             <h2 class="text-2xl font-semibold text-gray-900">Admin overview</h2>
-                            <p class="text-gray-500 text-sm mt-1">Monitor users, listings, subscriptions, and platform health in one place.</p>
+                            <p class="text-gray-500 text-sm mt-1">Monitor users, listings, promotions, and platform health in one place.</p>
                         </div>
                         <a href="{{ route('welcome') }}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white bg-emerald-600 hover:bg-emerald-700 shadow-md transition whitespace-nowrap">
                             <i class="ri-external-link-line text-lg"></i>
@@ -113,7 +113,7 @@
                             Platform checklist
                         </h3>
                         <p class="text-emerald-100 text-sm mb-6 leading-relaxed">
-                            Keep subscription plans, promotion rules, and coupon limits aligned so sellers and buyers always see consistent pricing at checkout.
+                            Keep promotion plans and coupon limits aligned so members see consistent pricing at checkout.
                         </p>
                         <ul class="space-y-3 text-sm text-emerald-50">
                             <li class="flex gap-2"><i class="ri-checkbox-circle-fill text-emerald-300 shrink-0 mt-0.5"></i> Audit roles after staff changes under Settings → Roles &amp; Permissions.</li>

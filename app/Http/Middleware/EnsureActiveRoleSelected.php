@@ -9,9 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureActiveRoleSelected
 {
     /**
-     * Admins with active_role admin: admin routes only.
-     * Admins with active_role buyer|seller: that workspace only; other admin pages redirect to admin dashboard.
-     * Non-admins: buyer or seller workspace per active_role (see handleNonAdmin).
+     * Admins keep a separate admin workspace; all non-admin accounts share the member workspace.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -56,7 +54,7 @@ class EnsureActiveRoleSelected
         }
 
         if ($role === 'buyer') {
-            if ($request->routeIs('buyer.*')) {
+            if ($request->routeIs('account.*', 'buyer.*', 'seller.*')) {
                 return $next($request);
             }
 
@@ -64,11 +62,11 @@ class EnsureActiveRoleSelected
                 return $next($request);
             }
 
-            return redirect()->route('buyer.dashboard');
+            return redirect()->route('account.dashboard');
         }
 
         if ($role === 'seller') {
-            if ($request->routeIs('seller.*')) {
+            if ($request->routeIs('account.*', 'buyer.*', 'seller.*')) {
                 return $next($request);
             }
 
@@ -76,7 +74,7 @@ class EnsureActiveRoleSelected
                 return $next($request);
             }
 
-            return redirect()->route('seller.dashboard');
+            return redirect()->route('account.dashboard');
         }
 
         return redirect()->route('admin.dashboard');
@@ -84,30 +82,6 @@ class EnsureActiveRoleSelected
 
     private function handleNonAdmin(Request $request, Closure $next, $user): Response
     {
-        if ($user->active_role === null || $user->active_role === '') {
-            if ($request->routeIs('buyer.dashboard', 'seller.dashboard')) {
-                return $next($request);
-            }
-
-            return redirect()->route('home');
-        }
-
-        if ($user->active_role === 'buyer') {
-            if ($request->routeIs('buyer.*')) {
-                return $next($request);
-            }
-
-            return redirect()->route('buyer.dashboard');
-        }
-
-        if ($user->active_role === 'seller') {
-            if ($request->routeIs('seller.*')) {
-                return $next($request);
-            }
-
-            return redirect()->route('seller.dashboard');
-        }
-
         return $next($request);
     }
 }

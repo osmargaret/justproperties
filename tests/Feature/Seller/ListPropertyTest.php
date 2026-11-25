@@ -5,14 +5,13 @@ namespace Tests\Feature\Seller;
 use App\Livewire\Seller\ListProperty;
 use App\Models\Category;
 use App\Models\Country;
-use App\Models\Currency;
 use App\Models\Payment;
-use App\Models\Price;
+use App\Models\Promotion;
+use App\Models\PromotionPlan;
 use App\Models\Property;
 use App\Models\State;
-use App\Models\Subscription;
-use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\GeographyService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -41,28 +40,15 @@ class ListPropertyTest extends TestCase
         $this->assertSame($seller->country_id, $property->country_id);
     }
 
-    public function test_submit_with_pending_payment_redirects_to_checkout(): void
+    public function test_submitting_a_listing_is_free_and_awaits_moderation(): void
     {
-        [$seller, $category, $state, $currency] = $this->seedBaseData();
-        $subscriptionPlan = SubscriptionPlan::query()->create([
-            'name' => 'Starter',
-            'slug' => 'starter',
-            'features' => ['listings' => 1],
-            'seats' => 1,
-            'days' => 30,
-        ]);
-        Price::query()->create([
-            'amount' => 12000,
-            'currency_id' => $currency->id,
-            'priceable_id' => $subscriptionPlan->id,
-            'priceable_type' => SubscriptionPlan::class,
-        ]);
+        [$seller, $category, $state] = $this->seedBaseData();
         Storage::fake('public');
 
-        $test = Livewire::actingAs($seller)
+        Livewire::actingAs($seller)
             ->test(ListProperty::class)
             ->set('listing_category_id', $category->id)
-            ->set('title', 'Pending Payment Listing')
+            ->set('title', 'Free Listing')
             ->set('description', str_repeat('Description ', 4))
             ->set('cost', 70000000)
             ->set('state_id', $state->id)
@@ -74,133 +60,100 @@ class ListPropertyTest extends TestCase
             ->set('contact_phone', '+2348000000000')
             ->set('contact_email', 'seller@example.com')
             ->set('uploadedImages', [UploadedFile::fake()->image('listing.jpg')])
-            ->set('selected_subscription_plan_id', $subscriptionPlan->id)
             ->call('submitListing');
 
         $property = Property::query()->firstOrFail();
-        $payment = Payment::query()->firstOrFail();
-        $subscription = Subscription::query()->firstOrFail();
-        $test->assertRedirect(route('seller.checkout', ['payment' => $payment->id]));
-
-        $this->assertSame('draft', $property->status);
+        $this->assertSame('pending', $property->status);
         $this->assertSame('Ikeja', $property->neighborhood);
-        $this->assertDatabaseHas('payments', [
-            'paymentable_type' => Subscription::class,
-            'paymentable_id' => $subscription->id,
-            'status' => 'pending',
-        ]);
+        $this->assertDatabaseCount('payments', 0);
     }
 
-    public function test_submit_without_payable_charge_marks_property_active(): void
+    public function test_listing_country_defaults_to_the_location_session_and_scopes_states(): void
     {
-        [$seller, $category, $state] = $this->seedBaseData();
-        $subscriptionPlan = SubscriptionPlan::query()->create([
-            'name' => 'Professional',
-            'slug' => 'professional',
-            'features' => ['listings' => 3],
-            'seats' => 3,
-            'days' => 30,
+        [$seller] = $this->seedBaseData();
+        $canada = Country::query()->create([
+            'name' => 'Canada',
+            'code' => 'CA',
         ]);
-        $subscription = Subscription::query()->create([
-            'user_id' => $seller->id,
-            'subscription_plan_id' => $subscriptionPlan->id,
-            'seats' => 3,
-            'days' => 30,
-            'start_at' => now()->subDay(),
-            'end_at' => now()->addDays(20),
-            'renew_at' => now()->addDays(20),
-            'status' => 'active',
+        State::query()->create([
+            'name' => 'Ontario',
+            'slug' => 'ontario',
+            'code' => 'ON',
+            'country_id' => $canada->id,
         ]);
+        session()->put('current_location', ['country_id' => $canada->id]);
+
+        Livewire::actingAs($seller)
+            ->test(ListProperty::class)
+            ->assertSet('country_id', $canada->id)
+            ->assertSee('Ontario')
+            ->assertDontSee('Lagos');
+    }
+
+    public function test_selecting_a_country_fetches_its_states_when_none_are_stored(): void
+    {
+        [$seller] = $this->seedBaseData();
+        $ghana = Country::query()->create([
+            'name' => 'Ghana',
+            'code' => 'GH',
+        ]);
+        $geography = \Mockery::mock(GeographyService::class);
+        $geography->shouldReceive('fetchAndSaveStates')
+            ->once()
+            ->withArgs(fn (Country $country): bool => $country->is($ghana))
+            ->andReturnUsing(function (Country $country): void {
+                State::query()->create([
+                    'name' => 'Greater Accra',
+                    'slug' => 'greater-accra',
+                    'code' => 'AA',
+                    'country_id' => $country->id,
+                ]);
+            });
+        $this->app->instance(GeographyService::class, $geography);
+
+        Livewire::actingAs($seller)
+            ->test(ListProperty::class)
+            ->set('country_id', $ghana->id)
+            ->assertSet('state_id', null)
+            ->assertSee('Greater Accra');
+    }
+
+    public function test_submitted_listing_uses_the_selected_country(): void
+    {
+        [$seller, $category] = $this->seedBaseData();
         Storage::fake('public');
+        $canada = Country::query()->create([
+            'name' => 'Canada',
+            'code' => 'CA',
+        ]);
+        $ontario = State::query()->create([
+            'name' => 'Ontario',
+            'slug' => 'ontario',
+            'code' => 'ON',
+            'country_id' => $canada->id,
+        ]);
+        session()->put('current_location', ['country_id' => $canada->id]);
 
         Livewire::actingAs($seller)
             ->test(ListProperty::class)
             ->set('listing_category_id', $category->id)
-            ->set('title', 'Active Listing')
+            ->set('title', 'Canada Listing')
             ->set('description', str_repeat('Description ', 4))
-            ->set('cost', 72000000)
-            ->set('state_id', $state->id)
-            ->set('city', 'Ikeja')
-            ->set('address', '3 Admiralty Way')
-            ->set('neighborhood', 'Lekki')
+            ->set('cost', 70000000)
+            ->set('state_id', $ontario->id)
+            ->set('city', 'Toronto')
+            ->set('address', '20 King Street')
             ->set('contact_name', 'Seller One')
             ->set('contact_phone', '+2348000000000')
             ->set('contact_email', 'seller@example.com')
             ->set('uploadedImages', [UploadedFile::fake()->image('listing.jpg')])
-            ->set('subscription_source', ListProperty::SUBSCRIPTION_SOURCE_EXISTING)
-            ->set('selected_subscription_id', $subscription->id)
             ->call('submitListing')
-            ->assertRedirect();
+            ->assertHasNoErrors();
 
-        $property = Property::query()->firstOrFail();
-        $this->assertSame('live', $property->status);
-        $this->assertDatabaseCount('payments', 0);
-    }
-
-    public function test_submit_with_unused_slots_but_purchase_choice_redirects_to_checkout(): void
-    {
-        [$seller, $category, $state, $currency] = $this->seedBaseData();
-        $heldPlan = SubscriptionPlan::query()->create([
-            'name' => 'Held Pack',
-            'slug' => 'held-pack',
-            'features' => ['listings' => 1],
-            'seats' => 1,
-            'days' => 30,
-        ]);
-        Subscription::query()->create([
-            'user_id' => $seller->id,
-            'subscription_plan_id' => $heldPlan->id,
-            'seats' => 1,
-            'days' => 30,
-            'start_at' => now()->subDay(),
-            'end_at' => now()->addDays(20),
-            'renew_at' => now()->addDays(20),
-            'status' => 'active',
-        ]);
-        $newPlan = SubscriptionPlan::query()->create([
-            'name' => 'Extra Pack',
-            'slug' => 'extra-pack',
-            'features' => ['listings' => 2],
-            'seats' => 2,
-            'days' => 30,
-        ]);
-        Price::query()->create([
-            'amount' => 9900,
-            'currency_id' => $currency->id,
-            'priceable_id' => $newPlan->id,
-            'priceable_type' => SubscriptionPlan::class,
-        ]);
-        Storage::fake('public');
-
-        $test = Livewire::actingAs($seller)
-            ->test(ListProperty::class)
-            ->set('listing_category_id', $category->id)
-            ->set('title', 'Purchase Despite Slots')
-            ->set('description', str_repeat('Description ', 4))
-            ->set('cost', 61000000)
-            ->set('state_id', $state->id)
-            ->set('city', 'Ikeja')
-            ->set('address', '5 Sample Close')
-            ->set('neighborhood', 'Gbagada')
-            ->set('show_address', true)
-            ->set('contact_name', 'Seller One')
-            ->set('contact_phone', '+2348000000000')
-            ->set('contact_email', 'seller@example.com')
-            ->set('uploadedImages', [UploadedFile::fake()->image('listing.jpg')])
-            ->set('subscription_source', ListProperty::SUBSCRIPTION_SOURCE_PURCHASE)
-            ->set('selected_subscription_plan_id', $newPlan->id)
-            ->call('submitListing');
-
-        $this->assertSame(2, Subscription::query()->where('user_id', $seller->id)->count());
-        $property = Property::query()->firstOrFail();
-        $payment = Payment::query()->firstOrFail();
-        $subscription = Subscription::query()->latest('id')->firstOrFail();
-        $test->assertRedirect(route('seller.checkout', ['payment' => $payment->id]));
-        $this->assertSame('draft', $property->status);
-        $this->assertSame('pending', $payment->status);
-        $this->assertDatabaseHas('payments', [
-            'paymentable_type' => Subscription::class,
-            'paymentable_id' => $subscription->id,
+        $this->assertDatabaseHas('properties', [
+            'name' => 'Canada Listing',
+            'country_id' => $canada->id,
+            'state_id' => $ontario->id,
         ]);
     }
 
@@ -244,12 +197,25 @@ class ListPropertyTest extends TestCase
             'status' => 'pending_payment',
             'user_id' => $seller->id,
         ]);
-        $currency = Currency::query()->where('code', 'NGN')->firstOrFail();
+        $country = Country::query()->where('code', 'NG')->firstOrFail();
+        $promotionPlan = PromotionPlan::query()->create([
+            'name' => 'Featured',
+            'slug' => 'featured',
+            'type' => 'featured',
+            'features' => [],
+        ]);
+        $promotion = Promotion::query()->create([
+            'user_id' => $seller->id,
+            'property_id' => $property->id,
+            'promotion_plan_id' => $promotionPlan->id,
+            'start_at' => now(),
+            'status' => 'pending_payment',
+        ]);
         $payment = Payment::query()->create([
             'user_id' => $seller->id,
-            'currency_id' => $currency->id,
-            'paymentable_id' => $property->id,
-            'paymentable_type' => Property::class,
+            'country_id' => $country->id,
+            'paymentable_id' => $promotion->id,
+            'paymentable_type' => Promotion::class,
             'reference' => 'TEST-CHECKOUT-001',
             'amount' => 10000,
             'coupon_value' => 0,
@@ -266,8 +232,36 @@ class ListPropertyTest extends TestCase
             ->assertSee('TEST-CHECKOUT-001');
     }
 
+    public function test_checkout_rejects_non_promotion_payments(): void
+    {
+        [$seller, $category] = $this->seedBaseData();
+        $property = Property::query()->create([
+            'name' => 'Legacy property payment',
+            'slug' => 'legacy-property-payment',
+            'description' => 'A legacy payment for a property listing.',
+            'cost' => 30000000,
+            'category_id' => $category->id,
+            'user_id' => $seller->id,
+        ]);
+        $country = Country::query()->where('code', 'NG')->firstOrFail();
+        $payment = Payment::query()->create([
+            'user_id' => $seller->id,
+            'country_id' => $country->id,
+            'paymentable_id' => $property->id,
+            'paymentable_type' => Property::class,
+            'reference' => 'LEGACY-PROPERTY-001',
+            'amount' => 10000,
+            'total' => 10000,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($seller)
+            ->get(route('seller.checkout', ['payment' => $payment->id]))
+            ->assertNotFound();
+    }
+
     /**
-     * @return array{User, Category, State, City, Currency}
+     * @return array{User, Category, State}
      */
     private function seedBaseData(): array
     {
@@ -275,24 +269,17 @@ class ListPropertyTest extends TestCase
             'name' => 'Nigeria',
             'slug' => 'nigeria',
             'code' => 'NG',
-            'is_active' => true,
+            'currency' => 'Nigerian Naira',
+            'currency_code' => 'NGN',
+            'currency_symbol' => '₦'
         ]);
         $state = State::query()->create([
             'name' => 'Lagos',
             'slug' => 'lagos',
             'code' => 'LA',
-            'country_id' => $country->id,
-            'is_active' => true,
+            'country_id' => $country->id
         ]);
         
-        $currency = Currency::query()->create([
-            'name' => 'Naira',
-            'slug' => 'naira',
-            'code' => 'NGN',
-            'symbol' => '₦',
-            'is_default' => true,
-            'is_active' => true,
-        ]);
         $category = Category::query()->create([
             'name' => 'Landed Properties',
             'slug' => 'landed-properties',
@@ -303,6 +290,6 @@ class ListPropertyTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        return [$seller, $category, $state, $currency];
+        return [$seller, $category, $state];
     }
 }

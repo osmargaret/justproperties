@@ -4,7 +4,7 @@ namespace App\Livewire\Seller;
 
 use App\Livewire\Seller\Concerns\ManagesPropertyListingFields;
 use App\Models\Category;
-use App\Models\Currency;
+use App\Models\Country;
 use App\Models\Media;
 use App\Models\Newsletter;
 use App\Models\Payment;
@@ -14,10 +14,8 @@ use App\Models\PromotionPlan;
 use App\Models\Property;
 use App\Models\Setting;
 use App\Models\State;
-use App\Models\Subscription;
 use App\Services\Content\ContentGenerationService;
 use App\Services\Pricing\ResolvesPlanPrice;
-use App\Services\Subscriptions\ManagesSubscriptionProperties;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -31,8 +29,6 @@ class PropertyDetails extends Component
     use WithFileUploads;
 
     public Property $property;
-
-    public ?Payment $pendingPayment = null;
 
     public string $activeTab = 'overview';
 
@@ -86,8 +82,6 @@ class PropertyDetails extends Component
 
     public ?int $editingPromotionId = null;
 
-    public ?int $selectedSubscriptionId = null;
-
     public ?int $previewPromotionId = null;
 
     public function mount(Property $property): void
@@ -100,7 +94,6 @@ class PropertyDetails extends Component
             'state',
             'media',
             'features',
-            'subscribedPropertyLinks.subscription.plan',
             'promotions.plan',
             'promotions.promotable',
             'promotions.payments',
@@ -116,13 +109,6 @@ class PropertyDetails extends Component
 
         $this->hydrateDynamicAttributesFromProperty($this->property);
         $this->syncEditFieldsFromProperty();
-
-        $this->pendingPayment = Payment::query()
-            ->where('paymentable_type', Property::class)
-            ->where('paymentable_id', $property->id)
-            ->where('status', 'pending')
-            ->latest()
-            ->first();
 
         $requestedTab = request()->query('tab');
         if (is_string($requestedTab) && in_array($requestedTab, ['overview', 'promotions', 'details'], true)) {
@@ -341,7 +327,7 @@ class PropertyDetails extends Component
         }
 
         $quote = $this->selectedPromotionQuote;
-        if (! $quote || ! $quote['currency_id']) {
+        if (! $quote || ! $quote['country_id']) {
             $this->addError('selectedPromotionPlanId', __('Unable to resolve price for your country/currency.'));
 
             return null;
@@ -454,7 +440,8 @@ class PropertyDetails extends Component
 
         $paymentPayload = [
             'user_id' => Auth::id(),
-            'currency_id' => (int) $quote['currency_id'],
+            'country_id' => $quote['country_id'],
+            'currency_code' => $quote['currency_code'],
             'paymentable_id' => $promotion->id,
             'paymentable_type' => Promotion::class,
             'amount' => $amount,
@@ -629,94 +616,10 @@ class PropertyDetails extends Component
     }
 
     #[Computed]
-    public function activeSubscription(): ?Subscription
+    public function activeCurrency(): ?Country
     {
-        return $this->currentSubscriptionAssignment;
-    }
-
-    #[Computed]
-    public function currentSubscriptionAssignment(): ?Subscription
-    {
-        $link = $this->property->activeSubscribedPropertyLink;
-
-        return $link?->subscription?->loadMissing('plan');
-    }
-
-    #[Computed]
-    public function assignableSubscriptions()
-    {
-        $userId = Auth::id();
-        $propertyId = $this->property->id;
-
-        return Subscription::query()
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->where('end_at', '>=', now())
-            ->with('plan')
-            ->withCount('subscribedProperties')
-            ->orderByDesc('end_at')
-            ->get()
-            ->filter(function (Subscription $subscription) use ($propertyId) {
-                $onThisPlan = $subscription->subscribedProperties()
-                    ->where('property_id', $propertyId)
-                    ->exists();
-
-                return $onThisPlan || $subscription->remainingSeats() > 0;
-            })
-            ->values();
-    }
-
-    public function assignPropertyToSubscription(): void
-    {
-        $this->validate([
-            'selectedSubscriptionId' => ['required', 'integer', 'exists:subscriptions,id'],
-        ]);
-
-        $subscription = Subscription::query()
-            ->whereKey($this->selectedSubscriptionId)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        app(ManagesSubscriptionProperties::class)->assign(
-            $this->property,
-            $subscription,
-            Auth::user(),
-        );
-
-        $this->property->load(['subscribedPropertyLinks.subscription.plan']);
-        $this->selectedSubscriptionId = null;
-        unset($this->currentSubscriptionAssignment, $this->activeSubscription, $this->assignableSubscriptions);
-
-        session()->flash('status', __('Property assigned to subscription.'));
-    }
-
-    public function removePropertyFromSubscription()
-    {
-        $subscription = $this->currentSubscriptionAssignment;
-        if (! $subscription) {
-            return;
-        }
-
-        app(ManagesSubscriptionProperties::class)->remove(
-            $this->property,
-            $subscription,
-            Auth::user(),
-        );
-
-        $this->property->load(['subscribedPropertyLinks.subscription.plan']);
-        unset($this->currentSubscriptionAssignment, $this->activeSubscription, $this->assignableSubscriptions);
-        session()->flash('status', __('Property removed from subscription.'));
-        return redirect(request()->header('Referer'));
-    }
-
-    #[Computed]
-    public function activeCurrency(): ?Currency
-    {
-        return Currency::query()
-            ->where('is_active', true)
-            ->where(function ($query) {
-                $query->where('is_default', true)->orWhere('code', 'NGN');
-            })
+        return Country::query()
+            ->when(Auth::user()?->country_id, fn ($query, $countryId) => $query->whereKey($countryId))
             ->orderByDesc('is_default')
             ->first();
     }
@@ -847,7 +750,7 @@ class PropertyDetails extends Component
         }
 
         return $plans->map(function (PromotionPlan $plan) use ($resolver, $user) {
-            $quote = $resolver->forUser(PromotionPlan::class, $plan->id, $user);
+            $quote = $resolver->forUser($plan, $user);
 
             return [
                 'plan' => $plan,
@@ -876,7 +779,7 @@ class PropertyDetails extends Component
             return null;
         }
 
-        return app(ResolvesPlanPrice::class)->forUser(PromotionPlan::class, $plan->id, $user);
+        return app(ResolvesPlanPrice::class)->forUser($plan, $user);
     }
 
     protected function persistNewMedia(): void
@@ -908,7 +811,7 @@ class PropertyDetails extends Component
     {
         return view('livewire.seller.property-details', [
             'categories' => Category::query()->with('fields')->orderBy('name', 'asc')->get(),
-            'states' => State::query()->where('is_active', true)->orderBy('name', 'asc')->get(),
+            'states' => State::query()->orderBy('name', 'asc')->get(),
             'cities' => collect(),
         ]);
     }

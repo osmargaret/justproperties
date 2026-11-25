@@ -72,10 +72,9 @@
             </div>
         </div>
 
-        <!-- Individual Ad Spot Rates (Per Week / Per 1,000 Emails) -->
         <div>
             <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wider mb-4 text-emerald-800 flex items-center gap-2">
-                <i class="ri-layout-grid-line"></i> Individual Ad Spot Rates (Weekly & Email CPM)
+                <i class="ri-layout-grid-line"></i> Advertising Plans &amp; Multi-Currency Rates
             </h2>
             <div class="overflow-x-auto border border-gray-200 rounded-xl">
                 <table class="w-full text-left text-xs sm:text-sm divide-y divide-gray-200">
@@ -85,52 +84,25 @@
                             <th class="p-3.5">Ad Format</th>
                             <th class="p-3.5">Dimensions</th>
                             <th class="p-3.5">Billing Basis</th>
-                            <th class="p-3.5 text-right">Rate (NGN / USD)</th>
+                            <th class="p-3.5 text-right">Configured Rates</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 text-gray-700">
-                        <tr>
-                            <td class="p-3.5 font-bold text-gray-900">1. Homepage Hero Banner</td>
-                            <td class="p-3.5">Top Leaderboard</td>
-                            <td class="p-3.5 font-mono text-xs">1200 x 300 px</td>
-                            <td class="p-3.5"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Per Week</span></td>
-                            <td class="p-3.5 font-bold text-right text-emerald-700">₦35,000 <span class="text-gray-400 font-normal">($25)/wk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="p-3.5 font-bold text-gray-900">2. Catalog & Listing Pages</td>
-                            <td class="p-3.5">Billboard Banner</td>
-                            <td class="p-3.5 font-mono text-xs">970 x 250 px</td>
-                            <td class="p-3.5"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Per Week</span></td>
-                            <td class="p-3.5 font-bold text-right text-emerald-700">₦25,000 <span class="text-gray-400 font-normal">($18)/wk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="p-3.5 font-bold text-gray-900">3. Property Details Page</td>
-                            <td class="p-3.5">Sticky Sidebar & Calculator Ad</td>
-                            <td class="p-3.5 font-mono text-xs">300 x 250 px</td>
-                            <td class="p-3.5"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Per Week</span></td>
-                            <td class="p-3.5 font-bold text-right text-emerald-700">₦20,000 <span class="text-gray-400 font-normal">($15)/wk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="p-3.5 font-bold text-gray-900">4. Blog & Article Sidebar</td>
-                            <td class="p-3.5">Skyscraper / In-Article</td>
-                            <td class="p-3.5 font-mono text-xs">300 x 600 px</td>
-                            <td class="p-3.5"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Per Week</span></td>
-                            <td class="p-3.5 font-bold text-right text-emerald-700">₦15,000 <span class="text-gray-400 font-normal">($10)/wk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="p-3.5 font-bold text-gray-900">5. Newsletter & Email</td>
-                            <td class="p-3.5">Sponsored Email Header</td>
-                            <td class="p-3.5 font-mono text-xs">600 x 200 px</td>
-                            <td class="p-3.5"><span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-bold rounded">Per 1,000 Emails</span></td>
-                            <td class="p-3.5 font-bold text-right text-emerald-700">₦30,000 <span class="text-gray-400 font-normal">($20)/1k</span></td>
-                        </tr>
-                        <tr>
-                            <td class="p-3.5 font-bold text-gray-900">6. Partner Directory Listing</td>
-                            <td class="p-3.5">Featured Directory Profile</td>
-                            <td class="p-3.5 font-mono text-xs">Logo + 50 Words</td>
-                            <td class="p-3.5"><span class="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] font-bold rounded">Per Month</span></td>
-                            <td class="p-3.5 font-bold text-right text-emerald-700">₦50,000 <span class="text-gray-400 font-normal">($35)/mo</span></td>
-                        </tr>
+                        @forelse ($advertisementPlans as $plan)
+                            <tr>
+                                <td class="p-3.5 font-bold text-gray-900">{{ $plan->name }}</td>
+                                <td class="p-3.5">{{ $plan->spaces->pluck('name')->join(', ') }}</td>
+                                <td class="p-3.5 font-mono text-xs">{{ $plan->spaces->pluck('dimensions')->filter()->unique()->join(', ') ?: '—' }}</td>
+                                <td class="p-3.5">Per {{ $plan->billing_quantity > 1 ? $plan->billing_quantity.' ' : '' }}{{ $plan->billing_period }}{{ $plan->billing_quantity > 1 && $plan->billing_period !== 'email' ? 's' : '' }}</td>
+                                <td class="p-3.5 text-right font-bold text-emerald-700">
+                                    @foreach ($plan->prices as $price)
+                                        <div>{{ $price->currency?->currency_symbol }}{{ number_format((float) $price->amount, 2) }} {{ $price->currency?->currency_code }}{{ $price->is_default ? ' *' : '' }}</div>
+                                    @endforeach
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="p-6 text-center text-gray-500">Advertising plans and rates are not available yet.</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -138,49 +110,34 @@
 
         {{-- <div class="page-break"></div> --}}
 
-        <!-- Premium Bundle Packages -->
         <div>
             <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wider mb-4 text-emerald-800 flex items-center gap-2">
-                <i class="ri-price-tag-3-line"></i> Premium Bundle Packages (Multi-Spot Savings)
+                <i class="ri-price-tag-3-line"></i> Available Advertising Plans
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Starter Package -->
-                <div class="border border-gray-200 rounded-2xl p-6 bg-white space-y-3 relative">
-                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full">Monthly Bundle</span>
-                    <h3 class="font-extrabold text-gray-900 text-lg">Starter Package</h3>
-                    <p class="text-2xl font-black text-emerald-600">₦150,000 <span class="text-xs font-normal text-gray-500">/ mo</span></p>
-                    <ul class="text-xs space-y-2 text-gray-600 pt-2 border-t border-gray-100">
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> 1 Placement Area Spot</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> 50,000 Guaranteed Impressions</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> Monthly Analytics Report</li>
-                    </ul>
-                </div>
-
-                <!-- Growth Package -->
-                <div class="border-2 border-emerald-500 rounded-2xl p-6 bg-emerald-50/40 space-y-3 relative shadow-md">
-                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-emerald-600 text-white rounded-full">Quarterly (Most Popular)</span>
-                    <h3 class="font-extrabold text-gray-900 text-lg">Growth Package</h3>
-                    <p class="text-2xl font-black text-emerald-600">₦380,000 <span class="text-xs font-normal text-gray-500">/ 3 mos</span></p>
-                    <ul class="text-xs space-y-2 text-gray-700 pt-2 border-t border-emerald-200">
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> 2 Placement Area Spots</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> 180,000 Guaranteed Impressions</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> Priority Rotator & Custom CTA</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> Save 15% vs Monthly</li>
-                    </ul>
-                </div>
-
-                <!-- Enterprise Partner -->
-                <div class="border border-gray-200 rounded-2xl p-6 bg-white space-y-3 relative">
-                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-yellow-100 text-yellow-800 rounded-full">Annual (Best Value)</span>
-                    <h3 class="font-extrabold text-gray-900 text-lg">Enterprise Partner</h3>
-                    <p class="text-2xl font-black text-emerald-600">₦1,200,000 <span class="text-xs font-normal text-gray-500">/ year</span></p>
-                    <ul class="text-xs space-y-2 text-gray-600 pt-2 border-t border-gray-100">
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> All 6 Placement Spots Included</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> 750,000+ Impressions</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> Newsletter & Email Feature</li>
-                        <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> Save 33% Annual Discount</li>
-                    </ul>
-                </div>
+                @forelse ($advertisementPlans as $plan)
+                    <div class="border border-gray-200 rounded-2xl p-6 bg-white space-y-3 relative">
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full">{{ $plan->billing_quantity }} {{ $plan->billing_period }} plan</span>
+                        <h3 class="font-extrabold text-gray-900 text-lg">{{ $plan->name }}</h3>
+                        @if ($plan->description)<p class="text-sm text-gray-600">{{ $plan->description }}</p>@endif
+                        @foreach ($plan->prices as $price)
+                            <p class="text-xl font-black text-emerald-600">{{ $price->currency?->currency_symbol }}{{ number_format((float) $price->amount, 2) }} <span class="text-xs font-normal text-gray-500">{{ $price->currency?->currency_code }}{{ $price->is_default ? ' · default' : '' }}</span></p>
+                        @endforeach
+                        <ul class="text-xs space-y-2 text-gray-600 pt-2 border-t border-gray-100">
+                            @foreach ($plan->spaces as $space)
+                                <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> {{ $space->name }}</li>
+                            @endforeach
+                            @foreach ($plan->features ?? [] as $feature)
+                                <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> {{ $feature }}</li>
+                            @endforeach
+                            @if ($plan->impressions_included)
+                                <li class="flex items-center gap-1.5"><i class="ri-check-line text-emerald-600 font-bold"></i> {{ number_format($plan->impressions_included) }} impressions included</li>
+                            @endif
+                        </ul>
+                    </div>
+                @empty
+                    <p class="col-span-full text-center text-gray-500">No advertising plans are available yet.</p>
+                @endforelse
             </div>
         </div>
 

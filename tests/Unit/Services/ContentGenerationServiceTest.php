@@ -43,14 +43,14 @@ class ContentGenerationServiceTest extends TestCase
             'name' => 'Nigeria',
             'slug' => 'nigeria',
             'code' => 'NG',
-            'is_active' => true,
+            
         ]);
         $state = State::query()->create([
             'name' => 'Lagos',
             'slug' => 'lagos',
             'code' => 'LA',
             'country_id' => $country->id,
-            'is_active' => true,
+            
         ]);
         
         $category = Category::query()->create([

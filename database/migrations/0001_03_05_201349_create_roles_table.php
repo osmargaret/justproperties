@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->nullable();
             $table->json('users_permission')->nullable();
-            $table->json('subscriptions_permission')->nullable();
             $table->json('promotions_permission')->nullable();
             $table->json('properties_permission')->nullable();
             $table->json('posts_permission')->nullable();

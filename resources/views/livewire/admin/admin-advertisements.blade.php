@@ -2,6 +2,9 @@
     @if (session('status'))
         <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('status') }}</div>
     @endif
+    @if (session('error'))
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') }}</div>
+    @endif
 
     <div class="mb-4 flex items-center justify-between">
         <button wire:click="openCreateAd" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
@@ -11,10 +14,10 @@
 
     <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-4">
         <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search company or email..." class="rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-        <select wire:model.live="placementFilter" class="rounded-lg border border-gray-200 px-3 py-2 text-sm">
-            <option value="">All Placements</option>
-            @foreach ($placements as $place)
-                <option value="{{ $place }}">{{ str_replace('_', ' ', $place) }}</option>
+        <select wire:model.live="planFilter" class="rounded-lg border border-gray-200 px-3 py-2 text-sm">
+            <option value="">All Plans</option>
+            @foreach ($plans as $plan)
+                <option value="{{ $plan->id }}">{{ $plan->name }}</option>
             @endforeach
         </select>
         <select wire:model.live="statusFilter" class="rounded-lg border border-gray-200 px-3 py-2 text-sm">
@@ -30,7 +33,7 @@
                 <tr>
                     <th class="px-4 py-3">Company</th>
                     <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Placement</th>
+                    <th class="px-4 py-3">Plan</th>
                     <th class="px-4 py-3">Duration</th>
                     <th class="px-4 py-3">Amount</th>
                     <th class="px-4 py-3">Status</th>
@@ -42,7 +45,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $ad->company }}</td>
                         <td class="px-4 py-3">{{ $ad->email }}</td>
-                        <td class="px-4 py-3 capitalize">{{ str_replace('_', ' ', $ad->placement) }}</td>
+                        <td class="px-4 py-3">{{ $ad->advertisementPlan?->name ?? '—' }}</td>
                         <td class="px-4 py-3 text-xs">
                             @if ($ad->start_date && $ad->end_date)
                                 {{ $ad->start_date->format('M d, Y') }} — {{ $ad->end_date->format('M d, Y') }}
@@ -50,7 +53,7 @@
                                 —
                             @endif
                         </td>
-                        <td class="px-4 py-3">₦{{ number_format((float) $ad->amount, 2) }}</td>
+                        <td class="px-4 py-3">{{ $ad->currency?->currency_symbol }}{{ number_format((float) $ad->amount, 2) }} {{ $ad->currency?->currency_code }}</td>
                         <td class="px-4 py-3">
                             <span class="capitalize text-xs px-2 py-0.5 rounded font-medium {{ $ad->payment_status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
                                 {{ $ad->payment_status }}
@@ -82,8 +85,9 @@
                     <div class="space-y-3">
                         <p><span class="font-medium text-gray-500 block">Company:</span> <strong class="text-gray-900">{{ $selectedAd->company }}</strong></p>
                         <p><span class="font-medium text-gray-500 block">Contact Email:</span> {{ $selectedAd->email }}</p>
-                        <p><span class="font-medium text-gray-500 block">Placement:</span> <span class="capitalize">{{ str_replace('_', ' ', $selectedAd->placement) }}</span></p>
-                        <p><span class="font-medium text-gray-500 block">Amount:</span> ₦{{ number_format((float) $selectedAd->amount, 2) }}</p>
+                        <p><span class="font-medium text-gray-500 block">Plan:</span> {{ $selectedAd->advertisementPlan?->name ?? '—' }}</p>
+                        <p><span class="font-medium text-gray-500 block">Spaces:</span> {{ $selectedAd->advertisementPlan?->spaces->pluck('name')->join(', ') ?: '—' }}</p>
+                        <p><span class="font-medium text-gray-500 block">Amount:</span> {{ $selectedAd->currency?->currency_symbol }}{{ number_format((float) $selectedAd->amount, 2) }} {{ $selectedAd->currency?->currency_code }}</p>
                         <p><span class="font-medium text-gray-500 block">Payment Status:</span> <span class="capitalize font-semibold px-2 py-0.5 rounded text-xs {{ $selectedAd->payment_status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">{{ $selectedAd->payment_status }}</span></p>
                         <p><span class="font-medium text-gray-500 block">Description / Target URL:</span> {{ $selectedAd->description ?? '—' }}</p>
 
@@ -164,18 +168,25 @@
 
                     <div class="grid md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block font-medium text-gray-700 mb-1">Placement *</label>
-                            <select wire:model="new_placement" class="w-full rounded-lg border-gray-300 px-3 py-2" required>
-                                @foreach ($placements as $place)
-                                    <option value="{{ $place }}">{{ str_replace('_', ' ', $place) }}</option>
+                            <label class="block font-medium text-gray-700 mb-1">Advertising Plan *</label>
+                            <select wire:model.live="new_plan_id" class="w-full rounded-lg border-gray-300 px-3 py-2" required>
+                                <option value="">Select a plan</option>
+                                @foreach ($plans as $plan)
+                                    <option value="{{ $plan->id }}">{{ $plan->name }}</option>
                                 @endforeach
                             </select>
-                            @error('new_placement') <span class="text-red-600 text-xs mt-1">{{ $message }}</span> @enderror
+                            @error('new_plan_id') <span class="text-red-600 text-xs mt-1">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <label class="block font-medium text-gray-700 mb-1">Amount (₦) *</label>
-                            <input type="number" step="0.01" wire:model="new_amount" class="w-full rounded-lg border-gray-300 px-3 py-2" required />
-                            @error('new_amount') <span class="text-red-600 text-xs mt-1">{{ $message }}</span> @enderror
+                            <label class="block font-medium text-gray-700 mb-1">Currency *</label>
+                            <select wire:model="new_currency_id" class="w-full rounded-lg border-gray-300 px-3 py-2" required>
+                                <option value="">Select a currency</option>
+                                @foreach ($prices as $price)
+                                    <option value="{{ $price->currency_id }}">{{ $price->currency?->currency_code }} {{ $price->currency?->currency_symbol }}{{ number_format((float) $price->amount, 2) }}{{ $price->is_default ? ' (default)' : '' }}</option>
+                                @endforeach
+                            </select>
+                            @error('new_currency_id') <span class="text-red-600 text-xs mt-1">{{ $message }}</span> @enderror
+                            <p class="mt-1 text-xs text-gray-500">The plan's configured price will be recorded automatically.</p>
                         </div>
                     </div>
 

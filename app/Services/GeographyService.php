@@ -5,68 +5,45 @@ namespace App\Services;
 
 use App\Models\Country;
 use App\Models\State;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Ixudra\Curl\Facades\Curl;
 
 class GeographyService
 {
     private const BASE_URL = 'https://api.countrystatecity.in/v1/countries';
 
     /**
-     * Fetch and persist states + cities for the given country.
-     * Uses the countrystatecity.in API with X-CSCAPI-KEY header.
+     * Fetch and persist states for the given country.
      * Safe to call multiple times — uses updateOrCreate internally.
      */
-    public function fetchAndSave(Country $country): void
+    public function fetchAndSaveStates(Country $country): void
     {
         try {
             $this->fetchStates($country);
-            // Cities are no longer stored in a separate table; skip city persistence.
-            // $this->fetchCities($country);
         } catch (\Throwable $e) {
             Log::warning('GeographyService: failed to fetch geography for country '.$country->code, [
                 'error' => $e->getMessage(),
             ]);
+
+            throw $e;
         }
     }
-
-    // -------------------------------------------------------------------------
-    // Internals
-    // -------------------------------------------------------------------------
 
     protected function apiKey(): string
     {
-        return config('services.countrystatecity.key', '');
+        return config('services.countrystatecity', '');
     }
 
-    /**
-     * Fetch all states for a country and save them.
-     * GET https://api.countrystatecity.in/v1/countries/{country_code}/states
-     */
     protected function fetchStates(Country $country): void
     {
-        $response = Http::withHeaders([
-            'X-CSCAPI-KEY' => $this->apiKey(),
-        ])->timeout(15)->get(self::BASE_URL."/{$country->code}/states");
-
-        if (! $response->successful()) {
-            Log::warning('GeographyService: HTTP error fetching states', [
-                'country' => $country->code,
-                'status'  => $response->status(),
-                'message' => $response->body(),
-            ]);
-
-            return;
-        }
-
-        $states = $response->json();
-
-        if (! is_array($states)) {
-            return;
-        }
+        $states = $this->fetchApiData(self::BASE_URL."/{$country->code}/states");
 
         foreach ($states as $stateData) {
+            if (! is_array($stateData)) {
+                continue;
+            }
+
             $stateName = $stateData['name'] ?? null;
             if (! $stateName) {
                 continue;
@@ -82,19 +59,34 @@ class GeographyService
                     'latitude'  => $stateData['latitude'] ?? null,
                     'longitude' => $stateData['longitude'] ?? null,
                     'timezone'  => null, // state-level timezone not in this API
-                    'is_active' => true,
                 ]
             );
         }
     }
 
-    /**
-     * Fetch all cities for a country and save them, linking to the matching state.
-     * GET https://api.countrystatecity.in/v1/countries/{country_code}/cities
-     */
-    protected function fetchCities(Country $country): void
+    protected function fetchApiData(string $url): array
     {
-        // Cities are now captured as freeform input on properties; we no longer persist city rows.
-        return;
+        $response = Curl::to($url)
+            ->withHeaders(['X-CSCAPI-KEY' => $this->apiKey()])
+            ->withTimeout(15)
+            ->returnResponseObject()
+            ->get();
+
+        if (isset($response->error)) {
+            throw new \RuntimeException('GeographyService: API request failed: '.$response->error);
+        }
+
+        if ($response->status < 200 || $response->status >= 300) {
+            throw new \RuntimeException('GeographyService: API returned HTTP '.$response->status);
+        }
+
+        $data = json_decode($response->content, true, 512, JSON_THROW_ON_ERROR);
+
+        if (! is_array($data) || ! array_is_list($data)) {
+            throw new \UnexpectedValueException('GeographyService: invalid API response');
+        }
+
+        return $data;
     }
+
 }

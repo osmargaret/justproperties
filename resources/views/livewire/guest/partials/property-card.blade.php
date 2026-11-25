@@ -22,8 +22,17 @@
         @if($property->promotions()->where('status', 'active')->exists())
         <div class="absolute top-3 left-0 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-3 py-1 text-xs font-bold transform -skew-x-12"><span class="block transform skew-x-12">⭐ BOOSTED</span></div>
         @endif
+
+        @auth
+            <form method="POST" action="{{ route('properties.bookmark.toggle', $property) }}" class="absolute top-3 right-3">
+                @csrf
+                <button type="submit" aria-label="Toggle bookmark" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-emerald-700 shadow hover:bg-white">
+                    <i class="{{ auth()->user()->savedProperties()->where('property_id', $property->id)->exists() ? 'ri-bookmark-fill' : 'ri-bookmark-line' }}"></i>
+                </button>
+            </form>
+        @endauth
         
-        <div class="absolute top-3 right-3 px-2.5 py-1 bg-emerald-500 text-white text-xs font-semibold rounded-full">Available</div>
+        <div class="absolute top-3 right-14 px-2.5 py-1 bg-emerald-500 text-white text-xs font-semibold rounded-full">Available</div>
         <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1.5">
             <i class="ri-eye-line text-white text-xs"></i><span class="text-white text-xs">{{ number_format($property->viewed_by_users_count ?? 0) }}</span>
         </div>

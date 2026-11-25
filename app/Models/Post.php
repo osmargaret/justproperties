@@ -65,6 +65,11 @@ class Post extends Model
         return $this->hasMany(PostComment::class);
     }
 
+    public function viewedByUsers(): HasMany
+    {
+        return $this->hasMany(ViewedPost::class);
+    }
+
     public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable');

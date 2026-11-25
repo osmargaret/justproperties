@@ -5,17 +5,13 @@ namespace App\Livewire\Seller;
 use App\Exports\PropertyBulkTemplateExport;
 use App\Models\Category;
 use App\Models\CategoryField;
-use App\Models\Currency;
+use App\Models\Country;
 use App\Models\Media;
-use App\Models\Payment;
-use App\Models\Price;
 use App\Models\Property;
 use App\Models\PropertyFeature;
 use App\Models\State;
-use App\Models\SubscribedProperty;
-use App\Models\Subscription;
-use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\GeographyService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -41,6 +37,8 @@ class ListProperty extends Component
     public string $description = '';
 
     public ?float $cost = null;
+
+    public ?int $country_id = null;
 
     public ?int $state_id = null;
 
@@ -68,47 +66,32 @@ class ListProperty extends Component
 
     public array $bulkUploadErrors = [];
 
-    public ?int $selected_subscription_id = null;
-
-    public ?int $selected_subscription_plan_id = null;
-
-    /**
-     * When the seller has unused subscription slots: {@see self::SUBSCRIPTION_SOURCE_EXISTING} uses a seat;
-     * {@see self::SUBSCRIPTION_SOURCE_PURCHASE} buys a new plan for this listing.
-     */
-    public string $subscription_source = self::SUBSCRIPTION_SOURCE_EXISTING;
-
-    public const SUBSCRIPTION_SOURCE_EXISTING = 'existing';
-
-    public const SUBSCRIPTION_SOURCE_PURCHASE = 'purchase';
-
     /**
      * @var array<string, mixed>
      */
     public array $dynamicAttributes = [];
 
-    private ?int $latestPendingPaymentId = null;
-
     public function mount(): void
     {
         /** @var User|null $user */
         $user = Auth::user();
-        if ($user && $user->active_role !== 'seller') {
-            $user->forceFill(['active_role' => 'seller'])->save();
-        }
+        $locationCountryId = session('current_location.country_id');
+        $country = $locationCountryId
+            ? Country::query()->find($locationCountryId)
+            : null;
+        $country ??= $user?->country_id
+            ? Country::query()->find($user->country_id)
+            : null;
+        $country ??= Country::query()->where('is_default', true)->first()
+            ?? Country::query()->where('code', 'NG')->first()
+            ?? Country::query()->orderBy('name')->first();
 
+        $this->country_id = $country?->id;
+        $this->ensureStatesExistForCountry($country);
         $this->contact_name = (string) ($user?->name ?? '');
         $this->contact_phone = (string) ($user?->phone ?? '');
         $this->contact_email = (string) ($user?->email ?? '');
         $this->contact_whatsapp = (string) ($user?->phone ?? '');
-        if ($this->availableSubscriptions->isNotEmpty()) {
-            $this->subscription_source = self::SUBSCRIPTION_SOURCE_EXISTING;
-            $this->selected_subscription_id = $this->availableSubscriptions->first()?->id;
-            $this->selected_subscription_plan_id = null;
-        } else {
-            $this->subscription_source = self::SUBSCRIPTION_SOURCE_PURCHASE;
-            $this->selected_subscription_id = null;
-        }
     }
 
     public function updatedListingCategoryId(mixed $value): void
@@ -141,20 +124,15 @@ class ListProperty extends Component
         $this->city = null;
     }
 
-    public function updatedSubscriptionSource(string $value): void
+    public function updatedCountryId(mixed $value): void
     {
-        if ($value === self::SUBSCRIPTION_SOURCE_EXISTING) {
-            $this->selected_subscription_plan_id = null;
-            if (! (int) $this->selected_subscription_id && $this->availableSubscriptions->isNotEmpty()) {
-                $this->selected_subscription_id = (int) $this->availableSubscriptions->first()->id;
-            }
+        $this->state_id = null;
+        $this->city = null;
 
-            return;
-        }
-
-        if ($value === self::SUBSCRIPTION_SOURCE_PURCHASE) {
-            $this->selected_subscription_id = null;
-        }
+        $country = $value !== null && $value !== ''
+            ? Country::query()->find((int) $value)
+            : null;
+        $this->ensureStatesExistForCountry($country);
     }
 
     public function removeImage(int $index): void
@@ -189,21 +167,6 @@ class ListProperty extends Component
     public function submitListing(): mixed
     {
         $property = $this->persistPropertyWorkflow('submit');
-        $requiresPayment = $this->requiresPayment();
-
-        if ($requiresPayment) {
-            session()->flash('status', __('Listing saved. Complete checkout to publish it.'));
-            $paymentId = $this->latestPendingPaymentId ?? Payment::query()
-                ->where('user_id', Auth::id())
-                ->where('paymentable_type', Subscription::class)
-                ->where('status', 'pending')
-                ->latest('id')
-                ->value('id');
-
-            if ($paymentId) {
-                return redirect()->route('seller.checkout', ['payment' => $paymentId]);
-            }
-        }
 
         session()->flash('status', __('Listing submitted successfully.'));
 
@@ -246,7 +209,7 @@ class ListProperty extends Component
                     'cost' => (float) ($row['cost'] ?? 0),
                     'category_id' => $category->id,
                     'location' => null,
-                    'country_id' => $user->country_id,
+                    'country_id' => $this->country_id,
                     'state_id' => $this->lookupStateId($row['state_code'] ?? null, $row['state_name'] ?? null),
                     'city' => $row['city'] ?? null,
                     'neighborhood' => (string) ($row['neighborhood'] ?? ''),
@@ -314,97 +277,19 @@ class ListProperty extends Component
         return Category::query()->with('fields')->find($this->listing_category_id);
     }
 
-    #[Computed]
-    public function availableSubscriptions(): Collection
-    {
-        $user = Auth::user();
-        if (! $user) {
-            return collect();
-        }
-
-        return Subscription::query()
-            ->where('user_id', $user->id)
-            ->where('status', 'active')
-            ->where('end_at', '>=', now())
-            ->with('plan')
-            ->withCount('subscribedProperties')
-            ->get()
-            ->map(function (Subscription $subscription) {
-                $remaining = max(0, (int) $subscription->seats - (int) $subscription->subscribed_properties_count);
-                $subscription->remaining_slots = $remaining;
-
-                return $subscription;
-            })
-            ->filter(fn (Subscription $subscription) => (int) $subscription->remaining_slots > 0)
-            ->values();
-    }
-
-    #[Computed]
-    public function hasUnusedSubscriptions(): bool
-    {
-        return $this->availableSubscriptions->isNotEmpty();
-    }
-
-    #[Computed]
-    public function activeCurrency(): ?Currency
-    {
-        return Currency::query()
-            ->where('is_active', true)
-            ->where(function ($query) {
-                $query->where('is_default', true)->orWhere('code', 'NGN');
-            })
-            ->orderByDesc('is_default')
-            ->first();
-    }
-
-    public function subscriptionAmount(): float
-    {
-        $purchasePlan = (int) $this->selected_subscription_plan_id > 0
-            && (
-                ! $this->hasUnusedSubscriptions
-                || $this->subscription_source === self::SUBSCRIPTION_SOURCE_PURCHASE
-            );
-
-        if (! $purchasePlan) {
-            return 0.0;
-        }
-
-        return $this->resolveAmountForPriceable(SubscriptionPlan::class, (int) $this->selected_subscription_plan_id);
-    }
-
-    public function subtotalAmount(): float
-    {
-        return round($this->subscriptionAmount(), 2);
-    }
-
-    public function vatRate(): float
-    {
-        return $this->subtotalAmount() > 0 ? 7.5 : 0.0;
-    }
-
-    public function vatAmount(): float
-    {
-        return round(($this->subtotalAmount() * $this->vatRate()) / 100, 2);
-    }
-
-    public function totalAmount(): float
-    {
-        return round($this->subtotalAmount() + $this->vatAmount(), 2);
-    }
-
-    public function requiresPayment(): bool
-    {
-        return $this->totalAmount() > 0;
-    }
-
     protected function rules(): array
     {
         return [
             'title' => ['required', 'string', 'max:255'],
             'listing_category_id' => ['required', 'exists:categories,id'],
+            'country_id' => ['required', 'integer', 'exists:countries,id'],
             'cost' => ['required', 'numeric', 'min:0'],
             'description' => ['required', 'string', 'min:20'],
-            'state_id' => ['required', 'exists:states,id'],
+            'state_id' => [
+                'required',
+                'integer',
+                Rule::exists('states', 'id')->where('country_id', $this->country_id),
+            ],
             'city' => ['nullable', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'neighborhood' => ['nullable', 'string', 'max:255'],
@@ -415,9 +300,6 @@ class ListProperty extends Component
             'contact_whatsapp' => ['nullable', 'string', 'max:40'],
             'uploadedImages' => ['required', 'array', 'min:1', 'max:10'],
             'uploadedImages.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-            'selected_subscription_id' => ['nullable', 'integer'],
-            'selected_subscription_plan_id' => ['nullable', 'integer', 'exists:subscription_plans,id'],
-            'subscription_source' => ['nullable', 'string', Rule::in([self::SUBSCRIPTION_SOURCE_EXISTING, self::SUBSCRIPTION_SOURCE_PURCHASE])],
         ];
     }
 
@@ -454,30 +336,12 @@ class ListProperty extends Component
     {
         return [
             'listing_category_id' => 'listing category',
+            'country_id' => 'country',
             'cost' => 'cost',
             'state_id' => 'state',
             'city' => 'city/LGA',
             'uploadedImages' => 'property images',
-            'selected_subscription_id' => 'existing subscription',
-            'selected_subscription_plan_id' => 'subscription plan',
-            'subscription_source' => 'subscription option',
         ];
-    }
-
-    private function resolveAmountForPriceable(string $priceableType, int $priceableId): float
-    {
-        $currency = $this->activeCurrency;
-        if (! $currency) {
-            return 0.0;
-        }
-
-        $price = Price::query()
-            ->where('currency_id', $currency->id)
-            ->where('priceable_type', $priceableType)
-            ->where('priceable_id', $priceableId)
-            ->value('amount');
-
-        return $price !== null ? (float) $price : 0.0;
     }
 
     private function persistFeatures(Property $property): void
@@ -523,49 +387,18 @@ class ListProperty extends Component
         }
     }
 
-    private function resolveOrCreateSubscriptionForListing(bool $requiresPayment): ?Subscription
-    {
-        if (
-            $this->hasUnusedSubscriptions
-            && $this->subscription_source === self::SUBSCRIPTION_SOURCE_EXISTING
-            && (int) $this->selected_subscription_id > 0
-        ) {
-            return Subscription::query()
-                ->where('user_id', Auth::id())
-                ->whereKey((int) $this->selected_subscription_id)
-                ->first();
-        }
-
-        if (! (int) $this->selected_subscription_plan_id) {
-            return null;
-        }
-
-        $plan = SubscriptionPlan::query()->find($this->selected_subscription_plan_id);
-        if (! $plan) {
-            return null;
-        }
-
-        return Subscription::query()->create([
-            'user_id' => Auth::id(),
-            'subscription_plan_id' => $plan->id,
-            'seats' => max(1, (int) $plan->seats),
-            'days' => max(1, (int) $plan->days),
-            'start_at' => now(),
-            'end_at' => now()->addDays(max(1, (int) $plan->days)),
-            'renew_at' => now()->addDays(max(1, (int) $plan->days)),
-            'status' => $requiresPayment ? 'pending' : 'active',
-        ]);
-    }
-
-
     private function lookupStateId(?string $code, ?string $name): ?int
     {
-        /** @var \App\Models\User|null $user */
-        $user = Auth::user();
+        if (! $this->country_id) {
+            return null;
+        }
 
         // 1) try exact code match
         if ($code) {
-            $id = State::query()->whereRaw('LOWER(code) = ?', [Str::lower($code)])->value('id');
+            $id = State::query()
+                ->where('country_id', $this->country_id)
+                ->whereRaw('LOWER(code) = ?', [Str::lower($code)])
+                ->value('id');
             if ($id) {
                 return (int) $id;
             }
@@ -573,51 +406,32 @@ class ListProperty extends Component
 
         // 2) try exact name match
         if ($name) {
-            $id = State::query()->whereRaw('LOWER(name) = ?', [Str::lower($name)])->value('id');
+            $id = State::query()
+                ->where('country_id', $this->country_id)
+                ->whereRaw('LOWER(name) = ?', [Str::lower($name)])
+                ->value('id');
             if ($id) {
                 return (int) $id;
             }
 
             // 2b) fuzzy LIKE match
-            $state = State::query()->where('name', 'LIKE', "%{$name}%")->first();
+            $state = State::query()
+                ->where('country_id', $this->country_id)
+                ->where('name', 'LIKE', "%{$name}%")
+                ->first();
             if ($state) {
                 return (int) $state->id;
             }
         }
 
-        // 3) fallback to first state in the user's country (if available)
-        if ($user?->country_id) {
-            $first = State::query()->where('country_id', $user->country_id)->orderBy('id')->value('id');
-            if ($first) {
-                return (int) $first;
-            }
-        }
-
-        // 4) final fallback: any first state available
-        $any = State::query()->orderBy('id')->value('id');
-        return $any ? (int) $any : null;
+        return null;
     }
 
-    /**
-     * @return array<string, list<string|ValidationRule>>
-     */
-    private function subscriptionSourceSubmitRules(): array
+    private function ensureStatesExistForCountry(?Country $country): void
     {
-        if ($this->subscription_source === self::SUBSCRIPTION_SOURCE_EXISTING) {
-            return [
-                'selected_subscription_id' => [
-                    'required',
-                    'integer',
-                    Rule::exists('subscriptions', 'id')->where(fn ($query) => $query->where('user_id', Auth::id())),
-                ],
-                'selected_subscription_plan_id' => ['nullable', 'integer', 'exists:subscription_plans,id'],
-            ];
+        if ($country && ! $country->states()->exists()) {
+            app(GeographyService::class)->fetchAndSaveStates($country);
         }
-
-        return [
-            'selected_subscription_plan_id' => ['required', 'integer', 'exists:subscription_plans,id'],
-            'selected_subscription_id' => ['nullable', 'integer'],
-        ];
     }
 
     private function persistPropertyWorkflow(string $mode): Property
@@ -629,31 +443,25 @@ class ListProperty extends Component
             if ($dynamicRules !== []) {
                 $this->validate($dynamicRules, [], $this->validationAttributes());
             }
-            if ($this->hasUnusedSubscriptions) {
-                $this->validate([
-                    'subscription_source' => ['required', 'string', Rule::in([self::SUBSCRIPTION_SOURCE_EXISTING, self::SUBSCRIPTION_SOURCE_PURCHASE])],
-                    ...$this->subscriptionSourceSubmitRules(),
-                ], [], $this->validationAttributes());
-            } else {
-                $this->validate([
-                    'selected_subscription_plan_id' => ['required', 'integer', 'exists:subscription_plans,id'],
-                ], [], $this->validationAttributes());
-            }
         } else {
             $this->validate([
                 'title' => ['nullable', 'string', 'max:255'],
                 'listing_category_id' => ['nullable', 'exists:categories,id'],
+                'country_id' => ['nullable', 'integer', 'exists:countries,id'],
+                'state_id' => [
+                    'nullable',
+                    'integer',
+                    Rule::exists('states', 'id')->where('country_id', $this->country_id),
+                ],
                 'cost' => ['nullable', 'numeric', 'min:0'],
             ]);
         }
 
-        $this->latestPendingPaymentId = null;
-        $requiresPayment = $mode === 'submit' ? $this->requiresPayment() : false;
         $targetStatus = $mode === 'draft'
             ? 0
-            : ($requiresPayment ? 0 : 1);
+            : 1;
 
-        return DB::transaction(function () use ($mode, $requiresPayment, $targetStatus): Property {
+        return DB::transaction(function () use ($mode, $targetStatus): Property {
             /** @var User $user */
             $user = Auth::user();
 
@@ -664,7 +472,7 @@ class ListProperty extends Component
                 'cost' => (float) ($this->cost ?? 0),
                 'category_id' => $this->listing_category_id,
                 'location' => trim($this->address.' '.$this->neighborhood),
-                'country_id' => $user->country_id,
+                'country_id' => $this->country_id,
                 'state_id' => $this->state_id,
                 'city' => $this->city,
                 'neighborhood' => $this->neighborhood !== '' ? $this->neighborhood : null,
@@ -683,35 +491,6 @@ class ListProperty extends Component
                 $this->persistMedia($property);
             }
 
-            if ($mode === 'submit') {
-                $subscriptionForListing = $this->resolveOrCreateSubscriptionForListing($requiresPayment);
-                if ($subscriptionForListing) {
-                    SubscribedProperty::query()->firstOrCreate([
-                        'property_id' => $property->id,
-                        'subscription_id' => $subscriptionForListing->id,
-                    ]);
-                }
-
-                    if ($requiresPayment && $this->activeCurrency && $this->totalAmount() > 0 && $subscriptionForListing) {
-                        $payment = Payment::query()->create([
-                            'user_id' => $user->id,
-                            'currency_id' => $this->activeCurrency->id,
-                            'paymentable_id' => $subscriptionForListing->id,
-                            'paymentable_type' => Subscription::class,
-                            'reference' => 'LIST-'.Str::upper(Str::random(12)),
-                            'request_id' => null,
-                            'amount' => $this->subtotalAmount(),
-                            'vat_rate' => $this->vatRate(),
-                            'vat_value' => $this->vatAmount(),
-                            'total' => $this->totalAmount(),
-                            'method' => null,
-                            'status' => 'pending',
-                        ]);
-
-                        $this->latestPendingPaymentId = $payment->id;
-                    }
-                }
-
             return $property;
         });
     }
@@ -719,17 +498,15 @@ class ListProperty extends Component
     public function render(): View
     {
         $states = State::query()
-            ->where('is_active', true)
-            ->orderBy('name', 'asc')
+            ->where('country_id', $this->country_id)
+            ->orderBy('name')
             ->get();
         $cities = Property::whereIn('state_id', $states->pluck('id'))->get()->pluck('city')->unique()->sort()->values();
         return view('livewire.seller.list-property', [
             'categories' => Category::query()->where('is_property', 1)->with('fields')->orderBy('name', 'asc')->get(),
+            'countries' => Country::query()->orderBy('name')->get(),
             'states' => $states,
             'cities' => $cities,
-            'subscriptionPlans' => SubscriptionPlan::query()->orderBy('name', 'asc')->get(),
-            'availableSubscriptions' => $this->availableSubscriptions,
-            'activeCurrency' => $this->activeCurrency,
         ]);
     }
 }

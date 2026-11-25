@@ -4,73 +4,58 @@ namespace App\Services\Pricing;
 
 use App\Models\Country;
 use App\Models\Currency;
-use App\Models\Price;
+use App\Models\PromotionPlan;
 use App\Models\User;
+use LogicException;
 
 class ResolvesPlanPrice
 {
     /**
-     * @return array{amount: float, currency_id: int|null, currency_code: string|null, currency_symbol: string|null}
+     * @return array{amount: float, country_id: int|null, currency_code: string, currency_name: string, currency_symbol: string|null, is_default: bool}
      */
-    public function forUser(string $priceableType, int $priceableId, User $user): array
+    public function forUser(PromotionPlan $plan, User $user): array
     {
-        $country = $user->country_id ? Country::query()->find($user->country_id) : null;
-        $currency = $this->resolveCurrency($country);
-
-        if (! $currency) {
-            return [
-                'amount' => 0.0,
-                'currency_id' => null,
-                'currency_code' => null,
-                'currency_symbol' => null,
-            ];
+        $country = $user->country;
+        if (! $country) {
+            $country = Country::query()
+                ->orderByDesc('is_default')
+                ->orderBy('name')
+                ->first();
         }
 
-        $amount = $this->resolveAmount($priceableType, $priceableId, $currency->id, $country?->id);
+        return $this->forCountry($plan, $country);
+    }
+
+    /**
+     * @return array{amount: float, country_id: int|null, currency_code: string, currency_name: string, currency_symbol: string|null, is_default: bool}
+     */
+    public function forCountry(PromotionPlan $plan, ?Country $country): array
+    {
+        $currencyCode = strtoupper(trim((string) $country?->currency_code));
+        $currencyId = $currencyCode !== ''
+            ? Currency::query()->where('currency_code', $currencyCode)->value('id')
+            : null;
+
+        $price = $currencyId
+            ? $plan->prices()->with('currency')->where('currency_id', $currencyId)->first()
+            : null;
+
+        $price ??= $plan->prices()
+            ->with('currency')
+            ->where('is_default', true)
+            ->first();
+
+        if (! $price || ! $price->currency) {
+            throw new LogicException("Promotion plan {$plan->id} must have a valid default price.");
+        }
 
         return [
-            'amount' => $amount,
-            'currency_id' => $currency->id,
-            'currency_code' => $currency->code,
-            'currency_symbol' => $currency->symbol,
+            'amount' => (float) $price->amount,
+            'country_id' => $country?->id,
+            'currency_code' => $price->currency->currency_code,
+            'currency_name' => $price->currency->currency_name,
+            'currency_symbol' => $price->currency->currency_symbol,
+            'is_default' => $price->is_default,
         ];
-    }
-
-    private function resolveCurrency(?Country $country): ?Currency
-    {
-        if ($country?->currency_id) {
-            return Currency::query()->find($country->currency_id);
-        }
-
-        return Currency::query()
-            ->where('is_active', true)
-            ->orderByDesc('is_default')
-            ->orderBy('code')
-            ->first();
-    }
-
-    private function resolveAmount(string $priceableType, int $priceableId, int $currencyId, ?int $countryId): float
-    {
-        if ($countryId) {
-            $countryAmount = Price::query()
-                ->where('priceable_type', $priceableType)
-                ->where('priceable_id', $priceableId)
-                ->where('currency_id', $currencyId)
-                ->where('country_id', $countryId)
-                ->value('amount');
-
-            if ($countryAmount !== null) {
-                return (float) $countryAmount;
-            }
-        }
-
-        $globalAmount = Price::query()
-            ->where('priceable_type', $priceableType)
-            ->where('priceable_id', $priceableId)
-            ->where('currency_id', $currencyId)
-            ->whereNull('country_id')
-            ->value('amount');
-
-        return $globalAmount !== null ? (float) $globalAmount : 0.0;
     }
 }

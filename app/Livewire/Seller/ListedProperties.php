@@ -45,7 +45,7 @@ class ListedProperties extends Component
     public function render()
     {
         $query = Property::query()
-            ->with(['category', 'latestModeration', 'activeSubscribedPropertyLink'])
+            ->with(['category', 'latestModeration'])
             ->where('user_id', Auth::id());
 
         // Search filter

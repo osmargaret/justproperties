@@ -17,7 +17,7 @@
                     <th class="px-4 py-3">Name</th>
                     <th class="px-4 py-3">Type</th>
                     <th class="px-4 py-3">Features</th>
-                    <th class="px-4 py-3">Default prices</th>
+                    <th class="px-4 py-3">Prices by currency</th>
                     <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
@@ -45,7 +45,10 @@
                         </td>
                         <td class="px-4 py-3 text-xs text-gray-600">
                             @foreach ($plan->prices as $p)
-                                <div>{{ $p->currency?->code }} {{ $p->amount }}</div>
+                                <div>
+                                    {{ $p->currency?->currency_code }} {{ $p->amount }}
+                                    @if ($p->is_default)<span class="font-semibold">(default)</span>@endif
+                                </div>
                             @endforeach
                             @if ($plan->prices->isEmpty()) — @endif
                         </td>
@@ -110,17 +113,29 @@
                     <!-- Prices Section -->
                     <div class="space-y-3 pb-4">
                         <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium text-gray-700">Default prices (global)</label>
+                            <label class="text-sm font-medium text-gray-700">Currency prices</label>
                             <button type="button" wire:click="addPriceRow" class="text-xs text-emerald-600 hover:underline">Add row</button>
                         </div>
+                        @if ($currencies->isEmpty())
+                            <p class="text-xs text-amber-700">
+                                Add a <a href="{{ route('admin.settings.promotion-currencies') }}" class="underline">promotion currency</a> before configuring plan prices.
+                            </p>
+                        @endif
                         @foreach ($priceRows as $i => $row)
                             <div class="mt-2 flex flex-wrap gap-2" wire:key="ppr-{{ $i }}">
                                 <select wire:model="priceRows.{{ $i }}.currency_id" class="rounded-lg border border-gray-200 px-2 py-1 text-sm">
-                                    @foreach ($currencies as $c)
-                                        <option value="{{ $c->id }}">{{ $c->code }}</option>
+                                    @foreach ($currencies as $currency)
+                                        <option value="{{ $currency->id }}">{{ $currency->currency_code }} — {{ $currency->currency_name }}</option>
                                     @endforeach
                                 </select>
+                                @error("priceRows.$i.currency_id") <p class="w-full text-xs text-red-600">{{ $message }}</p> @enderror
                                 <input type="text" wire:model="priceRows.{{ $i }}.amount" class="w-28 rounded-lg border border-gray-200 px-2 py-1 text-sm" />
+                                @error("priceRows.$i.amount") <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                                <label class="flex items-center gap-1 text-xs text-gray-600">
+                                    <input type="checkbox" wire:model="priceRows.{{ $i }}.is_default" />
+                                    Default
+                                </label>
+                                @error("priceRows.$i.is_default") <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                                 <button type="button" wire:click="removePriceRow({{ $i }})" class="text-xs text-red-600 hover:underline">Remove</button>
                             </div>
                         @endforeach

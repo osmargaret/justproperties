@@ -61,6 +61,7 @@
                             </div>
                             <div class="mt-3 border-t border-gray-200 pt-3 text-sm font-semibold text-emerald-700">
                                 {{ $quote['currency_symbol'] ?? '₦' }}{{ number_format((float) ($quote['amount'] ?? 0), 2) }}
+                                <span class="text-xs">{{ $quote['currency_code'] ?? '' }}</span>
                             </div>
                         </button>
                     @empty
@@ -132,6 +133,7 @@
                                 <span class="text-gray-500">Subtotal</span>
                                 <span class="font-medium">
                                     {{ $this->selectedPromotionQuote['currency_symbol'] ?? '₦' }}{{ number_format((float) $this->selectedPromotionQuote['amount'], 2) }}
+                                    <span class="text-xs">{{ $this->selectedPromotionQuote['currency_code'] }}</span>
                                 </span>
                             </div>
                         @endif

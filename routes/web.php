@@ -16,27 +16,20 @@ use App\Livewire\Admin\AdminPayments;
 use App\Livewire\Admin\AdminPromotions;
 use App\Livewire\Admin\AdminProperties;
 use App\Livewire\Admin\AdminPropertyDetails;
-use App\Livewire\Admin\AdminSubscriptions;
 use App\Livewire\Admin\AdminUserDetails;
 use App\Livewire\Admin\AdminUsers;
 use App\Livewire\Admin\Settings\AdminCategories;
 use App\Livewire\Admin\Settings\AdminCountries;
-use App\Livewire\Admin\Settings\AdminCurrencies;
 use App\Livewire\Admin\Settings\AdminGeneral;
+use App\Livewire\Admin\Settings\AdminAdvertisementSettings;
+use App\Livewire\Admin\Settings\AdminCurrencies;
 use App\Livewire\Admin\Settings\AdminPromotionPlans;
 use App\Livewire\Admin\Settings\AdminRolesPermissions;
 use App\Livewire\Admin\Settings\AdminStaff;
-use App\Livewire\Admin\Settings\AdminSubscriptionPlans;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\SwitchActiveRole;
-use App\Livewire\Buyer\BlogSubscriptions;
-use App\Livewire\Buyer\BuyerDashboard;
-use App\Livewire\Buyer\Favourites;
 use App\Livewire\Buyer\Profile;
-use App\Livewire\Buyer\PropertyAlerts;
-use App\Livewire\Buyer\SavedBlogPosts;
-use App\Livewire\Buyer\Security;
 use App\Livewire\Guest\About;
 use App\Livewire\Guest\Advertise;
 use App\Livewire\Guest\BlogPost;
@@ -53,16 +46,18 @@ use App\Livewire\Guest\ShortLet;
 use App\Livewire\Guest\TermsOfService;
 use App\Livewire\Guest\UncompletedProperty;
 use App\Livewire\Guest\Welcome;
+use App\Livewire\Member\Bookmarks;
+use App\Livewire\Member\Dashboard as MemberDashboard;
+use App\Livewire\Member\Notifications as MemberNotifications;
+use App\Livewire\Member\Promotions as MemberPromotions;
 use App\Livewire\Seller\Checkout as SellerCheckout;
 use App\Livewire\Seller\Documents;
 use App\Livewire\Seller\ListedProperties;
 use App\Livewire\Seller\ListProperty;
 use App\Livewire\Seller\PaymentCallback;
 use App\Livewire\Seller\PropertyDetails as SellerPropertyDetails;
-use App\Livewire\Seller\SellerDashboard;
-use App\Livewire\Seller\Subscriptions;
-use App\Livewire\Seller\Transactions;
 use Illuminate\Support\Facades\Route;
+use Ixudra\Curl\Facades\Curl;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', Welcome::class)->name('welcome');
@@ -106,7 +101,6 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('moderations', AdminModerations::class)->name('moderations');
         Route::get('users', AdminUsers::class)->name('users');
         Route::get('users/{user}', AdminUserDetails::class)->whereNumber('user')->name('users.show');
-        Route::get('subscriptions', AdminSubscriptions::class)->name('subscriptions');
         Route::get('promotions', AdminPromotions::class)->name('promotions');
         Route::get('properties', AdminProperties::class)->name('properties');
         Route::get('properties/{property}', AdminPropertyDetails::class)->whereNumber('property')->name('properties.show');
@@ -123,40 +117,52 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('general', AdminGeneral::class)->name('general');
             Route::get('categories', AdminCategories::class)->name('categories');
-            Route::get('subscription-plans', AdminSubscriptionPlans::class)->name('subscription-plans');
+            Route::get('currencies', AdminCurrencies::class)->name('currencies');
+            Route::get('advertising', AdminAdvertisementSettings::class)->name('advertising');
             Route::get('promotion-plans', AdminPromotionPlans::class)->name('promotion-plans');
             Route::get('staff', AdminStaff::class)->name('staff');
             Route::get('roles', AdminRolesPermissions::class)->name('roles');
-            Route::get('currencies', AdminCurrencies::class)->name('currencies');
             Route::get('countries', AdminCountries::class)->name('countries');
 
         });
     });
 
-    Route::middleware(['role.selected'])->prefix('seller')->name('seller.')->group(function () {
-        Route::get('dashboard', SellerDashboard::class)->name('dashboard');
+    Route::middleware(['role.selected'])->prefix('account')->name('account.')->group(function () {
+        Route::get('dashboard', MemberDashboard::class)->name('dashboard');
         Route::get('profile', Profile::class)->name('profile');
+        Route::get('bookmarks', Bookmarks::class)->name('bookmarks');
+        Route::get('notifications', MemberNotifications::class)->name('notifications');
+        Route::get('promotions', MemberPromotions::class)->name('promotions');
+    });
 
+    Route::middleware(['role.selected'])->prefix('seller')->name('seller.')->group(function () {
+        Route::get('dashboard', MemberDashboard::class)->name('dashboard');
+        Route::get('profile', Profile::class)->name('profile');
         Route::get('listed-properties', ListedProperties::class)->name('listed-properties');
         Route::get('properties/{property}', SellerPropertyDetails::class)->whereNumber('property')->name('properties.show');
         Route::get('checkout/{payment}', SellerCheckout::class)->whereNumber('payment')->name('checkout');
         Route::get('payment/callback', PaymentCallback::class)->name('payment.callback');
         Route::get('bulk-template', fn () => Excel::download(new PropertyBulkTemplateExport, 'property-listings-template.xlsx'))->name('bulk-template.download');
-        Route::get('transactions', Transactions::class)->name('transactions');
-        Route::get('subscriptions', Subscriptions::class)->name('subscriptions');
         Route::get('documents', Documents::class)->name('documents');
-
     });
 
     Route::middleware(['role.selected'])->prefix('buyer')->name('buyer.')->group(function () {
-        Route::get('dashboard', BuyerDashboard::class)->name('dashboard');
+        Route::get('dashboard', MemberDashboard::class)->name('dashboard');
         Route::get('profile', Profile::class)->name('profile');
-        Route::get('security', Security::class)->name('security');
-        Route::get('favourites', Favourites::class)->name('favourites');
-        Route::get('property-alerts', PropertyAlerts::class)->name('property-alerts');
-        Route::get('saved-blog-posts', SavedBlogPosts::class)->name('saved-blog-posts');
-        Route::get('blog-subscriptions', BlogSubscriptions::class)->name('blog-subscriptions');
+        Route::get('favourites', fn () => redirect()->route('account.bookmarks'))->name('favourites');
+        Route::get('security', fn () => redirect()->route('account.profile', ['tab' => 'security']))->name('security');
+        Route::get('property-alerts', fn () => redirect()->route('account.profile', ['tab' => 'notifications']))->name('property-alerts');
+        Route::get('blog-subscriptions', fn () => redirect()->route('account.profile', ['tab' => 'notifications']))->name('blog-subscriptions');
+        Route::get('saved-blog-posts', fn () => redirect()->route('account.dashboard'))->name('saved-blog-posts');
     });
+
+    Route::middleware(['role.selected'])->prefix('seller')->name('seller.')->group(function () {
+        Route::get('subscriptions', fn () => redirect()->route('account.promotions'))->name('subscriptions');
+        Route::get('transactions', fn () => redirect()->route('account.promotions'))->name('transactions');
+    });
+
+    Route::post('properties/{property}/bookmark', \App\Http\Controllers\TogglePropertyBookmark::class)
+        ->name('properties.bookmark.toggle');
 });
 
 require __DIR__.'/settings.php';
@@ -167,5 +173,20 @@ Route::get('/property-hero-preview', function () {
 })->name('property.hero.preview');
 
 Route::get('/advertise/rate-card', function () {
-    return view('guest.advertise-rate-card-pdf');
+    return view('guest.advertise-rate-card-pdf', [
+        'advertisementPlans' => \App\Models\AdvertisementPlan::query()
+            ->with(['spaces', 'prices.currency'])
+            ->where('is_active', true)
+            ->whereHas('prices')
+            ->orderBy('name')
+            ->get(),
+    ]);
 })->name('advertise.rate-card');
+
+Route::get('fetchstate',function(){
+    $response = Curl::to('https://api.countrystatecity.in/v1/countries/NG/states')
+                ->withHeaders(['X-CSCAPI-KEY' => config('services.countrystatecity', '')])
+                ->asJson()
+                ->get();
+    dd($response);
+});

@@ -3,6 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Advertisement;
+use App\Models\AdvertisementPlan;
+use App\Models\Currency;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -12,7 +15,7 @@ class AdminAdvertisements extends Component
     use WithPagination, WithFileUploads;
 
     public string $search = '';
-    public string $placementFilter = '';
+    public string $planFilter = '';
     public string $statusFilter = '';
 
     public ?int $selectedAdId = null;
@@ -21,8 +24,8 @@ class AdminAdvertisements extends Component
     public bool $showCreateModal = false;
     public string $new_company = '';
     public string $new_email = '';
-    public string $new_placement = 'homepage_banner';
-    public string $new_amount = '';
+    public int|string $new_plan_id = '';
+    public int|string $new_currency_id = '';
     public string $new_description = '';
     public string $new_start_date = '';
     public string $new_end_date = '';
@@ -36,10 +39,11 @@ class AdminAdvertisements extends Component
     public function openCreateAd(): void
     {
         $this->reset([
-            'new_company', 'new_email', 'new_amount', 'new_description',
+            'new_company', 'new_email', 'new_description',
             'new_start_date', 'new_end_date', 'new_image'
         ]);
-        $this->new_placement = 'homepage_banner';
+        $this->new_plan_id = '';
+        $this->new_currency_id = '';
         $this->new_payment_status = 'completed';
         $this->showCreateModal = true;
         $this->resetErrorBag();
@@ -55,8 +59,13 @@ class AdminAdvertisements extends Component
         $this->validate([
             'new_company' => ['required', 'string', 'max:255'],
             'new_email' => ['required', 'email', 'max:255'],
-            'new_placement' => ['required', 'in:homepage_banner,blog_sidebar,blog_post'],
-            'new_amount' => ['required', 'numeric', 'min:0'],
+            'new_plan_id' => ['required', 'integer', Rule::exists('advertisement_plans', 'id')->where('is_active', true)],
+            'new_currency_id' => [
+                'required',
+                'integer',
+                Rule::exists('advertisement_plan_prices', 'currency_id')
+                    ->where('advertisement_plan_id', $this->new_plan_id),
+            ],
             'new_description' => ['nullable', 'string'],
             'new_start_date' => ['nullable', 'date'],
             'new_end_date' => ['nullable', 'date', 'after_or_equal:new_start_date'],
@@ -64,13 +73,18 @@ class AdminAdvertisements extends Component
             'new_image' => ['required', 'image', 'max:2048'],
         ]);
 
+        $price = \App\Models\AdvertisementPlanPrice::query()
+            ->where('advertisement_plan_id', $this->new_plan_id)
+            ->where('currency_id', $this->new_currency_id)
+            ->firstOrFail();
         $imagePath = $this->new_image->store('advertisements', 'public');
 
         Advertisement::create([
             'company' => $this->new_company,
             'email' => $this->new_email,
-            'placement' => $this->new_placement,
-            'amount' => $this->new_amount,
+            'advertisement_plan_id' => $this->new_plan_id,
+            'currency_id' => $this->new_currency_id,
+            'amount' => $price->amount,
             'description' => $this->new_description,
             'start_date' => $this->new_start_date ?: null,
             'end_date' => $this->new_end_date ?: null,
@@ -85,7 +99,7 @@ class AdminAdvertisements extends Component
 
     public function showAd(int $id): void
     {
-        $ad = Advertisement::query()->findOrFail($id);
+        $ad = Advertisement::query()->with(['advertisementPlan.spaces', 'currency'])->findOrFail($id);
         $this->selectedAdId = $ad->id;
         $this->edit_start_date = $ad->start_date ? $ad->start_date->format('Y-m-d') : '';
         $this->edit_end_date = $ad->end_date ? $ad->end_date->format('Y-m-d') : '';
@@ -114,7 +128,7 @@ class AdminAdvertisements extends Component
             'edit_end_date' => ['required', 'date', 'after_or_equal:edit_start_date'],
         ]);
 
-        $ad = Advertisement::query()->findOrFail($this->selectedAdId);
+        $ad = Advertisement::query()->with(['advertisementPlan.spaces', 'currency'])->findOrFail($this->selectedAdId);
         $ad->start_date = $this->edit_start_date;
         $ad->end_date = $this->edit_end_date;
         $ad->save();
@@ -141,17 +155,32 @@ class AdminAdvertisements extends Component
                         ->orWhere('description', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->placementFilter !== '', fn ($query) => $query->where('placement', $this->placementFilter))
+            ->with(['advertisementPlan.spaces', 'currency'])
+            ->when($this->planFilter !== '', fn ($query) => $query->where('advertisement_plan_id', $this->planFilter))
             ->when($this->statusFilter !== '', fn ($query) => $query->where('payment_status', $this->statusFilter))
             ->latest()
             ->paginate(10);
 
-        $selectedAd = $this->selectedAdId ? Advertisement::query()->find($this->selectedAdId) : null;
+        $selectedAd = $this->selectedAdId
+            ? Advertisement::query()->with(['advertisementPlan.spaces', 'currency'])->find($this->selectedAdId)
+            : null;
 
         return view('livewire.admin.admin-advertisements', [
             'ads' => $ads,
             'selectedAd' => $selectedAd,
-            'placements' => ['homepage_banner', 'blog_sidebar', 'blog_post'],
+            'plans' => AdvertisementPlan::query()->where('is_active', true)->orderBy('name')->get(),
+            'currencies' => Currency::query()->orderBy('currency_code')->get(),
+            'prices' => $this->new_plan_id
+                ? \App\Models\AdvertisementPlanPrice::query()
+                    ->with('currency')
+                    ->where('advertisement_plan_id', $this->new_plan_id)
+                    ->get()
+                : collect(),
         ]);
+    }
+
+    public function updatedNewPlanId(): void
+    {
+        $this->new_currency_id = '';
     }
 }

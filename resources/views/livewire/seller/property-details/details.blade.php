@@ -1,5 +1,5 @@
 @php
-    $currencySymbol = $this->activeCurrency?->symbol ?? '₦';
+    $currencySymbol = $this->activeCurrency?->currency_symbol ?? '₦';
     $activeCategory = $categories->firstWhere('id', (int) $editCategoryId);
 @endphp
 
@@ -7,16 +7,6 @@
     <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
         <i class="ri-edit-line text-emerald-600"></i> Edit property details
     </h3>
-
-    @if ($this->activeSubscription)
-        <div class="mb-8 rounded-lg border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900">
-            <p class="font-medium">Subscription (read-only)</p>
-            <p class="mt-1 text-emerald-800">
-                {{ $this->activeSubscription->plan?->name ?? 'Plan' }}
-                — active until {{ $this->activeSubscription->end_at?->format('M d, Y') ?? 'N/A' }}
-            </p>
-        </div>
-    @endif
 
     <form wire:submit="updateProperty" class="space-y-8">
         <div>

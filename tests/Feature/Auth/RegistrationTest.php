@@ -22,8 +22,7 @@ class RegistrationTest extends TestCase
                 'slug' => 'nigeria',
                 'flag' => '🇳🇬',
                 'phone_code' => '+234',
-                'language_code' => 'en',
-                'is_active' => true,
+                'language_code' => 'en'
             ]
         );
     }

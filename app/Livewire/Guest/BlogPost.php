@@ -6,6 +6,7 @@ use App\Models\BlogSubscription;
 use App\Models\Post;
 use App\Models\PostComment;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -27,6 +28,13 @@ class BlogPost extends Component
         $post->load(['category', 'user', 'media']);
 
         $this->post = $post;
+        if (Auth::check()) {
+            $post->viewedByUsers()->updateOrCreate(
+                ['user_id' => Auth::id()],
+                []
+            );
+        }
+
         $this->relatedPosts = Post::query()
             ->with(['media', 'category'])
             ->where('status', 'published')

@@ -18,9 +18,6 @@
         <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') || request()->routeIs('admin.users.show') ? $navActive : $navIdle }}">
             <i class="ri-team-line text-xl"></i><span class="font-medium">Users</span>
         </a>
-        <a href="{{ route('admin.subscriptions') }}" class="{{ request()->routeIs('admin.subscriptions') ? $navActive : $navIdle }}">
-            <i class="ri-vip-crown-line text-xl"></i><span class="font-medium">Subscriptions</span>
-        </a>
         <a href="{{ route('admin.promotions') }}" class="{{ request()->routeIs('admin.promotions') ? $navActive : $navIdle }}">
             <i class="ri-megaphone-line text-xl"></i><span class="font-medium">Promotions</span>
         </a>
@@ -52,11 +49,11 @@
             <div class="pb-1">
                 <a href="{{ route('admin.settings.general') }}" class="{{ request()->routeIs('admin.settings.general') ? $subNavActive : $subNav }}">General</a>
                 <a href="{{ route('admin.settings.categories') }}" class="{{ request()->routeIs('admin.settings.categories') ? $subNavActive : $subNav }}">Categories</a>
-                <a href="{{ route('admin.settings.subscription-plans') }}" class="{{ request()->routeIs('admin.settings.subscription-plans') ? $subNavActive : $subNav }}">Subscription Plans</a>
+                <a href="{{ route('admin.settings.currencies') }}" class="{{ request()->routeIs('admin.settings.currencies') ? $subNavActive : $subNav }}">Currencies</a>
+                <a href="{{ route('admin.settings.advertising') }}" class="{{ request()->routeIs('admin.settings.advertising') ? $subNavActive : $subNav }}">Advertising Plans</a>
                 <a href="{{ route('admin.settings.promotion-plans') }}" class="{{ request()->routeIs('admin.settings.promotion-plans') ? $subNavActive : $subNav }}">Promotion Plans</a>
                 <a href="{{ route('admin.settings.roles') }}" class="{{ request()->routeIs('admin.settings.roles') ? $subNavActive : $subNav }}">Roles &amp; Permissions</a>
                 <a href="{{ route('admin.settings.staff') }}" class="{{ request()->routeIs('admin.settings.staff') ? $subNavActive : $subNav }}">Staff</a>
-                <a href="{{ route('admin.settings.currencies') }}" class="{{ request()->routeIs('admin.settings.currencies') ? $subNavActive : $subNav }}">Currencies</a>
                 <a href="{{ route('admin.settings.countries') }}" class="{{ request()->routeIs('admin.settings.countries*') ? $subNavActive : $subNav }}">Countries</a>
             </div>
         </details>

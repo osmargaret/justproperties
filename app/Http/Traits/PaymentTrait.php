@@ -106,7 +106,7 @@ trait PaymentTrait
     protected function verifyPayment(Payment $payment): ?array
     {
         
-        $gateway= $payment->gateway ?: $payment->currency?->payment_gateway;
+        $gateway = $payment->gateway ?: $payment->currency?->payment_gateway;
         return match ($gateway) {
             'paystack' => $this->verifyPaystack($payment),
             'flutterwave' => $this->verifyFlutterwave($payment ),

@@ -1,13 +1,17 @@
-
-Advertisement PDF ad areas pricing
-Property moderation
-Test coupon with buying subscription & promotion
-Test Promotions
-Test Notifications 
-Test Property Alerts
-Saved Properties
-Saved Blogpost
-Saved Subscriptions
-Buyer side 
-
-   
+Pages and Menus edit requirement: 
+1. We will no longer have a buyer and seller side, so we don't need 
+two different dashboards anymore.
+2. Dashboard - mix seller and buyer dashboard content into one
+add blog post you viewed, add properties you posted recently
+3. Mix the menus into one, but make the following changes:  
+Saved Properties: Change to Bookmark
+Saved Blog Post - remove this menu and page because users cannot save posts, but we will record posts that have been viewed
+Property Alerts - remove this menu and page, since the alerts goes to email & notification, 
+Notifications: Add this menu and page, show property alerts and blog newsletter in the page
+Blog Subscriptions - remove this menu and page. we will convert this to subscription config for property alerts and for blog subscription
+Subscriptions - remove this menu, page and logic completely. users will no longer need to subscribe to list properties. 
+            we will remove the logic from many other pages such as listing page, admin page
+Transactions - remove this menu and page.
+Promotions - Add this menu and page. Users now pay only for promotions
+Security - remove menu and move page content into profile page
+Profile - Add security tab to this page | add Notification config here to configure property alerts and blog subscriptions
